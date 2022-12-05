@@ -4,12 +4,13 @@ val postgresqlVersion: String by project
 val exposedVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.5.10"
     application
+    kotlin("jvm") version "1.7.20"
     id("io.ktor.plugin") version "2.1.3"
+
 }
 
-group = "me.hannes"
+group = "app.holybook"
 version = "1.0-SNAPSHOT"
 
 
@@ -44,6 +45,6 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClass.set("ServerKt")
+    mainClass.set("app.holybook.ApplicationKt")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }

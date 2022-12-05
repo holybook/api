@@ -1,4 +1,4 @@
-package models
+package app.holybook.models
 
 import org.jetbrains.exposed.sql.Table
 

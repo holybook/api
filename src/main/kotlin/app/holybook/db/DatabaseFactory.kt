@@ -1,7 +1,7 @@
-package db
+package app.holybook.db
 
 import io.ktor.server.config.*
-import models.Books
+import app.holybook.models.Books
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
