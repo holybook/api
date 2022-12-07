@@ -1,13 +1,17 @@
 package app.holybook.plugins
 
 import app.holybook.models.Books
-import kotlinx.serialization.Serializable
+import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.html.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.configureBooks() {
@@ -20,6 +24,45 @@ fun Routing.configureBooks() {
         }
         call.respond(CreateBookResponse(id.value))
     }
+
+    get("/book") {
+        val books = transaction {
+            Books.selectAll().map {
+                Book(it[Books.id].value, it[Books.title])
+            }
+        }
+        call.respond(books)
+    }
+
+    get("/book/{id}") {
+        val id = call.parameters["id"]?.toInt()
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
+        }
+        val book = transaction {
+            Books.select { Books.id eq id }.map {
+                Book(it[Books.id].value, it[Books.title])
+            }.firstOrNull()
+        }
+        if (book == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+        call.respond(book)
+    }
+
+    delete("/book/{id}") {
+        val id = call.parameters["id"]?.toInt()
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@delete
+        }
+        val numItemsDeleted = transaction {
+            Books.deleteWhere { Books.id eq id }
+        }
+        call.respond(DeleteBookResponse(numItemsDeleted))
+    }
 }
 
 @Serializable
@@ -27,3 +70,9 @@ data class CreateBookRequest(val title: String)
 
 @Serializable
 data class CreateBookResponse(val id: Int)
+
+@Serializable
+data class DeleteBookResponse(val numItemsDeleted: Int)
+
+@Serializable
+data class Book(val id: Int, val title: String)
