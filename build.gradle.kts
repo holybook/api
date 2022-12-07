@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val ktorVersion: String by project
 val postgresqlVersion: String by project
 val exposedVersion: String by project
 
@@ -7,7 +8,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.20"
     id("io.ktor.plugin") version "2.1.3"
-
+    kotlin("plugin.serialization") version "1.7.20"
 }
 
 group = "app.holybook"
@@ -20,12 +21,16 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-status-pages:2.1.3")
-    implementation("io.ktor:ktor-server-call-logging:2.1.3")
-    implementation("io.ktor:ktor-server-netty-jvm:2.1.3")
-    implementation("io.ktor:ktor-server-html-builder-jvm:2.1.3")
-    implementation("io.ktor:ktor-client-jvm:2.1.3")
-    implementation("io.ktor:ktor-client-cio-jvm:2.1.3")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-html-builder-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging-jvm:2.1.3")
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
     implementation("org.slf4j:slf4j-api:1.7.32")
