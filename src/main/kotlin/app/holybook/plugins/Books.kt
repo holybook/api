@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.configureBooks() {
-    post("/book") {
+    post("/books") {
         val request = call.receive<CreateBookRequest>()
         val id = transaction {
             Books.insert {
@@ -25,7 +25,7 @@ fun Routing.configureBooks() {
         call.respond(CreateBookResponse(id.value))
     }
 
-    get("/book") {
+    get("/books") {
         val books = transaction {
             Books.selectAll().map {
                 Book(it[Books.id].value, it[Books.title])
@@ -34,7 +34,7 @@ fun Routing.configureBooks() {
         call.respond(books)
     }
 
-    get("/book/{id}") {
+    get("/books/{id}") {
         val id = call.parameters["id"]?.toInt()
         if (id == null) {
             call.respond(HttpStatusCode.BadRequest)
@@ -52,7 +52,7 @@ fun Routing.configureBooks() {
         call.respond(book)
     }
 
-    delete("/book/{id}") {
+    delete("/books/{id}") {
         val id = call.parameters["id"]?.toInt()
         if (id == null) {
             call.respond(HttpStatusCode.BadRequest)
