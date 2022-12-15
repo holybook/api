@@ -1,4 +1,4 @@
-package app.holybook.plugins
+package app.holybook.plugins.importers
 
 interface ParagraphParser {
 

@@ -1,4 +1,4 @@
-package app.holybook.plugins
+package app.holybook.plugins.importers
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
