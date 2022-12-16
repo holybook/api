@@ -20,6 +20,7 @@ class XmlParser : ParagraphParser {
                 }
             }
         }
+        return listOf()
     }
 
 
