@@ -1,7 +1,7 @@
-package app.holybook
+package app.holybook.api
 
-import app.holybook.db.DatabaseFactory
-import app.holybook.plugins.configureRouting
+import app.holybook.api.db.DatabaseFactory
+import app.holybook.api.plugins.configureRouting
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

@@ -1,7 +1,7 @@
-package app.holybook.plugins
+package app.holybook.api.plugins
 
-import app.holybook.models.Paragraphs
-import app.holybook.plugins.importers.PdfParser
+import app.holybook.api.models.Paragraphs
+import app.holybook.api.plugins.importers.PdfParser
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

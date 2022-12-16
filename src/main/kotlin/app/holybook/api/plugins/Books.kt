@@ -1,6 +1,6 @@
-package app.holybook.plugins
+package app.holybook.api.plugins
 
-import app.holybook.models.Books
+import app.holybook.api.models.Books
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

@@ -1,4 +1,4 @@
-package app.holybook.plugins
+package app.holybook.api.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*
