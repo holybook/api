@@ -1,7 +1,7 @@
 package app.holybook.api.plugins
 
 import app.holybook.api.models.Paragraphs
-import app.holybook.api.plugins.importers.PdfParser
+import app.holybook.tools.importers.PdfParser
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -17,15 +17,9 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
-val client = HttpClient()
-
 fun Routing.configureParagraphs() {
     get("books/{id}/paragraphs") {
         getParagraphs()
-    }
-
-    post("books/{id}/paragraphs") {
-        postParagraphs()
     }
 }
 
@@ -55,46 +49,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.getParagraphs() {
         }
     }
     call.respond(paragraphs)
-}
-
-suspend fun PipelineContext<Unit, ApplicationCall>.postParagraphs() {
-    val content = call.receive<BookContent>()
-    val paragraphContent = client.get(content.sourceUrl)
-    val contentType = paragraphContent.contentType()
-
-    val paragraphs = parseParagraphs(contentType, paragraphContent.body())
-    if (paragraphs != null) {
-        transaction {
-            paragraphs.forEachIndexed { i, paragraph ->
-                Paragraphs.insert {
-                    it[bookId] = call.parameters["id"]?.toInt()!!
-                    it[index] = i
-                    it[language] = content.language
-                    it[text] = paragraph
-                }
-            }
-        }
-        call.respond(
-            HttpStatusCode.OK,
-            AddParagraphsResponse(paragraphsAdded = paragraphs.size)
-        )
-    } else {
-        call.respond(HttpStatusCode.NotImplemented)
-    }
-}
-
-val parsers = listOf(PdfParser())
-
-fun parseParagraphs(
-    contentType: ContentType?, content: ByteArray
-): List<String>? {
-    for (parser in parsers) {
-        if (contentType?.match(parser.contentType) == true) {
-            return parser.parse(content)
-        }
-    }
-
-    return null
 }
 
 @Serializable

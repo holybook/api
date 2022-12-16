@@ -1,4 +1,4 @@
-package app.holybook.api.plugins.importers
+package app.holybook.tools.importers
 
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
 import com.gitlab.mvysny.konsumexml.konsumeXml
