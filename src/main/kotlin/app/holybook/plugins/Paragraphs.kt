@@ -62,16 +62,10 @@ suspend fun PipelineContext<Unit, ApplicationCall>.postParagraphs() {
     val paragraphContent = client.get(content.sourceUrl)
     val contentType = paragraphContent.contentType()
 
-    val skipStart = call.request.queryParameters["skipStart"]?.toInt() ?: 0
-    val skipEnd = call.request.queryParameters["skipStart"]?.toInt() ?: 0
-
     val paragraphs = parseParagraphs(contentType, paragraphContent.body())
     if (paragraphs != null) {
-        val filteredParagraphs = paragraphs.subList(
-            fromIndex = skipStart, toIndex = paragraphs.size - skipEnd
-        )
         transaction {
-            filteredParagraphs.forEachIndexed { i, paragraph ->
+            paragraphs.forEachIndexed { i, paragraph ->
                 Paragraphs.insert {
                     it[bookId] = call.parameters["id"]?.toInt()!!
                     it[index] = i
@@ -82,7 +76,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.postParagraphs() {
         }
         call.respond(
             HttpStatusCode.OK,
-            AddParagraphsResponse(paragraphsAdded = filteredParagraphs.size)
+            AddParagraphsResponse(paragraphsAdded = paragraphs.size)
         )
     } else {
         call.respond(HttpStatusCode.NotImplemented)
