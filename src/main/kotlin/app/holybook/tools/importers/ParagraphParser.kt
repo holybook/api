@@ -1,9 +1,12 @@
 package app.holybook.tools.importers
 
+import app.holybook.tools.BookContent
+import io.ktor.http.*
+
 interface ParagraphParser {
 
-    val contentType: String
+    fun matches(contentType: ContentType?, url: String): Boolean
 
-    fun parse(content: ByteArray): List<String>
+    fun parse(content: ByteArray): BookContent
 
 }

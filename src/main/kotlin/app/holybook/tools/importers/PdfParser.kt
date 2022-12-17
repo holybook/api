@@ -1,13 +1,17 @@
 package app.holybook.tools.importers
 
+import app.holybook.tools.BookContent
+import app.holybook.tools.Paragraph
+import io.ktor.http.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 
 class PdfParser : ParagraphParser {
-    override val contentType: String
-        get() = "application/pdf"
+    override fun matches(contentType: ContentType?, url: String): Boolean {
+        return contentType?.match("application/pdf") == true
+    }
 
-    override fun parse(content: ByteArray): List<String> {
+    override fun parse(content: ByteArray): BookContent {
         val pdfDocument = PDDocument.load(content)
         val pdfTextStripper = PDFTextStripper()
         pdfTextStripper.paragraphStart = "/t"
@@ -19,7 +23,9 @@ class PdfParser : ParagraphParser {
                 it.value.replace(pdfTextStripper.paragraphStart, "")
             }
 
-        val paragraphs = text.split(pdfTextStripper.paragraphStart).map { it.trim() }.filter { it.isNotEmpty() }
+        val paragraphs =
+            text.split(pdfTextStripper.paragraphStart).map { it.trim() }
+                .filter { it.isNotEmpty() }
         val mergedParagraphs = mutableListOf<String>()
         var pendingParagraph = ""
         for (p in paragraphs) {
@@ -31,7 +37,10 @@ class PdfParser : ParagraphParser {
             }
         }
 
-        return mergedParagraphs
+        return BookContent(
+            title = "",
+            paragraphs = mergedParagraphs.map { Paragraph(it, "body") }
+        )
     }
 
     private fun String.endsWithStop(): Boolean {

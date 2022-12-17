@@ -7,6 +7,7 @@ object Paragraphs : Table() {
     val index = integer("index")
     val language = varchar("language", 3)
     val text = text("text")
+    val type = varchar("type", 64)
 
     override val primaryKey = PrimaryKey(bookId, index, language)
 }
