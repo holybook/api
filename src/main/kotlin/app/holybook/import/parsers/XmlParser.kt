@@ -1,6 +1,6 @@
-package app.holybook.tools.importers
+package app.holybook.import.parsers
 
-import app.holybook.tools.BookContent
+import app.holybook.import.BookContent
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
 import io.ktor.http.*

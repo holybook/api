@@ -4,6 +4,7 @@ val ktorVersion: String by project
 val postgresqlVersion: String by project
 val exposedVersion: String by project
 val h2Version: String by project
+val logbackVersion: String by project
 
 plugins {
     application
@@ -40,9 +41,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.apache.pdfbox:pdfbox:2.0.27")
     implementation("com.gitlab.mvysny.konsume-xml:konsume-xml:1.0")
     implementation("com.h2database:h2:$h2Version")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 }
 
 tasks.test {

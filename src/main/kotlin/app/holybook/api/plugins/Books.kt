@@ -15,20 +15,20 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.configureBooks() {
-    post("/books") {
-        val request = call.receive<CreateBookRequest>()
-        val id = transaction {
-            Books.insert {
-                it[title] = request.title
-            } get Books.id
-        }
-        call.respond(CreateBookResponse(id.value))
-    }
+//    post("/books") {
+//        val request = call.receive<CreateBookRequest>()
+//        val id = transaction {
+//            Books.insert {
+//                it[title] = request.title
+//            } get Books.id
+//        }
+//        call.respond(CreateBookResponse(id.value))
+//    }
 
     get("/books") {
         val books = transaction {
             Books.selectAll().map {
-                Book(it[Books.id].value, it[Books.title])
+                Book(it[Books.id].value, it[Books.author])
             }
         }
         call.respond(books)
@@ -42,7 +42,7 @@ fun Routing.configureBooks() {
         }
         val book = transaction {
             Books.select { Books.id eq id }.map {
-                Book(it[Books.id].value, it[Books.title])
+                Book(it[Books.id].value, it[Books.author])
             }.firstOrNull()
         }
         if (book == null) {
@@ -52,27 +52,27 @@ fun Routing.configureBooks() {
         call.respond(book)
     }
 
-    delete("/books/{id}") {
-        val id = call.parameters["id"]?.toInt()
-        if (id == null) {
-            call.respond(HttpStatusCode.BadRequest)
-            return@delete
-        }
-        val numItemsDeleted = transaction {
-            Books.deleteWhere { Books.id eq id }
-        }
-        call.respond(DeleteBookResponse(numItemsDeleted))
-    }
+//    delete("/books/{id}") {
+//        val id = call.parameters["id"]?.toInt()
+//        if (id == null) {
+//            call.respond(HttpStatusCode.BadRequest)
+//            return@delete
+//        }
+//        val numItemsDeleted = transaction {
+//            Books.deleteWhere { Books.id eq id }
+//        }
+//        call.respond(DeleteBookResponse(numItemsDeleted))
+//    }
 }
 
-@Serializable
-data class CreateBookRequest(val title: String)
+//@Serializable
+//data class CreateBookRequest(val title: String)
+//
+//@Serializable
+//data class CreateBookResponse(val id: Int)
+//
+//@Serializable
+//data class DeleteBookResponse(val numItemsDeleted: Int)
 
 @Serializable
-data class CreateBookResponse(val id: Int)
-
-@Serializable
-data class DeleteBookResponse(val numItemsDeleted: Int)
-
-@Serializable
-data class Book(val id: Int, val title: String)
+data class Book(val id: Int, val author: String)
