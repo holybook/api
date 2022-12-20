@@ -7,8 +7,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Routing.configureParagraphs() {
@@ -18,7 +20,7 @@ fun Routing.configureParagraphs() {
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.getParagraphs() {
-    val bookId = call.parameters["id"]?.toInt()
+    val bookId = call.parameters["id"]
 
     if (bookId == null) {
         call.respond(HttpStatusCode.NotFound)
@@ -29,16 +31,16 @@ suspend fun PipelineContext<Unit, ApplicationCall>.getParagraphs() {
     val endIndex = call.request.queryParameters["end"]?.toInt()
 
     val paragraphs = transaction {
-        Paragraphs.select {
-            var filter = Paragraphs.bookId eq bookId
-            if (startIndex != null) {
-                filter = filter and (Paragraphs.index greaterEq startIndex)
-            }
-            if (endIndex != null) {
-                filter = filter and (Paragraphs.index lessEq endIndex)
-            }
-            filter
-        }.orderBy(Paragraphs.index).map {
+        val query = Paragraphs.select {
+            Paragraphs.bookId eq bookId
+        }
+        if (startIndex != null) {
+            query.andWhere { Paragraphs.index greaterEq startIndex }
+        }
+        if (endIndex != null) {
+            query.andWhere { Paragraphs.index lessEq endIndex }
+        }
+        query.orderBy(Paragraphs.index).map {
             Paragraph(it[Paragraphs.index], it[Paragraphs.text])
         }
     }

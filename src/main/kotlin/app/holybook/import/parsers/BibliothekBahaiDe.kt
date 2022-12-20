@@ -5,6 +5,7 @@ import app.holybook.import.Paragraph
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
+import com.gitlab.mvysny.konsumexml.textRecursively
 import java.lang.AssertionError
 
 object BibliothekBahaiDe {
@@ -37,19 +38,18 @@ object BibliothekBahaiDe {
         children(Names.of("div", "par", "heading")) {
             when (localName) {
                 "div" -> processDiv(paragraphs)
-                "par" -> processPar("body", paragraphs)
-                "heading" -> processPar("header", paragraphs)
+                "par" -> processPar(paragraphs)
+                "heading" -> paragraphs.add(Paragraph(text(), "header"))
                 else -> throw AssertionError("error")
             }
         }
     }
 
     private fun Konsumer.processPar(
-        type: String,
         paragraphs: MutableList<Paragraph>
     ) {
-        allChildrenAutoIgnore(Names.of()) {}
-        paragraphs.add(Paragraph(text(), type))
+        childOrNull("address") { skipContents() }
+        paragraphs.add(Paragraph(text(), "body"))
     }
 
 }

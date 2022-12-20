@@ -35,7 +35,7 @@ fun Routing.configureBooks() {
     }
 
     get("/books/{id}") {
-        val id = call.parameters["id"]?.toInt()
+        val id = call.parameters["id"]
         if (id == null) {
             call.respond(HttpStatusCode.BadRequest)
             return@get
@@ -75,4 +75,4 @@ fun Routing.configureBooks() {
 //data class DeleteBookResponse(val numItemsDeleted: Int)
 
 @Serializable
-data class Book(val id: Int, val author: String)
+data class Book(val id: String, val author: String)

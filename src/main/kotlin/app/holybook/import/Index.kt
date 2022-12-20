@@ -14,10 +14,10 @@ suspend fun fetchAndImportIndex(log: Logger) {
     )
     index.forEach { bookInfo ->
         log.info("Importing from ${bookInfo.original.url}")
-        val id = fetchAndImportContent(existingBookId = null, bookInfo.original)
+        fetchAndImportContent(log, bookInfo.id, bookInfo.original)
         bookInfo.translations.forEach {
             log.info("Importing from ${it.url}")
-            fetchAndImportContent(id, it)
+            fetchAndImportContent(log, bookInfo.id, it)
         }
     }
 }
@@ -27,6 +27,7 @@ data class Index(val bookInfos: List<BookInfo>)
 
 @Serializable
 data class BookInfo(
+    val id: String,
     val original: ContentInfo,
     val translations: List<ContentInfo>
 )

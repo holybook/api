@@ -5,7 +5,7 @@ import io.ktor.http.*
 
 interface ParagraphParser {
 
-    fun matches(contentType: ContentType?, url: String): Boolean
+    fun matches(contentType: ContentType?, url: Url): Boolean
 
     fun parse(content: ByteArray): BookContent
 

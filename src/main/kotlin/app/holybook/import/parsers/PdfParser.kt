@@ -7,7 +7,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 
 class PdfParser : ParagraphParser {
-    override fun matches(contentType: ContentType?, url: String): Boolean {
+    override fun matches(contentType: ContentType?, url: Url): Boolean {
         return contentType?.match("application/pdf") == true
     }
 
