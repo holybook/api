@@ -7,7 +7,7 @@ object Translations : Table() {
     val bookId = reference("book", Books)
     val language = varchar("language", 3)
     val title = varchar("title", 512)
-    val lastModified = datetime("last_modified").nullable()
+    val lastModified = datetime("last_modified")
 
     override val primaryKey = PrimaryKey(bookId, language)
 }
