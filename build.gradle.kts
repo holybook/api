@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion: String by project
 val postgresqlVersion: String by project
+val hikariVersion: String by project
 val exposedVersion: String by project
 val h2Version: String by project
 val logbackVersion: String by project
@@ -20,6 +21,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     jcenter()
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -39,6 +41,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("org.slf4j:slf4j-simple:1.7.32")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
+    implementation ("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -47,6 +50,7 @@ dependencies {
     implementation("com.gitlab.mvysny.konsume-xml:konsume-xml:1.0")
     implementation("com.h2database:h2:$h2Version")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("com.github.Benjozork:exposed-postgres-extensions:master-SNAPSHOT")
 }
 
 tasks.test {

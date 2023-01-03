@@ -1,6 +1,6 @@
 package app.holybook.api
 
-import app.holybook.api.db.DatabaseFactory
+import app.holybook.api.db.Database
 import app.holybook.api.plugins.configureRouting
 import app.holybook.import.fetchAndImportIndex
 import io.ktor.http.*
@@ -18,7 +18,7 @@ fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
     System.err.println(environment.config.keys())
-    DatabaseFactory.init(environment.config)
+    Database.init(environment.config, log)
     launch {
         fetchAndImportIndex(log)
     }
