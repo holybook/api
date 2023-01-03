@@ -3,6 +3,7 @@ package app.holybook.api.plugins
 import app.holybook.api.models.Books
 import app.holybook.api.models.Books.author
 import app.holybook.api.models.Paragraphs
+import app.holybook.api.models.Translations
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -16,7 +17,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun Routing.configureBooks() {
 
   get("/books") {
-    val books = transaction { Books.selectAll().map { Book(it[Books.id].value, it[author], null) } }
+    val books = transaction {
+      Books.selectAll().map { Book(it[Books.id].value, it[author], null, listOf()) }
+    }
     call.respond(books)
   }
 
@@ -40,8 +43,21 @@ fun Routing.configureBooks() {
           ?.get(Paragraphs.bookId.count())
           ?: 0
     }
-    call.respond(Book(id, bookRow[author], paragraphCount))
+
+    val translations = transaction {
+      Translations.select { Translations.bookId eq id }
+          .map { Translation(it[Translations.language], it[Translations.title]) }
+    }
+    call.respond(Book(id, bookRow[author], paragraphCount, translations))
   }
 }
 
-@Serializable data class Book(val id: String, val author: String, val paragraphCount: Long?)
+@Serializable
+data class Book(
+    val id: String,
+    val author: String,
+    val paragraphCount: Long?,
+    val translations: List<Translation>
+)
+
+@Serializable data class Translation(val language: String, val title: String)
