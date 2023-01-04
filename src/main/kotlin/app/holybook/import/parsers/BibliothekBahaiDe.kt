@@ -1,7 +1,7 @@
 package app.holybook.import.parsers
 
+import app.holybook.api.models.Paragraph
 import app.holybook.import.BookContent
-import app.holybook.import.Paragraph
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
@@ -39,7 +39,7 @@ object BibliothekBahaiDe {
             when (localName) {
                 "div" -> processDiv(paragraphs)
                 "par" -> processPar(paragraphs)
-                "heading" -> paragraphs.add(Paragraph(text(), "header"))
+                "heading" -> paragraphs.add(Paragraph(paragraphs.size, text(), "header"))
                 else -> throw AssertionError("error")
             }
         }
@@ -49,7 +49,7 @@ object BibliothekBahaiDe {
         paragraphs: MutableList<Paragraph>
     ) {
         childOrNull("address") { skipContents() }
-        paragraphs.add(Paragraph(text(), "body"))
+        paragraphs.add(Paragraph(paragraphs.size, text(), "body"))
     }
 
 }

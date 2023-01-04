@@ -17,18 +17,19 @@ object Database {
     dataSource.username = "server"
   }
 
-  fun getConnection() = dataSource.connection
-
-  fun transaction(body: (Connection) -> Unit) {
-    val connection = getConnection()
-    try {
+  fun <R> transaction(body: Connection.() -> R): R {
+    val connection = dataSource.connection
+    return try {
       connection.autoCommit = false
-      body(connection)
+      val result = connection.body()
       connection.commit()
-      connection.autoCommit = true
+      result
     } catch (e: SQLException) {
       log?.error("transaction failed", e)
       connection.rollback()
+      throw e
+    } finally {
+      connection.close()
     }
   }
 }

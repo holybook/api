@@ -1,7 +1,7 @@
 package app.holybook.import.parsers
 
+import app.holybook.api.models.Paragraph
 import app.holybook.import.BookContent
-import app.holybook.import.Paragraph
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
@@ -37,6 +37,7 @@ object ReferenceLibrary {
                                 children("p") {
                                     paragraphs.add(
                                         Paragraph(
+                                            paragraphs.size,
                                             textRecursively(),
                                             "body"
                                         )
