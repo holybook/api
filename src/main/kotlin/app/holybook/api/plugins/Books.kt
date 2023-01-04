@@ -32,33 +32,52 @@ fun Routing.configureBooks() {
     call.respond(books)
   }
 
-  // get("/books/{id}") {
-  //   val id = call.parameters["id"]
-  //   if (id == null) {
-  //     call.respond(HttpStatusCode.BadRequest)
-  //     return@get
-  //   }
-  //   val bookRow = transaction { Books.select { Books.id eq id }.firstOrNull() }
-  //   if (bookRow == null) {
-  //     call.respond(HttpStatusCode.NotFound)
-  //     return@get
-  //   }
-  //
-  //   val paragraphCount = transaction {
-  //     Paragraphs.slice(Paragraphs.bookId.count(), Paragraphs.language)
-  //       .select { Paragraphs.bookId eq id }
-  //       .groupBy(Paragraphs.language)
-  //       .firstOrNull()
-  //       ?.get(Paragraphs.bookId.count())
-  //       ?: 0
-  //   }
-  //
-  //   val translations = transaction {
-  //     Translations.select { Translations.bookId eq id }
-  //       .map { Translation(it[Translations.language], it[Translations.title]) }
-  //   }
-  //   call.respond(Book(id, bookRow[author], paragraphCount, translations))
-  // }
+   get("/books/{id}") {
+     val id = call.parameters["id"]
+     if (id == null) {
+       call.respond(HttpStatusCode.BadRequest)
+       return@get
+     }
+
+     val getBook = Database.getConnection().prepareStatement("""
+       SELECT id, author FROM books WHERE id = ?
+     """.trimIndent())
+     getBook.setString(1, id)
+     val bookRow = getBook.executeQuery()
+     if (!bookRow.next()) {
+       call.respond(HttpStatusCode.NotFound)
+       return@get
+     }
+     val author = bookRow.getString("author")
+
+     val getParagraphCount = Database.getConnection().prepareStatement("""
+         SELECT COUNT(*) FROM paragraphs WHERE book = ? GROUP BY language
+     """.trimIndent())
+     getParagraphCount.setString(1, id)
+     val paragraphCountRows = getParagraphCount.executeQuery()
+     val paragraphCount = if (paragraphCountRows.next()) {
+         paragraphCountRows.getLong(1)
+     } else {
+         0
+     }
+
+     val getTranslations = Database.getConnection().prepareStatement("""
+         SELECT language, title FROM translations WHERE book = ?
+     """.trimIndent())
+     getTranslations.setString(1, id)
+     val translationRows = getTranslations.executeQuery()
+     val translations = mutableListOf<Translation>()
+     while (translationRows.next()) {
+         translations.add(
+             Translation(
+                 translationRows.getString("language"),
+                 translationRows.getString("title")
+             )
+         )
+     }
+
+     call.respond(Book(id, author, paragraphCount, translations))
+   }
 }
 
 @Serializable

@@ -50,7 +50,7 @@ fun importContent(log: Logger, bookId: String, content: BookContent, info: Conte
 
     preparedStatement.setString(1, bookId)
     preparedStatement.setString(2, content.author)
-    val row = preparedStatement.executeUpdate()
+    preparedStatement.executeUpdate()
 
     val getExistingTranslation = connection.prepareStatement("""
       SELECT last_modified FROM translations WHERE book = ? AND language = ?
@@ -60,7 +60,7 @@ fun importContent(log: Logger, bookId: String, content: BookContent, info: Conte
     val existingTranslation = getExistingTranslation.executeQuery()
 
     if (existingTranslation.next()) {
-      if (existingTranslation.getTimestamp("last_modified").toLocalDateTime()
+      if (!existingTranslation.getTimestamp("last_modified").toLocalDateTime()
           .isBefore(info.lastModified)
       ) {
         log.info("Translation $bookId:${info.language} is already at the newest version.")
@@ -70,10 +70,9 @@ fun importContent(log: Logger, bookId: String, content: BookContent, info: Conte
 
     val upsertTranslation = connection.prepareStatement("""
       INSERT INTO translations(book, language, title, last_modified) VALUES (?, ?, ?, ?)
-      ON CONFLICT DO UPDATE SET 
-        title = ?
-        last_modified = ?
-        WHERE book = ? AND language = ? 
+      ON CONFLICT (book, language) DO UPDATE SET 
+        title = ?,
+        last_modified = ? 
     """.trimIndent())
     upsertTranslation.setString(1, bookId)
     upsertTranslation.setString(2, info.language)
@@ -81,8 +80,22 @@ fun importContent(log: Logger, bookId: String, content: BookContent, info: Conte
     upsertTranslation.setTimestamp(4, Timestamp.valueOf(info.lastModified))
     upsertTranslation.setString(5, content.title)
     upsertTranslation.setTimestamp(6, Timestamp.valueOf(info.lastModified))
-    upsertTranslation.setString(7, bookId)
-    upsertTranslation.setString(8, info.language)
+    upsertTranslation.executeUpdate()
+
+    val insertParagraph = connection.prepareStatement("""
+        INSERT INTO paragraphs(book, language, index, type, text)
+        VALUES (?, ?, ?, ?, ?)
+    """.trimIndent())
+
+    content.paragraphs.forEachIndexed { i, paragraph ->
+      insertParagraph.setString(1, bookId)
+      insertParagraph.setString(2, info.language)
+      insertParagraph.setInt(3, i)
+      insertParagraph.setString(4, paragraph.type)
+      insertParagraph.setString(5, paragraph.text)
+      insertParagraph.addBatch()
+    }
+    insertParagraph.executeBatch()
 
   }
 
