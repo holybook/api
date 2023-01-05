@@ -25,7 +25,9 @@ object ReferenceLibrary {
                             author = attributes.getValue("content")
                         }
 
-                        "title" -> text()
+                        "title" -> {
+                            title = text()
+                        }
                     }
                 }
             }
