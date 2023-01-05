@@ -1,7 +1,9 @@
 package app.holybook.api.models
 
 import app.holybook.api.db.Database.transaction
+import app.holybook.api.db.languageConfigurationMapping
 import java.sql.Connection
+import java.sql.ResultSet
 import kotlinx.serialization.Serializable
 
 fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: Int?) =
@@ -22,27 +24,57 @@ fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: 
     if (endIndex != null) {
       getParagraphs.setInt(colIndex, endIndex)
     }
-    val paragraphRows = getParagraphs.executeQuery()
-    val paragraphs = mutableListOf<Paragraph>()
-    while (paragraphRows.next()) {
-      paragraphs.add(Paragraph(paragraphRows.getInt("index"),
-                               paragraphRows.getString("text"),
-                               paragraphRows.getString("type")))
-    }
-    paragraphs
+    getParagraphs.executeQuery().extractParagraphs()
   }
+
+fun searchParagraphs(language: String, query: String) = transaction {
+  val getParagraphs = prepareStatement("""
+      SELECT book, index, type, text FROM paragraphs 
+      WHERE language = ? AND text_tokens @@ websearch_to_tsquery(?)
+    """.trimIndent())
+  getParagraphs.setString(1, language)
+  getParagraphs.setString(2, query)
+  getParagraphs.executeQuery().extractSearchResults()
+}
+
+private fun ResultSet.extractParagraphs(): List<Paragraph> {
+  val paragraphs = mutableListOf<Paragraph>()
+  while (next()) {
+    paragraphs.add(currentParagraph())
+  }
+  return paragraphs
+}
+
+private fun ResultSet.currentParagraph() =
+  Paragraph(
+    getInt("index"),
+    getString("text"),
+    getString("type")
+  )
+
+private fun ResultSet.extractSearchResults(): List<SearchResult> {
+  val results = mutableListOf<SearchResult>()
+  while (next()) {
+    results.add(SearchResult(
+      bookId = getString("book"),
+      paragraph = currentParagraph()
+    ))
+  }
+  return results
+}
 
 fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: List<Paragraph>) {
   val insertParagraph = prepareStatement("""
-        INSERT INTO paragraphs(book, language, index, type, text)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO paragraphs(book, language, search_configuration, index, type, text)
+        VALUES (?, ?, ?::REGCONFIG, ?, ?, ?)
     """.trimIndent())
   paragraphs.forEach { paragraph ->
     insertParagraph.setString(1, bookId)
     insertParagraph.setString(2, language)
-    insertParagraph.setInt(3, paragraph.index)
-    insertParagraph.setString(4, paragraph.type)
-    insertParagraph.setString(5, paragraph.text)
+    insertParagraph.setString(3, languageConfigurationMapping[language] ?: "simple")
+    insertParagraph.setInt(4, paragraph.index)
+    insertParagraph.setString(5, paragraph.type)
+    insertParagraph.setString(6, paragraph.text)
     insertParagraph.addBatch()
   }
   insertParagraph.executeBatch()
@@ -50,3 +82,6 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
 
 @Serializable
 data class Paragraph(val index: Int, val text: String, val type: String)
+
+@Serializable
+data class SearchResult(val bookId: String, val paragraph: Paragraph)

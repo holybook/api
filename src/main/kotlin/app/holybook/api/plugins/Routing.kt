@@ -11,5 +11,6 @@ fun Application.configureRouting() {
         }
         configureBooks()
         configureParagraphs()
+        configureSearch()
     }
 }
