@@ -1,5 +1,6 @@
 package app.holybook.api.models
 
+import app.holybook.api.db.map
 import app.holybook.api.db.Database.transaction
 import java.sql.Connection
 import io.ktor.http.HttpStatusCode
@@ -8,15 +9,12 @@ import io.ktor.server.response.respond
 import kotlinx.serialization.Serializable
 
 fun getAllBooks() = transaction {
-  val result = prepareStatement("SELECT id, author FROM books").executeQuery()
-  val books = mutableListOf<Book>()
-  while (result.next()) {
-    books.add(Book(id = result.getString("id"),
-                   author = result.getString("author"),
-                   paragraphCount = null,
-                   translations = listOf()))
+  prepareStatement("SELECT id, author FROM books").executeQuery().map {
+    Book(id = getString("id"),
+         author = getString("author"),
+         paragraphCount = null,
+         translations = listOf())
   }
-  books
 }
 
 fun getBook(id: String): Book? = transaction {

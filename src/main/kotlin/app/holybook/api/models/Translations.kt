@@ -1,5 +1,6 @@
 package app.holybook.api.models
 
+import app.holybook.api.db.map
 import io.ktor.http.content.LastModifiedVersion
 import java.sql.Connection
 import java.sql.Timestamp
@@ -11,17 +12,12 @@ fun Connection.getTranslations(bookId: String): List<Translation> {
         SELECT language, title FROM translations WHERE book = ?
       """.trimIndent())
   getTranslations.setString(1, bookId)
-  val translationRows = getTranslations.executeQuery()
-  val translations = mutableListOf<Translation>()
-  while (translationRows.next()) {
-    translations.add(
-      Translation(
-        translationRows.getString("language"),
-        translationRows.getString("title")
-      )
+  return getTranslations.executeQuery().map {
+    Translation(
+      getString("language"),
+      getString("title")
     )
   }
-  return translations
 }
 
 fun Connection.getTranslationLastModified(bookId: String, language: String): LocalDateTime? {

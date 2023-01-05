@@ -1,5 +1,6 @@
 package app.holybook.api.models
 
+import app.holybook.api.db.map
 import app.holybook.api.db.Database.transaction
 import app.holybook.api.db.languageConfigurationMapping
 import java.sql.Connection
@@ -24,7 +25,7 @@ fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: 
     if (endIndex != null) {
       getParagraphs.setInt(colIndex, endIndex)
     }
-    getParagraphs.executeQuery().extractParagraphs()
+    getParagraphs.executeQuery().map { currentParagraph() }
   }
 
 fun searchParagraphs(language: String, query: String) = transaction {
@@ -34,15 +35,12 @@ fun searchParagraphs(language: String, query: String) = transaction {
     """.trimIndent())
   getParagraphs.setString(1, language)
   getParagraphs.setString(2, query)
-  getParagraphs.executeQuery().extractSearchResults()
-}
-
-private fun ResultSet.extractParagraphs(): List<Paragraph> {
-  val paragraphs = mutableListOf<Paragraph>()
-  while (next()) {
-    paragraphs.add(currentParagraph())
+  getParagraphs.executeQuery().map {
+    SearchResult(
+      bookId = getString("book"),
+      paragraph = currentParagraph()
+    )
   }
-  return paragraphs
 }
 
 private fun ResultSet.currentParagraph() =
@@ -51,17 +49,6 @@ private fun ResultSet.currentParagraph() =
     getString("text"),
     getString("type")
   )
-
-private fun ResultSet.extractSearchResults(): List<SearchResult> {
-  val results = mutableListOf<SearchResult>()
-  while (next()) {
-    results.add(SearchResult(
-      bookId = getString("book"),
-      paragraph = currentParagraph()
-    ))
-  }
-  return results
-}
 
 fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: List<Paragraph>) {
   val insertParagraph = prepareStatement("""
