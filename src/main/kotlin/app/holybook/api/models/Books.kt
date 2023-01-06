@@ -9,11 +9,18 @@ import io.ktor.server.response.respond
 import kotlinx.serialization.Serializable
 
 fun getAllBooks() = transaction {
-  prepareStatement("SELECT id, author FROM books").executeQuery().map {
-    Book(id = getString("id"),
-         author = getString("author"),
-         paragraphCount = null,
-         translations = listOf())
+  prepareStatement("""
+    SELECT id, author, language, title 
+    FROM translations INNER JOIN books ON translations.book = books.id
+  """.trimIndent()).executeQuery().map {
+    Pair(Pair(getString("id"), getString("author")),
+         Translation(getString("language"), getString("title")))
+  }.groupBy {
+    it.first
+  }.entries.map {
+    Book(it.key.first, it.key.second, null, it.value.map {
+      it.second
+    })
   }
 }
 
