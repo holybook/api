@@ -2,7 +2,7 @@ package app.holybook.api.models
 
 import app.holybook.api.db.map
 import app.holybook.api.db.Database.transaction
-import app.holybook.api.db.languageConfigurationMapping
+import app.holybook.api.db.getLanguageConfiguration
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlinx.serialization.Serializable
@@ -29,15 +29,22 @@ fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: 
   }
 
 fun searchParagraphs(language: String, query: String) = transaction {
+  val languageConfiguration = getLanguageConfiguration(language)
   val getParagraphs = prepareStatement("""
-      SELECT book, index, type, text FROM paragraphs 
-      WHERE language = ? AND text_tokens @@ websearch_to_tsquery(?)
+      SELECT book, index, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+      FROM paragraphs 
+      WHERE language = ? AND text_tokens @@ websearch_to_tsquery(?::REGCONFIG, ?)
     """.trimIndent())
-  getParagraphs.setString(1, language)
-  getParagraphs.setString(2, query)
+  getParagraphs.setString(1, languageConfiguration)
+  getParagraphs.setString(2, languageConfiguration)
+  getParagraphs.setString(3, query)
+  getParagraphs.setString(4, language)
+  getParagraphs.setString(5, languageConfiguration)
+  getParagraphs.setString(6, query)
   getParagraphs.executeQuery().map {
     SearchResult(
       bookId = getString("book"),
+      highlightedText = getString("highlighted"),
       paragraph = currentParagraph()
     )
   }
@@ -58,7 +65,7 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
   paragraphs.forEach { paragraph ->
     insertParagraph.setString(1, bookId)
     insertParagraph.setString(2, language)
-    insertParagraph.setString(3, languageConfigurationMapping[language] ?: "simple")
+    insertParagraph.setString(3, getLanguageConfiguration(language))
     insertParagraph.setInt(4, paragraph.index)
     insertParagraph.setString(5, paragraph.type)
     insertParagraph.setString(6, paragraph.text)
@@ -71,4 +78,4 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
 data class Paragraph(val index: Int, val text: String, val type: String)
 
 @Serializable
-data class SearchResult(val bookId: String, val paragraph: Paragraph)
+data class SearchResult(val bookId: String, val highlightedText: String, val paragraph: Paragraph)
