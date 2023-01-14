@@ -8,7 +8,7 @@ import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 
 fun Routing.configureParagraphs() {
-  get("books/{id}/paragraphs") { fetchParagraphs() }
+  get("/api/books/{id}/paragraphs") { fetchParagraphs() }
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.fetchParagraphs() {

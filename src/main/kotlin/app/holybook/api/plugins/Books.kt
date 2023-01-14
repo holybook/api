@@ -10,11 +10,11 @@ import io.ktor.server.routing.get
 
 fun Routing.configureBooks() {
 
-  get("/books") {
+  get("/api/books") {
     call.respond(getAllBooks())
   }
 
-  get("/books/{id}") {
+  get("/api/books/{id}") {
     val id = call.parameters["id"]
     if (id == null) {
       call.respond(HttpStatusCode.BadRequest)

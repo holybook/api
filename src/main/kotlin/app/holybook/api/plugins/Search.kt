@@ -10,7 +10,7 @@ import io.ktor.server.routing.get
 
 fun Routing.configureSearch() {
 
-  get("/search") {
+  get("/api/search") {
     val language = call.parameters["lang"] ?: "en"
     val query = call.parameters["q"]
     if (query == null) {
