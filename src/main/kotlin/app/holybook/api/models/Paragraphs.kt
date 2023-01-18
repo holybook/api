@@ -50,6 +50,42 @@ fun searchParagraphs(language: String, query: String) = transaction {
   }
 }
 
+fun translate(request: TranslateRequest) = transaction {
+  val languageConfiguration = getLanguageConfiguration(request.fromLanguage)
+  val getParagraphs = prepareStatement("""
+    SELECT book, index, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+    FROM paragraphs 
+    WHERE language = ? AND text ILIKE ?
+  """.trimIndent())
+  getParagraphs.setString(1, languageConfiguration)
+  getParagraphs.setString(2, languageConfiguration)
+  getParagraphs.setString(3, request.text)
+  getParagraphs.setString(4, request.fromLanguage)
+  getParagraphs.setString(5, "%${request.text}%")
+  val searchResults = getParagraphs.executeQuery().map {
+    SearchResult(
+      bookId = getString("book"),
+      highlightedText = getString("highlighted"),
+      paragraph = currentParagraph()
+    )
+  }
+  val firstResult = searchResults.firstOrNull() ?: return@transaction null
+  val getTranslatedParagraph = prepareStatement("""
+    SELECT index, type, text FROM paragraphs
+    WHERE book = ? AND index = ? AND language = ?
+  """.trimIndent())
+  getTranslatedParagraph.setString(1, firstResult.bookId)
+  getTranslatedParagraph.setInt(2, firstResult.paragraph.index)
+  getTranslatedParagraph.setString(3, request.toLanguage)
+  val results = getTranslatedParagraph.executeQuery()
+  if (!results.next()) {
+    return@transaction null
+  }
+
+  val translatedParagraph = results.currentParagraph()
+  TranslateResponse(translatedParagraph, searchResults)
+}
+
 private fun ResultSet.currentParagraph() =
   Paragraph(
     getInt("index"),
@@ -73,6 +109,12 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
   }
   insertParagraph.executeBatch()
 }
+
+@Serializable
+data class TranslateRequest(val fromLanguage: String, val toLanguage: String, val text: String)
+
+@Serializable
+data class TranslateResponse(val translatedParagraph: Paragraph, val allOriginalResults: List<SearchResult>)
 
 @Serializable
 data class Paragraph(val index: Int, val text: String, val type: String)
