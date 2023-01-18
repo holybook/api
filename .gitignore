@@ -3,3 +3,4 @@ build
 .gradle
 tmp
 application.local.conf
+static

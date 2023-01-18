@@ -1,16 +1,17 @@
 package app.holybook.api.plugins
 
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.application.Application
+import io.ktor.server.http.content.react
+import io.ktor.server.http.content.singlePageApplication
+import io.ktor.server.routing.routing
 
 fun Application.configureRouting() {
-    routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
-        configureBooks()
-        configureParagraphs()
-        configureSearch()
+  routing {
+    singlePageApplication {
+      react("static")
     }
+    configureBooks()
+    configureParagraphs()
+    configureSearch()
+  }
 }
