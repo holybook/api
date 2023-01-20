@@ -2,6 +2,10 @@
 
 package app.holybook.import
 
+import app.holybook.api.db.Database.transaction
+import app.holybook.api.models.createBooksTable
+import app.holybook.api.models.createParagraphsTable
+import app.holybook.api.models.createTranslationsTable
 import io.ktor.util.logging.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -12,6 +16,14 @@ suspend fun fetchAndImportIndex(log: Logger) {
     val index: List<BookInfo> = Json.decodeFromStream(
         Json::class.java.getResourceAsStream("/index.json")
     )
+
+    transaction {
+        // Create tables:
+        createBooksTable()
+        createTranslationsTable()
+        createParagraphsTable()
+    }
+
     index.forEach { bookInfo ->
         log.info("Importing from ${bookInfo.original.url}")
         fetchAndImportContent(log, bookInfo.id, bookInfo.original)

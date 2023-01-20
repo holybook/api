@@ -6,6 +6,25 @@ import app.holybook.api.db.getLanguageConfiguration
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlinx.serialization.Serializable
+fun Connection.createParagraphsTable() {
+  createStatement().executeUpdate("""
+    CREATE TABLE IF NOT EXISTS paragraphs (
+        book VARCHAR(32) NOT NULL,
+        language VARCHAR(3) NOT NULL,
+        search_configuration REGCONFIG NOT NULL,
+        index INT NOT NULL,
+        type VARCHAR(64) NOT NULL,
+        text TEXT NOT NULL,
+        text_tokens tsvector
+            GENERATED ALWAYS AS (to_tsvector(search_configuration, text)) STORED,
+    
+        PRIMARY KEY (book, language, index),
+        FOREIGN KEY (book) REFERENCES books(id)
+    );
+    
+    CREATE INDEX IF NOT EXISTS text_search_idx ON paragraphs USING GIN (text_tokens);
+  """.trimIndent())
+}
 
 fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: Int?) =
   transaction {

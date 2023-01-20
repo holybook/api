@@ -8,6 +8,17 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import kotlinx.serialization.Serializable
 
+fun Connection.createBooksTable() {
+  createStatement().executeUpdate("""
+    CREATE TABLE IF NOT EXISTS books (
+        id VARCHAR(32) NOT NULL,
+        author VARCHAR(256) NOT NULL,
+
+        PRIMARY KEY (id)
+    );
+  """.trimIndent())
+}
+
 fun getAllBooks() = transaction {
   prepareStatement("""
     SELECT id, author, language, title 

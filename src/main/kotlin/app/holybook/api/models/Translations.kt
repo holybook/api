@@ -7,6 +7,20 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import kotlinx.serialization.Serializable
 
+fun Connection.createTranslationsTable() {
+  createStatement().executeUpdate("""
+    CREATE TABLE IF NOT EXISTS translations (
+        book VARCHAR(32) NOT NULL,
+        language VARCHAR(3) NOT NULL,
+        title VARCHAR(512) NOT NULL,
+        last_modified TIMESTAMP NOT NULL,
+    
+        PRIMARY KEY (book, language),
+        FOREIGN KEY (book) REFERENCES books(id)
+    )
+  """.trimIndent())
+}
+
 fun Connection.getTranslations(bookId: String): List<Translation> {
   val getTranslations = prepareStatement("""
         SELECT language, title FROM translations WHERE book = ?
