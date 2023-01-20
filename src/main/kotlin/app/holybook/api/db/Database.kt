@@ -38,6 +38,13 @@ object Database {
     val port = property("storage.port").getString()
     val db = property("storage.dbName").getString()
     val user = property("storage.userName").getString()
-    return "jdbc:postgresql://$host:$port/$db?user=$user"
+    val passwordParameter = propertyOrNull("storage.password")?.getString().let {
+      if (it == null || it.isEmpty()) {
+        null
+      } else {
+        "&password=$it"
+      }
+    } ?: ""
+    return "jdbc:postgresql://$host:$port/$db?user=$user$passwordParameter"
   }
 }
