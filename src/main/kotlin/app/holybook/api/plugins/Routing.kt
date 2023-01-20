@@ -8,7 +8,8 @@ import io.ktor.server.routing.routing
 fun Application.configureRouting() {
   routing {
     singlePageApplication {
-      react("static")
+      useResources = true
+      react("client")
     }
     configureBooks()
     configureParagraphs()

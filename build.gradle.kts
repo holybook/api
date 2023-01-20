@@ -10,7 +10,7 @@ val logbackVersion: String by project
 plugins {
     application
     kotlin("jvm") version "1.7.20"
-    id("io.ktor.plugin") version "2.1.3"
+    id("io.ktor.plugin") version "2.2.2"
     kotlin("plugin.serialization") version "1.7.20"
 }
 
@@ -58,6 +58,5 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClass.set("app.holybook.ApplicationKt")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }

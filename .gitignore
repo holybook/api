@@ -4,3 +4,4 @@ build
 tmp
 application.local.conf
 static
+src/main/resources/client

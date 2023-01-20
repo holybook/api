@@ -13,7 +13,7 @@ object Database {
 
   fun init(config: ApplicationConfig, log: Logger) {
     this.log = log
-    dataSource.jdbcUrl = config.property("storage.jdbcURL").getString()
+    dataSource.jdbcUrl = config.getJdbcUrl()
     dataSource.username = "server"
   }
 
@@ -31,5 +31,13 @@ object Database {
     } finally {
       connection.close()
     }
+  }
+
+  fun ApplicationConfig.getJdbcUrl(): String {
+    val host = property("storage.hostName").getString()
+    val port = property("storage.port").getString()
+    val db = property("storage.dbName").getString()
+    val user = property("storage.userName").getString()
+    return "jdbc:postgresql://$host:$port/$db?user=$user"
   }
 }
