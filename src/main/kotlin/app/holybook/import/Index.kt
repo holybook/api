@@ -41,5 +41,5 @@ data class Index(val bookInfos: List<BookInfo>)
 data class BookInfo(
     val id: String,
     val original: ContentInfo,
-    val translations: List<ContentInfo>
+    val translations: List<ContentInfo> = listOf()
 )

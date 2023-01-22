@@ -33,25 +33,26 @@ object ReferenceLibrary {
             }
             child("body") {
                 child("div") {
-                    child("div") {
-                        child("div") {
-                            child("div") {
-                                children("p") {
-                                    paragraphs.add(
-                                        Paragraph(
-                                            paragraphs.size,
-                                            textRecursively(),
-                                            "body"
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    recursiveGetParagraphs(paragraphs)
                 }
                 skipContents()
             }
         }
         return BookContent(title, author, paragraphs)
+    }
+
+    private fun Konsumer.recursiveGetParagraphs(paragraphs: MutableList<Paragraph>) {
+        allChildrenAutoIgnore(Names.of("div", "p")) {
+            when (localName) {
+                "div" -> recursiveGetParagraphs(paragraphs)
+                "p" -> paragraphs.add(
+                    Paragraph(
+                        paragraphs.size,
+                        textRecursively(),
+                        "body"
+                    )
+                )
+            }
+        }
     }
 }

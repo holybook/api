@@ -49,7 +49,7 @@ object BibliothekBahaiDe {
         paragraphs: MutableList<Paragraph>
     ) {
         childOrNull("address") { skipContents() }
-        paragraphs.add(Paragraph(paragraphs.size, text(), "body"))
+        paragraphs.add(Paragraph(paragraphs.size, textRecursively(), "body"))
     }
 
 }
