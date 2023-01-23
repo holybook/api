@@ -15,7 +15,7 @@ object ReferenceLibrary {
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyymmdd")
 
-    val parser: ParagraphParser = XmlParser("bahai.org") {
+    val parser: ParagraphParser<OriginalBook> = XmlParser("bahai.org") {
         return@XmlParser parse()
     }
 

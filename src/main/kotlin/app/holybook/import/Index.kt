@@ -24,13 +24,8 @@ suspend fun fetchAndImportIndex(log: Logger) {
         createParagraphsTable()
     }
 
-    index.forEach { bookInfo ->
-        log.info("Importing from ${bookInfo.original.url}")
-        fetchAndImportContent(log, bookInfo.id, bookInfo.original)
-        bookInfo.translations.forEach {
-            log.info("Importing from ${it.url}")
-            fetchAndImportContent(log, bookInfo.id, it)
-        }
+    index.forEach {
+        fetchAndImportBook(log, it)
     }
 }
 

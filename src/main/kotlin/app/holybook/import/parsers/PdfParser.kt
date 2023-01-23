@@ -6,7 +6,7 @@ import io.ktor.http.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 
-class PdfParser : ParagraphParser {
+class PdfParser : ParagraphParser<BookContent> {
     override fun matches(contentType: ContentType?, url: Url): Boolean {
         return contentType?.match("application/pdf") == true
     }
@@ -39,7 +39,6 @@ class PdfParser : ParagraphParser {
 
         return BookContent(
             title = "",
-            author = "",
             paragraphs = mergedParagraphs.mapIndexed { i, text -> Paragraph(i, text, "body") }
         )
     }

@@ -10,9 +10,10 @@ import java.lang.AssertionError
 
 object BibliothekBahaiDe {
 
-    val parser: ParagraphParser = XmlParser("bibliothek.bahai.de") {
-        return@XmlParser parse()
-    }
+    val parser: ParagraphParser<BookContent> =
+        XmlParser("bibliothek.bahai.de") {
+            return@XmlParser parse()
+        }
 
     private fun Konsumer.parse(): BookContent {
         var title = ""
@@ -37,7 +38,14 @@ object BibliothekBahaiDe {
             when (localName) {
                 "div" -> processDiv(paragraphs)
                 "par" -> processPar(paragraphs)
-                "heading" -> paragraphs.add(Paragraph(paragraphs.size, text(), "header"))
+                "heading" -> paragraphs.add(
+                    Paragraph(
+                        paragraphs.size,
+                        text(),
+                        "header"
+                    )
+                )
+
                 else -> throw AssertionError("error")
             }
         }

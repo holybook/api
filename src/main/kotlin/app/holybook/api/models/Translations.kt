@@ -1,7 +1,6 @@
 package app.holybook.api.models
 
 import app.holybook.api.db.map
-import io.ktor.http.content.LastModifiedVersion
 import java.sql.Connection
 import java.sql.Timestamp
 import java.time.LocalDateTime

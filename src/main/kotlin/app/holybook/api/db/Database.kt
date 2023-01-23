@@ -33,6 +33,22 @@ object Database {
     }
   }
 
+  suspend fun <R> transactionSuspending(body: suspend Connection.() -> R): R {
+    val connection = dataSource.connection
+    return try {
+      connection.autoCommit = false
+      val result = connection.body()
+      connection.commit()
+      result
+    } catch (e: SQLException) {
+      log?.error("transaction failed", e)
+      connection.rollback()
+      throw e
+    } finally {
+      connection.close()
+    }
+  }
+
   fun ApplicationConfig.getJdbcUrl(): String {
     val host = property("storage.hostName").getString()
     val port = property("storage.port").getString()

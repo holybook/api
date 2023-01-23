@@ -1,11 +1,13 @@
 package app.holybook.import
 
 import app.holybook.api.db.Database.transaction
+import app.holybook.api.db.Database.transactionSuspending
 import app.holybook.api.models.getTranslationLastModified
 import app.holybook.api.models.insertBook
 import app.holybook.api.models.insertParagraphs
 import app.holybook.api.models.upsertTranslation
 import app.holybook.import.parsers.BibliothekBahaiDe
+import app.holybook.import.parsers.ParagraphParser
 import app.holybook.import.parsers.PdfParser
 import app.holybook.import.parsers.ReferenceLibrary
 import app.holybook.util.serialization.DateSerializer
@@ -16,22 +18,20 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.util.logging.*
 import kotlinx.serialization.Serializable
+import java.sql.Connection
 import java.time.LocalDateTime
-import java.util.*
 
 val client = HttpClient()
 val parsers =
-    listOf(PdfParser(), ReferenceLibrary.parser, BibliothekBahaiDe.parser)
+    listOf(PdfParser(), BibliothekBahaiDe.parser)
 val originalParsers = listOf(ReferenceLibrary.parser)
 
-fun parseParagraphs(
+fun <T> parseParagraphs(
+    parsers: List<ParagraphParser<T>>,
     contentType: ContentType?,
     url: Url,
-    content: ByteArray,
-    isOriginal: Boolean
-): BookContent? {
-    val parsers = if (isOriginal) originalParsers else parsers
-
+    content: ByteArray
+): T? {
     for (parser in parsers) {
         if (parser.matches(contentType, url)) {
             return parser.parse(content)
@@ -41,57 +41,69 @@ fun parseParagraphs(
     return null
 }
 
-suspend fun fetchContent(
-    contentInfo: ContentInfo,
-    isOriginal: Boolean
-): BookContent {
+suspend fun <T> fetchContent(
+    parsers: List<ParagraphParser<T>>,
+    contentInfo: ContentInfo
+): T {
     val paragraphContent = client.get(contentInfo.url)
     val contentType = paragraphContent.contentType()
 
     return parseParagraphs(
+        parsers,
         contentType,
         Url(contentInfo.url),
-        paragraphContent.body(),
-        isOriginal
+        paragraphContent.body()
     )
         ?: throw InvalidBodyException("Could not parse content from url ${contentInfo.url}")
 }
 
-fun importContent(
+fun Connection.importContent(
     log: Logger,
     bookId: String,
     content: BookContent,
     info: ContentInfo
 ) {
-    transaction {
-        insertBook(bookId, content.author)
-        val translationLastModified =
-            getTranslationLastModified(bookId, info.language)
-        if (translationLastModified != null && !translationLastModified.isBefore(
-                info.lastModified
-            )
-        ) {
-            log.info("Translation $bookId:${info.language} is already at the newest version.")
-            return@transaction
-        }
-        upsertTranslation(
-            bookId,
-            info.language,
-            content.title,
+    val translationLastModified =
+        getTranslationLastModified(bookId, info.language)
+    if (translationLastModified != null && !translationLastModified.isBefore(
             info.lastModified
         )
-        insertParagraphs(bookId, info.language, content.paragraphs)
+    ) {
+        log.info("Translation $bookId:${info.language} is already at the newest version.")
+        return
     }
+    upsertTranslation(
+        bookId,
+        info.language,
+        content.title,
+        info.lastModified
+    )
+    insertParagraphs(bookId, info.language, content.paragraphs)
 }
 
-suspend fun fetchAndImportContent(
+suspend fun Connection.fetchAndImportContent(
     log: Logger,
     bookId: String,
-    info: ContentInfo,
-    isOriginal: Boolean
+    info: ContentInfo
 ) {
-    val fetchResult = fetchContent(info, isOriginal)
+    val fetchResult = fetchContent(parsers, info)
     importContent(log, bookId, fetchResult, info)
+}
+
+suspend fun fetchAndImportBook(
+    log: Logger,
+    bookInfo: BookInfo
+) {
+    log.info("Importing from ${bookInfo.original.url}")
+    val original = fetchContent(originalParsers, bookInfo.original)
+    transactionSuspending {
+        insertBook(bookInfo.id, original.metadata.author)
+        importContent(log, bookInfo.id, original.content, bookInfo.original)
+        bookInfo.translations.forEach {
+            log.info("Importing from ${it.url}")
+            fetchAndImportContent(log, bookInfo.id, it)
+        }
+    }
 }
 
 @Serializable
