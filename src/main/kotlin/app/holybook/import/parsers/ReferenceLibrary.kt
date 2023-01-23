@@ -2,27 +2,38 @@ package app.holybook.import.parsers
 
 import app.holybook.api.models.Paragraph
 import app.holybook.import.BookContent
+import app.holybook.import.BookMetadata
+import app.holybook.import.OriginalBook
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
 import com.gitlab.mvysny.konsumexml.textRecursively
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object ReferenceLibrary {
+
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyymmdd")
 
     val parser: ParagraphParser = XmlParser("bahai.org") {
         return@XmlParser parse()
     }
 
-    private fun Konsumer.parse(): BookContent {
+    private fun Konsumer.parse(): OriginalBook {
         var title = ""
         var author = ""
+        var date: LocalDate? = null
         val paragraphs = mutableListOf<Paragraph>()
         child("html") {
             child("head") {
                 allChildrenAutoIgnore(Names.of("meta", "title")) {
                     when (localName) {
-                        "meta" -> if (attributes.getValueOrNull("name") == "author") {
-                            author = attributes.getValue("content")
+                        "meta" -> when (attributes.getValueOrNull("name")) {
+                            "author" -> author = attributes.getValue("content")
+                            "date" -> date = LocalDate.parse(
+                                attributes.getValue("content"),
+                                dateFormatter
+                            )
                         }
 
                         "title" -> {
@@ -38,7 +49,10 @@ object ReferenceLibrary {
                 skipContents()
             }
         }
-        return BookContent(title, author, paragraphs)
+        return OriginalBook(
+            BookMetadata(author, date!!),
+            BookContent(title, paragraphs)
+        )
     }
 
     private fun Konsumer.recursiveGetParagraphs(paragraphs: MutableList<Paragraph>) {
