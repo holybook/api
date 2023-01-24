@@ -1,6 +1,7 @@
 package app.holybook.import.parsers
 
 import app.holybook.api.models.Paragraph
+import app.holybook.api.models.ParagraphType
 import app.holybook.import.BookContent
 import app.holybook.import.BookMetadata
 import app.holybook.import.OriginalBook
@@ -58,14 +59,30 @@ object ReferenceLibrary {
         allChildrenAutoIgnore(Names.of("div", "p")) {
             when (localName) {
                 "div" -> recursiveGetParagraphs(paragraphs)
-                "p" -> paragraphs.add(
-                    Paragraph(
-                        paragraphs.size,
-                        textRecursively(),
-                        "body"
+                "p" -> {
+                    val classNames = attributes.getValueOrNull("class")
+                    paragraphs.add(
+                        Paragraph(
+                            paragraphs.size,
+                            textRecursively(),
+                            getParagraphType(classNames)
+                        )
                     )
-                )
+                }
             }
         }
+    }
+}
+
+private fun getParagraphType(classNames: String?): ParagraphType {
+    return when (classNames) {
+        "c zb" -> ParagraphType.LETTER_HEAD
+        "wb" -> ParagraphType.DATE
+        "ub" -> ParagraphType.ADDRESSEE
+        "tb" -> ParagraphType.SALUTATION
+        "c cd hb" -> ParagraphType.HEADER
+        "sb vb" -> ParagraphType.SEPARATOR
+        "pb" -> ParagraphType.SIGNATURE
+        else -> ParagraphType.BODY
     }
 }

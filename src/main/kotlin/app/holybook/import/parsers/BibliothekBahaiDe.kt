@@ -1,6 +1,7 @@
 package app.holybook.import.parsers
 
 import app.holybook.api.models.Paragraph
+import app.holybook.api.models.ParagraphType
 import app.holybook.import.BookContent
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
@@ -42,7 +43,7 @@ object BibliothekBahaiDe {
                     Paragraph(
                         paragraphs.size,
                         text(),
-                        "header"
+                        ParagraphType.HEADER
                     )
                 )
 
@@ -54,8 +55,26 @@ object BibliothekBahaiDe {
     private fun Konsumer.processPar(
         paragraphs: MutableList<Paragraph>
     ) {
+        val classNames = attributes.getValueOrNull("class")
         childOrNull("address") { skipContents() }
-        paragraphs.add(Paragraph(paragraphs.size, textRecursively(), "body"))
+        paragraphs.add(
+            Paragraph(
+                paragraphs.size,
+                textRecursively(),
+                getParagraphType(classNames)
+            )
+        )
+    }
+
+    private fun getParagraphType(classNames: String?): ParagraphType {
+        return when (classNames) {
+            "letter sender uhj" -> ParagraphType.LETTER_HEAD
+            "letter date" -> ParagraphType.DATE
+            "letter addressee" -> ParagraphType.ADDRESSEE
+            "letter salutation" -> ParagraphType.SALUTATION
+            "letter signed" -> ParagraphType.SIGNATURE
+            else -> ParagraphType.BODY
+        }
     }
 
 }

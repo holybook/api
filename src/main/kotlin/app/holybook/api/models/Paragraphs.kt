@@ -109,7 +109,7 @@ private fun ResultSet.currentParagraph() =
   Paragraph(
     getInt("index"),
     getString("text"),
-    getString("type")
+    ParagraphType.valueOf(getString("type"))
   )
 
 fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: List<Paragraph>) {
@@ -122,7 +122,7 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
     insertParagraph.setString(2, language)
     insertParagraph.setString(3, getLanguageConfiguration(language))
     insertParagraph.setInt(4, paragraph.index)
-    insertParagraph.setString(5, paragraph.type)
+    insertParagraph.setString(5, paragraph.type.value)
     insertParagraph.setString(6, paragraph.text)
     insertParagraph.addBatch()
   }
@@ -136,7 +136,19 @@ data class TranslateRequest(val fromLanguage: String, val toLanguage: String, va
 data class TranslateResponse(val translatedParagraph: Paragraph, val allOriginalResults: List<SearchResult>)
 
 @Serializable
-data class Paragraph(val index: Int, val text: String, val type: String)
+data class Paragraph(val index: Int, val text: String, val type: ParagraphType)
 
 @Serializable
 data class SearchResult(val bookId: String, val highlightedText: String, val paragraph: Paragraph)
+
+enum class ParagraphType(val value: String) {
+  BODY("body"),
+  HEADER("header"),
+  TITLE("title"),
+  LETTER_HEAD("letterhead"),
+  DATE("date"),
+  ADDRESSEE("addressee"),
+  SALUTATION("salutation"),
+  SEPARATOR("separator"),
+  SIGNATURE("signature")
+}

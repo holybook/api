@@ -1,6 +1,7 @@
 package app.holybook.import.parsers
 
 import app.holybook.api.models.Paragraph
+import app.holybook.api.models.ParagraphType
 import app.holybook.import.BookContent
 import io.ktor.http.*
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -39,7 +40,13 @@ class PdfParser : ParagraphParser<BookContent> {
 
         return BookContent(
             title = "",
-            paragraphs = mergedParagraphs.mapIndexed { i, text -> Paragraph(i, text, "body") }
+            paragraphs = mergedParagraphs.mapIndexed { i, text ->
+                Paragraph(
+                    i,
+                    text,
+                    ParagraphType.BODY
+                )
+            }
         )
     }
 
