@@ -97,7 +97,7 @@ suspend fun fetchAndImportBook(
     log.info("Importing from ${bookInfo.original.url}")
     val original = fetchContent(originalParsers, bookInfo.original)
     transactionSuspending {
-        insertBook(bookInfo.id, original.metadata.author)
+        insertBook(bookInfo.id, original.metadata.author, original.metadata.publishedAt)
         importContent(log, bookInfo.id, original.content, bookInfo.original)
         bookInfo.translations.forEach {
             log.info("Importing from ${it.url}")

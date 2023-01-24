@@ -15,5 +15,5 @@ class BookContent(
 
 class BookMetadata(
     val author: String,
-    val publishedAt: LocalDate
+    val publishedAt: LocalDate?
 )

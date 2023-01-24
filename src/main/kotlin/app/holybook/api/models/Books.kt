@@ -3,6 +3,8 @@ package app.holybook.api.models
 import app.holybook.api.db.Database.transaction
 import app.holybook.api.db.map
 import java.sql.Connection
+import java.sql.Date
+import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 fun Connection.createBooksTable() {
@@ -62,13 +64,14 @@ private fun Connection.getParagraphCount(id: String): Long {
   }
 }
 
-fun Connection.insertBook(id: String, author: String) {
+fun Connection.insertBook(id: String, author: String, publishedAt: LocalDate?) {
   val preparedStatement = prepareStatement("""
-      INSERT INTO books(id, author) VALUES (?, ?) ON CONFLICT DO NOTHING
+      INSERT INTO books(id, author, published_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING
     """.trimIndent())
 
   preparedStatement.setString(1, id)
   preparedStatement.setString(2, author)
+  preparedStatement.setDate(3, publishedAt?.let(Date::valueOf))
   preparedStatement.executeUpdate()
 }
 

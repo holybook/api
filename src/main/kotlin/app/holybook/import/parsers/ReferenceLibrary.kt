@@ -10,10 +10,9 @@ import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
 import com.gitlab.mvysny.konsumexml.textRecursively
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.BASIC_ISO_DATE
 
 object ReferenceLibrary {
-
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyymmdd")
 
     val parser: ParagraphParser<OriginalBook> = XmlParser("bahai.org") {
         return@XmlParser parse()
@@ -32,7 +31,7 @@ object ReferenceLibrary {
                             "author" -> author = attributes.getValue("content")
                             "date" -> date = LocalDate.parse(
                                 attributes.getValue("content"),
-                                dateFormatter
+                                BASIC_ISO_DATE
                             )
                         }
 
@@ -50,7 +49,7 @@ object ReferenceLibrary {
             }
         }
         return OriginalBook(
-            BookMetadata(author, date!!),
+            BookMetadata(author, date),
             BookContent(title, paragraphs)
         )
     }
