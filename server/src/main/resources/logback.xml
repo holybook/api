@@ -8,4 +8,9 @@
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="io.netty" level="INFO"/>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="WARN"/>
+    <logger name="com.zaxxer.hikari.pool.PoolBase" level="WARN"/>
+    <logger name="com.zaxxer.hikari.HikariConfig" level="WARN"/>
+    <logger name="com.zaxxer.hikari.HikariDataSource" level="WARN"/>
+    <logger name="com.zaxxer.hikari.util.DriverDataSource" level="WARN"/>
 </configuration>

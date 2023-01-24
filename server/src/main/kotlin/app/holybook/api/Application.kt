@@ -2,26 +2,21 @@ package app.holybook.api
 
 import app.holybook.api.db.Database
 import app.holybook.api.plugins.configureRouting
-import app.holybook.import.fetchAndImportIndex
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
-import kotlinx.coroutines.launch
 import org.slf4j.event.*
 
 fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
-    System.err.println(environment.config.keys())
-    Database.init(environment.config, log)
-    launch {
-        fetchAndImportIndex(log)
-    }
+    Database.init(environment.config.getJdbcUrl())
     install(ContentNegotiation) {
         json()
     }
@@ -34,4 +29,19 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
     }
     configureRouting()
+}
+
+fun ApplicationConfig.getJdbcUrl(): String {
+    val host = property("storage.hostName").getString()
+    val port = property("storage.port").getString()
+    val db = property("storage.dbName").getString()
+    val user = property("storage.userName").getString()
+    val passwordParameter = propertyOrNull("storage.password")?.getString().let {
+        if (it.isNullOrEmpty()) {
+            null
+        } else {
+            "&password=$it"
+        }
+    } ?: ""
+    return "jdbc:postgresql://$host:$port/$db?user=$user$passwordParameter"
 }

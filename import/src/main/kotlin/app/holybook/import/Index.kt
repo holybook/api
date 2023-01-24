@@ -11,8 +11,9 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import org.slf4j.LoggerFactory
 
-suspend fun fetchAndImportIndex(log: Logger) {
+suspend fun fetchAndImportIndex() {
     val index: List<BookInfo> = Json.decodeFromStream(
         Json::class.java.getResourceAsStream("/index.json")
     )
@@ -25,7 +26,7 @@ suspend fun fetchAndImportIndex(log: Logger) {
     }
 
     index.forEach {
-        fetchAndImportBook(log, it)
+        fetchAndImportBook(it)
     }
 }
 

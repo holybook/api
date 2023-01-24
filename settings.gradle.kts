@@ -1,3 +1,7 @@
 
-rootProject.name = "server"
+rootProject.name = "api"
+
+include("lib")
+include("import")
+include("server")
 
