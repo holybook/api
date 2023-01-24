@@ -1,11 +1,8 @@
 package app.holybook.api.models
 
-import app.holybook.api.db.map
 import app.holybook.api.db.Database.transaction
+import app.holybook.api.db.map
 import java.sql.Connection
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.response.respond
 import kotlinx.serialization.Serializable
 
 fun Connection.createBooksTable() {
@@ -13,6 +10,7 @@ fun Connection.createBooksTable() {
     CREATE TABLE IF NOT EXISTS books (
         id VARCHAR(32) NOT NULL,
         author VARCHAR(256) NOT NULL,
+        published_at DATE NULL,
 
         PRIMARY KEY (id)
     );
