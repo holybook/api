@@ -21,7 +21,7 @@ import java.io.IOException
 import java.sql.Connection
 import java.time.LocalDateTime
 
-val log = LoggerFactory.getLogger("import")
+private val log = LoggerFactory.getLogger("import")
 val client = HttpClient()
 val parsers =
     listOf(PdfParser(), BibliothekBahaiDe.parser)

@@ -19,6 +19,12 @@ fun Connection.createBooksTable() {
   """.trimIndent())
 }
 
+fun Connection.dropBooksTable() {
+  createStatement().executeUpdate("""
+    DROP TABLE books;
+  """.trimIndent())
+}
+
 fun getAllBooks() = transaction {
   prepareStatement("""
     SELECT id, author, language, title 

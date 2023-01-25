@@ -35,6 +35,7 @@ dependencies {
     implementation("com.gitlab.mvysny.konsume-xml:konsume-xml:1.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("com.typesafe:config:1.4.2")
+    implementation("commons-cli:commons-cli:1.5.0")
 }
 
 tasks.test {

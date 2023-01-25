@@ -20,6 +20,12 @@ fun Connection.createTranslationsTable() {
   """.trimIndent())
 }
 
+fun Connection.dropTranslationsTable() {
+  createStatement().executeUpdate("""
+    DROP TABLE translations;
+  """.trimIndent())
+}
+
 fun Connection.getTranslations(bookId: String): List<Translation> {
   val getTranslations = prepareStatement("""
         SELECT language, title FROM translations WHERE book = ?
