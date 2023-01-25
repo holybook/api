@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
-import org.slf4j.LoggerFactory
 
 fun main(args: Array<String>) = runBlocking {
   val conf: Config = ConfigFactory.load()
