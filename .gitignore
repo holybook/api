@@ -4,5 +4,5 @@ build
 tmp
 application.local.conf
 static
-src/main/resources/client
+server/src/main/resources/client
 import/src/main/resources/application.prod.conf
