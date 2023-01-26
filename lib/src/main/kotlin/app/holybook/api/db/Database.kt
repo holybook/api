@@ -12,6 +12,7 @@ object Database {
     private val log: Logger = LoggerFactory.getLogger("db")
 
     fun init(jdbcUrl: String) {
+        log.info("Connecting to $jdbcUrl")
         dataSource.jdbcUrl = jdbcUrl
     }
 

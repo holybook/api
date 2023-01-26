@@ -8,33 +8,57 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 
 fun main(args: Array<String>) = runBlocking {
-  val conf: Config = ConfigFactory.load()
-  val password =
-    System.console()?.readPassword("Password: ") ?: {
-      print("Password: ")
-      readLine()
+    val options = Options()
+    options.addOption(
+        "c",
+        "recreate-db",
+        false,
+        "Recreate the database and populate it from scratch."
+    )
+    options.addOption("h", "host", true, "Database host")
+    options.addOption("p", "port", true, "Database port")
+    options.addOption("d", "database", true, "Database name")
+    options.addOption("u", "user", true, "Database username")
+    options.addOption("pwd", "password", false, "Use password")
+
+    val parser = DefaultParser()
+    val cmd = parser.parse(options, args)
+
+    val jdbcUrl = getJdbcUrl(
+        host = cmd.getOptionValue("h", "127.0.0.1"),
+        port = cmd.getOptionValue("p", "5432"),
+        database = cmd.getOptionValue("d", "holybook"),
+        user = cmd.getOptionValue("u", "server"),
+        usePassword = cmd.hasOption("pwd")
+    )
+    Database.init(jdbcUrl)
+
+    if (cmd.hasOption("c")) {
+        resetDatabase()
     }
-  Database.init(conf.getJdbcUrl(password.toString()))
-
-  val options = Options()
-  options.addOption("c",
-                    "recreate-db",
-                    false,
-                    "Recreate the database and populate it from scratch.")
-
-  val parser = DefaultParser()
-  val cmd = parser.parse(options, args)
-
-  if (cmd.hasOption("c")) {
-    resetDatabase()
-  }
-  fetchAndImportIndex()
+    fetchAndImportIndex()
 }
 
-fun Config.getJdbcUrl(password: String): String {
-  val host = getString("storage.hostName")
-  val port = getString("storage.port")
-  val db = getString("storage.dbName")
-  val user = getString("storage.userName")
-  return "jdbc:postgresql://$host:$port/$db?user=$user&password=$password"
+fun getJdbcUrl(
+    host: String,
+    port: String,
+    database: String,
+    user: String,
+    usePassword: Boolean
+): String {
+    val passwordQuery = if (usePassword) {
+        "&password=${readPassword()}"
+    } else {
+        ""
+    }
+    return "jdbc:postgresql://$host:$port/$database?user=$user$passwordQuery"
+}
+
+private fun readPassword(): String {
+    val console = System.console()
+    if (console == null) {
+        print("Password: ")
+        return readln()
+    }
+    return console.readPassword("Password: ").toString()
 }
