@@ -60,5 +60,5 @@ private fun readPassword(): String {
         print("Password: ")
         return readln()
     }
-    return console.readPassword("Password: ").toString()
+    return String(console.readPassword("Password: "))
 }
