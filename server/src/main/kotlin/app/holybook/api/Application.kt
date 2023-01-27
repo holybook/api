@@ -1,6 +1,6 @@
 package app.holybook.api
 
-import app.holybook.api.db.Database
+import app.holybook.lib.db.Database
 import app.holybook.api.plugins.configureRouting
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*

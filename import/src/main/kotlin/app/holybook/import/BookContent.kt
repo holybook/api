@@ -1,6 +1,6 @@
 package app.holybook.import
 
-import app.holybook.api.models.Paragraph
+import app.holybook.lib.models.Paragraph
 import java.time.LocalDate
 
 class OriginalBook(

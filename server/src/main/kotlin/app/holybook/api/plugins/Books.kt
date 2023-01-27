@@ -1,7 +1,7 @@
 package app.holybook.api.plugins
 
-import app.holybook.api.models.getAllBooks
-import app.holybook.api.models.getBook
+import app.holybook.lib.models.getAllBooks
+import app.holybook.lib.models.getBook
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.response.respond

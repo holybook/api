@@ -1,9 +1,9 @@
 package app.holybook.api.plugins
 
-import app.holybook.api.models.TranslateRequest
-import app.holybook.api.models.getBook
-import app.holybook.api.models.searchParagraphs
-import app.holybook.api.models.translate
+import app.holybook.lib.models.TranslateRequest
+import app.holybook.lib.models.getBook
+import app.holybook.lib.models.searchParagraphs
+import app.holybook.lib.models.translate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.request.receive

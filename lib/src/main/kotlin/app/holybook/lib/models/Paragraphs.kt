@@ -1,8 +1,8 @@
-package app.holybook.api.models
+package app.holybook.lib.models
 
-import app.holybook.api.db.map
-import app.holybook.api.db.Database.transaction
-import app.holybook.api.db.getLanguageConfiguration
+import app.holybook.lib.db.map
+import app.holybook.lib.db.Database.transaction
+import app.holybook.lib.db.getLanguageConfiguration
 import java.sql.Connection
 import java.sql.ResultSet
 import kotlinx.serialization.Serializable

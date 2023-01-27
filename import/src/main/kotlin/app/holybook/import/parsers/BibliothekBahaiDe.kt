@@ -1,7 +1,7 @@
 package app.holybook.import.parsers
 
-import app.holybook.api.models.Paragraph
-import app.holybook.api.models.ParagraphType
+import app.holybook.lib.models.Paragraph
+import app.holybook.lib.models.ParagraphType
 import app.holybook.import.BookContent
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names

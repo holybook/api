@@ -1,6 +1,6 @@
 package app.holybook.import
 
-import app.holybook.api.db.Database
+import app.holybook.lib.db.Database
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking

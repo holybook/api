@@ -2,10 +2,10 @@
 
 package app.holybook.import
 
-import app.holybook.api.db.Database.transaction
-import app.holybook.api.models.createBooksTable
-import app.holybook.api.models.createParagraphsTable
-import app.holybook.api.models.createTranslationsTable
+import app.holybook.lib.db.Database.transaction
+import app.holybook.lib.models.createBooksTable
+import app.holybook.lib.models.createParagraphsTable
+import app.holybook.lib.models.createTranslationsTable
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

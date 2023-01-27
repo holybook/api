@@ -1,4 +1,4 @@
-package app.holybook.api.db
+package app.holybook.lib.db
 
 import com.zaxxer.hikari.HikariDataSource
 import java.sql.Connection

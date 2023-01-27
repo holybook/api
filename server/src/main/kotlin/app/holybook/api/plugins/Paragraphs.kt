@@ -1,6 +1,6 @@
 package app.holybook.api.plugins
 
-import app.holybook.api.models.getParagraphs
+import app.holybook.lib.models.getParagraphs
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

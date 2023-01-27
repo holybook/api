@@ -1,6 +1,6 @@
-package app.holybook.api.models
+package app.holybook.lib.models
 
-import app.holybook.api.db.map
+import app.holybook.lib.db.map
 import java.sql.Connection
 import java.sql.Timestamp
 import java.time.LocalDateTime

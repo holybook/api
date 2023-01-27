@@ -1,7 +1,7 @@
-package app.holybook.api.models
+package app.holybook.lib.models
 
-import app.holybook.api.db.Database.transaction
-import app.holybook.api.db.map
+import app.holybook.lib.db.Database.transaction
+import app.holybook.lib.db.map
 import java.sql.Connection
 import java.sql.Date
 import java.time.LocalDate
@@ -31,7 +31,8 @@ fun getAllBooks() = transaction {
     FROM translations INNER JOIN books ON translations.book = books.id
   """.trimIndent()).executeQuery().map {
     Pair(Pair(getString("id"), getString("author")),
-         Translation(getString("language"), getString("title")))
+         Translation(getString("language"), getString("title"))
+    )
   }.groupBy {
     it.first
   }.entries.map {

@@ -1,15 +1,15 @@
 package app.holybook.import
 
-import app.holybook.api.db.Database.transactionSuspending
-import app.holybook.api.models.getTranslationLastModified
-import app.holybook.api.models.insertBook
-import app.holybook.api.models.insertParagraphs
-import app.holybook.api.models.upsertTranslation
+import app.holybook.lib.db.Database.transactionSuspending
+import app.holybook.lib.models.getTranslationLastModified
+import app.holybook.lib.models.insertBook
+import app.holybook.lib.models.insertParagraphs
+import app.holybook.lib.models.upsertTranslation
 import app.holybook.import.parsers.BibliothekBahaiDe
 import app.holybook.import.parsers.ParagraphParser
 import app.holybook.import.parsers.PdfParser
 import app.holybook.import.parsers.ReferenceLibrary
-import app.holybook.util.serialization.DateSerializer
+import app.holybook.lib.serialization.DateSerializer
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

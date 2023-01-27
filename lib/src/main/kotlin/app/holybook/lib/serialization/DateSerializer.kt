@@ -1,4 +1,4 @@
-package app.holybook.util.serialization
+package app.holybook.lib.serialization
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
