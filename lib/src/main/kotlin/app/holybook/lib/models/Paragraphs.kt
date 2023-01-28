@@ -31,7 +31,7 @@ fun Connection.createParagraphsTable() {
 
 fun Connection.dropParagraphsTable() {
   createStatement().executeUpdate("""
-    DROP TABLE paragraphs;
+    DROP TABLE IF EXISTS paragraphs;
   """.trimIndent())
 }
 

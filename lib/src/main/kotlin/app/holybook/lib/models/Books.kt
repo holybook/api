@@ -11,7 +11,7 @@ fun Connection.createBooksTable() {
   createStatement().executeUpdate("""
     CREATE TABLE IF NOT EXISTS books (
         id VARCHAR(32) NOT NULL,
-        author VARCHAR(256) NOT NULL,
+        author SERIAL NOT NULL REFERENCES authors,
         published_at DATE NULL,
 
         PRIMARY KEY (id)
@@ -21,7 +21,7 @@ fun Connection.createBooksTable() {
 
 fun Connection.dropBooksTable() {
   createStatement().executeUpdate("""
-    DROP TABLE books;
+    DROP TABLE IF EXISTS books;
   """.trimIndent())
 }
 
@@ -71,13 +71,13 @@ private fun Connection.getParagraphCount(id: String): Long {
   }
 }
 
-fun Connection.insertBook(id: String, author: String, publishedAt: LocalDate?) {
+fun Connection.insertBook(id: String, authorId: Int, publishedAt: LocalDate?) {
   val preparedStatement = prepareStatement("""
       INSERT INTO books(id, author, published_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING
     """.trimIndent())
 
   preparedStatement.setString(1, id)
-  preparedStatement.setString(2, author)
+  preparedStatement.setInt(2, authorId)
   preparedStatement.setDate(3, publishedAt?.let(Date::valueOf))
   preparedStatement.executeUpdate()
 }

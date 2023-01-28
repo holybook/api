@@ -18,12 +18,14 @@ object BibliothekBahaiDe {
 
     private fun Konsumer.parse(): BookContent {
         var title = ""
+        var author = ""
         val paragraphs = mutableListOf<Paragraph>()
         child("doc") {
             child("metadata") {
-                allChildrenAutoIgnore(Names.of("titleName")) {
+                allChildrenAutoIgnore(Names.of("titleName", "authorName")) {
                     when (localName) {
                         "titleName" -> title = text()
+                        "authorName" -> author = text()
                     }
                 }
             }
@@ -31,7 +33,7 @@ object BibliothekBahaiDe {
                 processDiv(paragraphs)
             }
         }
-        return BookContent(title, paragraphs)
+        return BookContent(title, author, paragraphs)
     }
 
     private fun Konsumer.processDiv(paragraphs: MutableList<Paragraph>) {

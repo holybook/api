@@ -50,8 +50,8 @@ object ReferenceLibrary {
             }
         }
         return OriginalBook(
-            BookMetadata(author, date),
-            BookContent(title, paragraphs)
+            BookMetadata(date),
+            BookContent(title, author, paragraphs)
         )
     }
 

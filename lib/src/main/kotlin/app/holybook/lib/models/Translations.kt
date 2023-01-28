@@ -22,7 +22,7 @@ fun Connection.createTranslationsTable() {
 
 fun Connection.dropTranslationsTable() {
   createStatement().executeUpdate("""
-    DROP TABLE translations;
+    DROP TABLE IF EXISTS translations;
   """.trimIndent())
 }
 

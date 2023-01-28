@@ -2,10 +2,6 @@
 
 package app.holybook.import
 
-import app.holybook.lib.db.Database.transaction
-import app.holybook.lib.models.createBooksTable
-import app.holybook.lib.models.createParagraphsTable
-import app.holybook.lib.models.createTranslationsTable
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -15,13 +11,7 @@ suspend fun fetchAndImportIndex() {
   val index: List<BookInfo> =
     Json.decodeFromStream(Json::class.java.getResourceAsStream("/index.json"))
 
-  transaction {
-    // Create tables:
-    createBooksTable()
-    createTranslationsTable()
-    createParagraphsTable()
-  }
-
+  createDatabase()
   index.forEach { fetchAndImportBook(it) }
 }
 

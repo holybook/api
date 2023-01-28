@@ -10,10 +10,10 @@ class OriginalBook(
 
 class BookContent(
     val title: String,
+    val author: String,
     val paragraphs: List<Paragraph>
 )
 
 class BookMetadata(
-    val author: String,
     val publishedAt: LocalDate?
 )

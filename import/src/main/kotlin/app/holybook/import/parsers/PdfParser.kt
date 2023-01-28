@@ -40,6 +40,7 @@ class PdfParser : ParagraphParser<BookContent> {
 
         return BookContent(
             title = "",
+            author = "",
             paragraphs = mergedParagraphs.mapIndexed { i, text ->
                 Paragraph(
                     i,
