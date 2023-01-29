@@ -144,13 +144,15 @@ fun translate(request: TranslateRequest) = transaction {
   TranslateResponse(translatedParagraph, searchResults)
 }
 
-private fun ResultSet.currentParagraph() =
-  Paragraph(
+private fun ResultSet.currentParagraph(): Paragraph {
+  val number = getInt("number")
+  return Paragraph(
     getInt("index"),
     getString("text"),
     ParagraphType.fromValue(getString("type"))!!,
-    getInt("number")
+    if (number > 0) number else null
   )
+}
 
 fun Connection.insertParagraphs(
   bookId: String,
