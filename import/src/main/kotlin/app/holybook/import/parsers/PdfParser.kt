@@ -45,7 +45,8 @@ class PdfParser : ParagraphParser<BookContent> {
                 Paragraph(
                     i,
                     text,
-                    ParagraphType.BODY
+                    ParagraphType.BODY,
+                    null
                 )
             }
         )
