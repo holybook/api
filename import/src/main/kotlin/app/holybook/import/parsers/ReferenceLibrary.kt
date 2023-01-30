@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter.BASIC_ISO_DATE
 object ReferenceLibrary {
 
   val parser: ContentParser<OriginalBook> =
-    XmlParser("bahai.org") {
+    XmlParser(UrlPrefixMatcher("bahai.org")) {
       return@XmlParser parse()
     }
 

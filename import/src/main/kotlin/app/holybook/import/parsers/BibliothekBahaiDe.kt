@@ -11,7 +11,7 @@ import com.gitlab.mvysny.konsumexml.textRecursively
 object BibliothekBahaiDe {
 
   val parser: ContentParser<BookContent> =
-    XmlParser("bibliothek.bahai.de") {
+    XmlParser(UrlPrefixMatcher("bibliothek.bahai.de")) {
       return@XmlParser parse()
     }
 
