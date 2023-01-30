@@ -5,10 +5,7 @@ import com.gitlab.mvysny.konsumexml.konsumeXml
 import io.ktor.http.ContentType
 import io.ktor.http.Url
 import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.xpath.XPathConstants
-import javax.xml.xpath.XPathFactory
 import org.w3c.dom.Node
-import org.w3c.dom.NodeList
 
 class XmlParser<T>(
   private val urlMatcher: UrlMatcher,
@@ -38,17 +35,6 @@ class XmlDOMParser<T>(private val urlMatcher: UrlMatcher, private val transform:
     val documentBuilder = documentBuilderFactory.newDocumentBuilder()
     transform(documentBuilder.parse(content.inputStream()).documentElement)
   }
-}
-
-fun <T> Node.transform(xPathExpression: String, transform: (List<Node>) -> T): T {
-  val xpath = XPathFactory.newInstance().newXPath()
-  val nodes = xpath.evaluate(xPathExpression, this, XPathConstants.NODESET) as NodeList
-
-  val nodeList = mutableListOf<Node>()
-  for (i in 0 until nodes.length) {
-    nodeList.add(nodes.item(i))
-  }
-  return transform(nodeList)
 }
 
 interface UrlMatcher {
