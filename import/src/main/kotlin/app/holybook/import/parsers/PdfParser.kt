@@ -7,7 +7,7 @@ import io.ktor.http.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 
-class PdfParser : ParagraphParser<BookContent> {
+class PdfParser : ContentParser<BookContent> {
     override fun matches(contentType: ContentType?, url: Url): Boolean {
         return contentType?.match("application/pdf") == true
     }

@@ -1,18 +1,16 @@
 package app.holybook.import.parsers
 
 import app.holybook.import.BookContent
-import app.holybook.lib.models.Paragraph
 import app.holybook.lib.models.ParagraphListBuilder
 import app.holybook.lib.models.ParagraphType
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.Names
 import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
 import com.gitlab.mvysny.konsumexml.textRecursively
-import java.lang.AssertionError
 
 object BibliothekBahaiDe {
 
-  val parser: ParagraphParser<BookContent> =
+  val parser: ContentParser<BookContent> =
     XmlParser("bibliothek.bahai.de") {
       return@XmlParser parse()
     }

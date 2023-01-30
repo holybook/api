@@ -1,7 +1,7 @@
 package app.holybook.import
 
 import app.holybook.import.parsers.BibliothekBahaiDe
-import app.holybook.import.parsers.ParagraphParser
+import app.holybook.import.parsers.ContentParser
 import app.holybook.import.parsers.PdfParser
 import app.holybook.import.parsers.ReferenceLibrary
 import app.holybook.lib.db.Database.transactionSuspending
@@ -16,7 +16,6 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.util.logging.*
 import java.io.IOException
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -29,7 +28,7 @@ val parsers = listOf(PdfParser(), BibliothekBahaiDe.parser)
 val originalParsers = listOf(ReferenceLibrary.parser)
 
 fun <T> parseParagraphs(
-  parsers: List<ParagraphParser<T>>,
+  parsers: List<ContentParser<T>>,
   contentType: ContentType?,
   url: Url,
   content: ByteArray
@@ -43,7 +42,7 @@ fun <T> parseParagraphs(
   return null
 }
 
-suspend fun <T> fetchContent(parsers: List<ParagraphParser<T>>, contentInfo: ContentInfo): T {
+suspend fun <T> fetchContent(parsers: List<ContentParser<T>>, contentInfo: ContentInfo): T {
   val paragraphContent = client.get(contentInfo.url)
   val contentType = paragraphContent.contentType()
 
