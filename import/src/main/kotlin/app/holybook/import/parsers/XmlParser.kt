@@ -33,7 +33,7 @@ class XmlDOMParser<T>(private val urlMatcher: UrlMatcher, private val transform:
 
   override fun parse(content: ByteArray): T {
     val documentBuilder = documentBuilderFactory.newDocumentBuilder()
-    transform(documentBuilder.parse(content.inputStream()).documentElement)
+    return transform(documentBuilder.parse(content.inputStream()).documentElement)
   }
 }
 
