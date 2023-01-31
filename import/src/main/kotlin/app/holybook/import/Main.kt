@@ -1,7 +1,11 @@
 package app.holybook.import
 
 import app.holybook.import.sources.fetchSources
+import app.holybook.lib.db.Database
+import java.nio.file.FileSystems
+import java.nio.file.Path
 import kotlinx.coroutines.runBlocking
+import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 
@@ -18,22 +22,36 @@ fun main(args: Array<String>) = runBlocking {
   options.addOption("d", "database", true, "Database name")
   options.addOption("u", "user", true, "Database username")
   options.addOption("pwd", "password", false, "Use password")
+  options.addOption("o", "output", true, "Target directory for source indices")
 
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
 
   when (cmd.args.firstOrNull() ?: "import") {
-    "import" -> import()
-    "reset" -> reset()
-    "fetch-sources" -> fetchSources()
+    "import" -> import(cmd.getJdbcUrl())
+    "reset" -> reset(cmd.getJdbcUrl())
+    "fetch-sources" -> fetchSources(cmd.getTargetDirectory())
   }
 }
 
-suspend fun import() {
+suspend fun import(jdbcUrl: String) {
+  Database.init(jdbcUrl)
   fetchAndImportIndex()
 }
 
-suspend fun reset() {
+suspend fun reset(jdbcUrl: String) {
+  Database.init(jdbcUrl)
   resetDatabase()
-  import()
+  fetchAndImportIndex()
 }
+
+fun CommandLine.getTargetDirectory(): Path =
+  FileSystems.getDefault().getPath(getOptionValue("o", "import/src/main/resources"))
+
+fun CommandLine.getJdbcUrl() = getJdbcUrl(
+  host = getOptionValue("h", "127.0.0.1"),
+  port = getOptionValue("p", "5432"),
+  database = getOptionValue("d", "holybook"),
+  user = getOptionValue("u", "server"),
+  usePassword = hasOption("pwd")
+)

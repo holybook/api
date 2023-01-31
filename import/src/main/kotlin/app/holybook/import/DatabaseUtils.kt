@@ -36,18 +36,6 @@ fun resetDatabase() {
   }
 }
 
-fun initDb(cmd: CommandLine) {
-  val jdbcUrl =
-    getJdbcUrl(
-      host = cmd.getOptionValue("h", "127.0.0.1"),
-      port = cmd.getOptionValue("p", "5432"),
-      database = cmd.getOptionValue("d", "holybook"),
-      user = cmd.getOptionValue("u", "server"),
-      usePassword = cmd.hasOption("pwd")
-    )
-  Database.init(jdbcUrl)
-}
-
 fun getJdbcUrl(
   host: String,
   port: String,
