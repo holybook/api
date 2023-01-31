@@ -36,6 +36,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("com.typesafe:config:1.4.2")
     implementation("commons-cli:commons-cli:1.5.0")
+    implementation("org.jsoup:jsoup:1.15.3")
 }
 
 tasks.test {

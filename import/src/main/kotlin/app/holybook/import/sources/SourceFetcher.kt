@@ -28,6 +28,8 @@ suspend fun fetchSources(targetDirectory: Path) {
     val response = client.get(source.url)
     val contentDescriptors = source.parser(response.body())
 
+    log.info(contentDescriptors.toString())
+
     val filePath =
       FileSystems.getDefault().getPath(targetDirectory.absolutePathString() + "/${source.fileName}")
   }

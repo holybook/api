@@ -2,25 +2,21 @@ package app.holybook.import.sources
 
 import app.holybook.import.common.ContentParser
 import app.holybook.import.model.ContentDescriptor
-import app.holybook.import.parsers.getStringList
 import app.holybook.import.parsers.parse
-import org.w3c.dom.Node
+import org.jsoup.nodes.Document
 
 object ReferenceLibrary {
 
-  val uhjList: ContentParser<List<ContentDescriptor>> = {
-    it.parse {
-      parseUHJList()
-    }
-  }
+  val uhjList: ContentParser<List<ContentDescriptor>> = { it.parse { parseUHJList() } }
 
-  fun Node.parseUHJList(): List<ContentDescriptor> {
-    val ids = getStringList("//td[@class=col-date]/a@href")
+  private fun Document.parseUHJList(): List<ContentDescriptor> {
+    val ids = select("td.col-date a[href]").eachAttr("href")
     return ids.map {
+      val id = it.replace("_001/1", "")
       ContentDescriptor(
-        it.replace("_001/1", ""),
+        id,
         "en",
-        "https://www.bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/$it"
+        "\"https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}_001/${id}_001.xhtml"
       )
     }
   }
