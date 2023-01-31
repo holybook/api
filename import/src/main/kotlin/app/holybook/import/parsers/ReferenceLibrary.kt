@@ -3,6 +3,9 @@ package app.holybook.import.parsers
 import app.holybook.import.BookContent
 import app.holybook.import.BookMetadata
 import app.holybook.import.OriginalBook
+import app.holybook.import.common.CONTENT_TYPES_XML
+import app.holybook.import.common.ContentMatcher
+import app.holybook.import.common.ContentParsingRule
 import app.holybook.lib.models.ParagraphListBuilder
 import app.holybook.lib.models.ParagraphType
 import com.gitlab.mvysny.konsumexml.Konsumer
@@ -14,11 +17,11 @@ import java.time.format.DateTimeFormatter.BASIC_ISO_DATE
 
 object ReferenceLibrary {
 
-  val parser: ContentParser<OriginalBook> =
-    XmlParser(UrlPrefixMatcher("bahai.org")) {
-      return@XmlParser parse()
+  val rule = ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bahai.org")) {
+    it.parseWithKonsumer {
+      parse()
     }
-
+  }
   private fun Konsumer.parse(): OriginalBook {
     var title = ""
     var author = ""

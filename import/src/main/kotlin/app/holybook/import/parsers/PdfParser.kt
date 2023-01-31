@@ -7,12 +7,9 @@ import io.ktor.http.*
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 
-class PdfParser : ContentParser<BookContent> {
-    override fun matches(contentType: ContentType?, url: Url): Boolean {
-        return contentType?.match("application/pdf") == true
-    }
+class PdfParser {
 
-    override fun parse(content: ByteArray): BookContent {
+    fun parse(content: ByteArray): BookContent {
         val pdfDocument = PDDocument.load(content)
         val pdfTextStripper = PDFTextStripper()
         pdfTextStripper.paragraphStart = "/t"

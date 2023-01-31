@@ -1,21 +1,34 @@
 package app.holybook.import.sources
 
-import app.holybook.import.model.ContentDescriptor
-import app.holybook.import.parsers.ContentParser
-import io.ktor.client.*
-
-val httpClient = HttpClient()
+import app.holybook.import.model.SourceDescriptor
+import app.holybook.import.network.Http.client
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.http.Url
+import java.nio.file.FileSystems
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import org.slf4j.LoggerFactory
 
 private val fetchers =
-  mapOf<String, ContentParser<List<ContentDescriptor>>>(
-    "https://www.bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/" to
+  listOf(
+    SourceDescriptor(
+      Url(
+        "https://www.bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/"
+      ),
+      "en.uhj.txt",
       ReferenceLibrary.uhjList
+    )
   )
+private val log = LoggerFactory.getLogger("fetch-sources")
 
-suspend fun fetchSources() {
-  fetchers.forEach { (url, parser) ->
-    val response = httpClient.get(url)
-    parser.parse(response.body())
+suspend fun fetchSources(targetDirectory: Path) {
+  fetchers.forEach { source ->
+    log.info("Fetching sources from ${source.url}")
+    val response = client.get(source.url)
+    val contentDescriptors = source.parser(response.body())
+
+    val filePath =
+      FileSystems.getDefault().getPath(targetDirectory.absolutePathString() + "/${source.fileName}")
   }
 }
-

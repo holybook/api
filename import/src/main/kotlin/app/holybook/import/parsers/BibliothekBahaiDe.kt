@@ -1,6 +1,9 @@
 package app.holybook.import.parsers
 
 import app.holybook.import.BookContent
+import app.holybook.import.common.CONTENT_TYPES_XML
+import app.holybook.import.common.ContentMatcher
+import app.holybook.import.common.ContentParsingRule
 import app.holybook.lib.models.ParagraphListBuilder
 import app.holybook.lib.models.ParagraphType
 import com.gitlab.mvysny.konsumexml.Konsumer
@@ -10,10 +13,11 @@ import com.gitlab.mvysny.konsumexml.textRecursively
 
 object BibliothekBahaiDe {
 
-  val parser: ContentParser<BookContent> =
-    XmlParser(UrlPrefixMatcher("bibliothek.bahai.de")) {
-      return@XmlParser parse()
+  val rule = ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bibliothek.bahai.de")) {
+    it.parseWithKonsumer {
+      parse()
     }
+  }
 
   private fun Konsumer.parse(): BookContent {
     var title = ""

@@ -1,8 +1,8 @@
 package app.holybook.import
 
+import app.holybook.import.common.ContentParsingRule
+import app.holybook.import.network.Http.client
 import app.holybook.import.parsers.BibliothekBahaiDe
-import app.holybook.import.parsers.ContentParser
-import app.holybook.import.parsers.PdfParser
 import app.holybook.import.parsers.ReferenceLibrary
 import app.holybook.lib.db.Database.transactionSuspending
 import app.holybook.lib.models.findAuthorIdByName
@@ -12,10 +12,11 @@ import app.holybook.lib.models.insertBook
 import app.holybook.lib.models.insertParagraphs
 import app.holybook.lib.models.upsertTranslation
 import app.holybook.lib.serialization.DateSerializer
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.http.ContentType
+import io.ktor.http.Url
+import io.ktor.http.contentType
 import java.io.IOException
 import java.sql.Connection
 import java.time.LocalDateTime
@@ -23,26 +24,25 @@ import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("import")
-val client = HttpClient()
-val parsers = listOf(PdfParser(), BibliothekBahaiDe.parser)
-val originalParsers = listOf(ReferenceLibrary.parser)
+val parsers = listOf(BibliothekBahaiDe.rule)
+val originalParsers = listOf(ReferenceLibrary.rule)
 
 fun <T> parseParagraphs(
-  parsers: List<ContentParser<T>>,
+  rules: List<ContentParsingRule<T>>,
   contentType: ContentType?,
   url: Url,
   content: ByteArray
 ): T? {
-  for (parser in parsers) {
-    if (parser.matches(contentType, url)) {
-      return parser.parse(content)
+  for (rule in rules) {
+    if (rule.matcher.matches(contentType, url)) {
+      return rule.parser(content)
     }
   }
 
   return null
 }
 
-suspend fun <T> fetchContent(parsers: List<ContentParser<T>>, contentInfo: ContentInfo): T {
+suspend fun <T> fetchContent(parsers: List<ContentParsingRule<T>>, contentInfo: ContentInfo): T {
   val paragraphContent = client.get(contentInfo.url)
   val contentType = paragraphContent.contentType()
 
