@@ -1,0 +1,33 @@
+#translate {
+  .language-header {
+    height:60px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 600px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    .language-container {
+      flex-grow: 1;
+      max-width: 900px;
+      padding-bottom: 4px;
+    }
+  }
+
+  .text-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 600px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    .translate-text {
+      flex-grow: 1;
+      max-width: 900px;
+    }
+  }
+}

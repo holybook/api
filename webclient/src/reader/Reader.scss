@@ -1,0 +1,50 @@
+.reader {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topbar {
+  display: flex;
+}
+
+#home-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 16px;
+}
+
+#home-button:hover {
+  background-color: #efefef;
+}
+
+p.par {
+  font-family: Libertine, serif;
+  font-size: 16pt;
+  text-align: justify;
+  text-indent: 4px;
+  padding-bottom: 30px;
+  color: #2d2835;
+  max-width: 800px;
+  margin: 0;
+
+  .number {
+    font-size: 12pt;
+    vertical-align: 3px;
+    color: #6d6875;
+  }
+}
+
+p.letter-head {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+p.date {
+  text-align: center;
+}

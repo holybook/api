@@ -1,0 +1,28 @@
+.overview {
+
+  #content {
+    margin-top: 10px;
+  }
+
+  .author-books {
+
+    h1 {
+      font-family: Source Sans Pro Bold, sans-serif;
+      font-size: 20pt;
+      color: #b5838d;
+    }
+
+    .book-item {
+      display: block;
+      padding: 12px;
+      text-decoration: none;
+      font-size: 16pt;
+      color: #6d6875;
+    }
+
+    .book-item:hover {
+      background-color: #ffcdb2;
+    }
+  }
+
+}

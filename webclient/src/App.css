@@ -1,0 +1,62 @@
+@font-face {
+  font-family: Libertine;
+  src: url("fonts/LinLibertine_Rah.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: Source Sans Pro;
+  src: url("fonts/SourceSansPro-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: Source Sans Pro Bold;
+  src: url("fonts/SourceSansPro-Bold.ttf") format("truetype");
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-family: Source Sans Pro, sans-serif;
+}
+
+#root {
+  height: 100%;
+}
+
+.topbar {
+  padding: 8px;
+  flex-basis: 40px;
+  min-height: 40px;
+  background-color: #fcfcfc;
+  box-shadow: 0 3px 5px #aaa;
+}
+
+#language-selector {
+  height: 40px;
+}
+
+#content-container {
+  flex-grow: 1;
+  overflow: auto;
+  width: 100%;
+}
+
+#content {
+  max-width: 800px;
+  margin: auto;
+  padding-top: 40px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
