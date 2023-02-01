@@ -27,10 +27,15 @@ fun Connection.dropBooksTable() {
 
 fun getAllBooks() = transaction {
   prepareStatement("""
-    SELECT id, author, language, title 
-    FROM translations INNER JOIN books ON translations.book = books.id
+    SELECT books.id, author_names.name, translations.language, translations.title 
+    FROM translations 
+    INNER JOIN books ON 
+        translations.book = books.id
+    INNER JOIN author_names ON 
+        author_names.language = translations.language AND
+        author_names.id = books.author
   """.trimIndent()).executeQuery().map {
-    Pair(Pair(getString("id"), getString("author")),
+    Pair(Pair(getString("id"), getString("name")),
          Translation(getString("language"), getString("title"))
     )
   }.groupBy {
