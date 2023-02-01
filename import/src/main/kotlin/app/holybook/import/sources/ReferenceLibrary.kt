@@ -12,11 +12,11 @@ object ReferenceLibrary {
   private fun Document.parseUHJList(): List<ContentDescriptor> {
     val ids = select("td.col-date a[href]").eachAttr("href")
     return ids.map {
-      val id = it.replace("_001/1", "")
+      val id = it.replace("/1", "")
       ContentDescriptor(
         id,
         "en",
-        "\"https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}_001/${id}_001.xhtml"
+        "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}/${id}.xhtml"
       )
     }
   }

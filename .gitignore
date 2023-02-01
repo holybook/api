@@ -6,6 +6,7 @@ application.local.conf
 static
 server/src/main/resources/client
 import/src/main/resources/application.prod.conf
+cache
 
 webclient/node_modules
 .DS_Store

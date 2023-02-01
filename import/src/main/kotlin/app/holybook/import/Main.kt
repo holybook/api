@@ -1,6 +1,6 @@
 package app.holybook.import
 
-import app.holybook.import.sources.fetchSources
+import app.holybook.import.sources.SourceFetcher.fetchSources
 import app.holybook.lib.db.Database
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -9,7 +9,7 @@ import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 
-fun main(args: Array<String>) = runBlocking {
+fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
   options.addOption(
     "c",
@@ -31,6 +31,7 @@ fun main(args: Array<String>) = runBlocking {
     "import" -> import(cmd.getJdbcUrl())
     "reset" -> reset(cmd.getJdbcUrl())
     "fetch-sources" -> fetchSources(cmd.getTargetDirectory())
+    else -> import(cmd.getJdbcUrl())
   }
 }
 
@@ -46,7 +47,7 @@ suspend fun reset(jdbcUrl: String) {
 }
 
 fun CommandLine.getTargetDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("o", "import/src/main/resources"))
+  FileSystems.getDefault().getPath(getOptionValue("o", "cache"))
 
 fun CommandLine.getJdbcUrl() = getJdbcUrl(
   host = getOptionValue("h", "127.0.0.1"),
