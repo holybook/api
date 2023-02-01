@@ -34,7 +34,7 @@ object BibliothekBahaiDe {
       }
       child("main") { processDiv(paragraphs) }
     }
-    return BookContent(title, author, paragraphs.build())
+    return BookContent(title, author, null, paragraphs.build())
   }
 
   private fun Konsumer.processDiv(paragraphs: ParagraphListBuilder) {

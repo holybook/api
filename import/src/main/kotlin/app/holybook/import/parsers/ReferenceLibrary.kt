@@ -1,8 +1,6 @@
 package app.holybook.import.parsers
 
 import app.holybook.import.BookContent
-import app.holybook.import.BookMetadata
-import app.holybook.import.OriginalBook
 import app.holybook.import.common.CONTENT_TYPES_XML
 import app.holybook.import.common.ContentMatcher
 import app.holybook.import.common.ContentParsingRule
@@ -17,12 +15,11 @@ import java.time.format.DateTimeFormatter.BASIC_ISO_DATE
 
 object ReferenceLibrary {
 
-  val rule = ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bahai.org")) {
-    it.parseWithKonsumer {
-      parse()
+  val rule =
+    ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bahai.org")) {
+      it.parseWithKonsumer { parse() }
     }
-  }
-  private fun Konsumer.parse(): OriginalBook {
+  private fun Konsumer.parse(): BookContent {
     var title = ""
     var author = ""
     var date: LocalDate? = null
@@ -47,7 +44,7 @@ object ReferenceLibrary {
         skipContents()
       }
     }
-    return OriginalBook(BookMetadata(date), BookContent(title, author, paragraphs.build()))
+    return BookContent(title, author, date, paragraphs.build())
   }
 
   private fun Konsumer.recursiveGetParagraphs(paragraphs: ParagraphListBuilder) {

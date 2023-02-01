@@ -1,17 +1,15 @@
 package app.holybook.import
 
-import app.holybook.import.common.ContentParsingRule
+import app.holybook.import.model.ContentDescriptor
 import app.holybook.import.network.Http.client
 import app.holybook.import.parsers.BibliothekBahaiDe
 import app.holybook.import.parsers.ReferenceLibrary
 import app.holybook.lib.db.Database.transactionSuspending
 import app.holybook.lib.models.findAuthorIdByName
-import app.holybook.lib.models.getTranslationLastModified
 import app.holybook.lib.models.insertAuthor
 import app.holybook.lib.models.insertBook
 import app.holybook.lib.models.insertParagraphs
-import app.holybook.lib.models.upsertTranslation
-import app.holybook.lib.serialization.DateSerializer
+import app.holybook.lib.models.insertTranslation
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
@@ -19,20 +17,12 @@ import io.ktor.http.Url
 import io.ktor.http.contentType
 import java.io.IOException
 import java.sql.Connection
-import java.time.LocalDateTime
-import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("import")
-val parsers = listOf(BibliothekBahaiDe.rule)
-val originalParsers = listOf(ReferenceLibrary.rule)
+val rules = listOf(ReferenceLibrary.rule, BibliothekBahaiDe.rule)
 
-fun <T> parseParagraphs(
-  rules: List<ContentParsingRule<T>>,
-  contentType: ContentType?,
-  url: Url,
-  content: ByteArray
-): T? {
+fun parseParagraphs(contentType: ContentType?, url: Url, content: ByteArray): BookContent? {
   for (rule in rules) {
     if (rule.matcher.matches(contentType, url)) {
       return rule.parser(content)
@@ -42,49 +32,34 @@ fun <T> parseParagraphs(
   return null
 }
 
-suspend fun <T> fetchContent(parsers: List<ContentParsingRule<T>>, contentInfo: ContentInfo): T {
-  val paragraphContent = client.get(contentInfo.url)
+suspend fun fetchContent(descriptor: ContentDescriptor): BookContent {
+  val paragraphContent = client.get(descriptor.url)
   val contentType = paragraphContent.contentType()
 
-  return parseParagraphs(parsers, contentType, Url(contentInfo.url), paragraphContent.body())
-    ?: throw IOException("Could not parse content from url ${contentInfo.url}")
+  return parseParagraphs(contentType, Url(descriptor.url), paragraphContent.body())
+    ?: throw IOException("Could not parse content from url ${descriptor.url}")
 }
 
-fun Connection.importContent(bookId: String, content: BookContent, info: ContentInfo) {
-  val translationLastModified = getTranslationLastModified(bookId, info.language)
-  if (translationLastModified != null && !translationLastModified.isBefore(info.lastModified)) {
-    log.info("Translation $bookId:${info.language} is already at the newest version.")
-    return
-  }
-  upsertTranslation(bookId, info.language, content.title, info.lastModified)
-  insertParagraphs(bookId, info.language, content.paragraphs)
+fun Connection.importContent(bookId: String, content: BookContent, descriptor: ContentDescriptor) {
+  insertTranslation(bookId, descriptor.language, content.title)
+  insertParagraphs(bookId, descriptor.language, content.paragraphs)
 }
 
-suspend fun Connection.fetchAndImportContent(bookId: String, info: ContentInfo) {
-  val fetchResult = fetchContent(parsers, info)
-  importContent(bookId, fetchResult, info)
+suspend fun Connection.fetchAndImportContent(bookId: String, descriptor: ContentDescriptor) {
+  val fetchResult = fetchContent(descriptor)
+  importContent(bookId, fetchResult, descriptor)
 }
 
-suspend fun fetchAndImportBook(bookInfo: BookInfo) {
-  log.info("Importing from ${bookInfo.original.url}")
-  val original = fetchContent(originalParsers, bookInfo.original)
+suspend fun fetchAndImport(descriptor: ContentDescriptor) {
+  log.info("Importing from ${descriptor.url}")
+  val content = fetchContent(descriptor)
   transactionSuspending {
-    val authorId =
-      findAuthorIdByName(original.content.author, bookInfo.original.language)
-        ?: insertAuthor(original.content.author, bookInfo.original.language)
+    val authorId = ensureAuthor(content.author, descriptor.language)
+    insertBook(descriptor.id, authorId, content.publishedAt)
 
-    insertBook(bookInfo.id, authorId, original.metadata.publishedAt)
-    importContent(bookInfo.id, original.content, bookInfo.original)
-    bookInfo.translations.forEach {
-      log.info("Importing from ${it.url}")
-      fetchAndImportContent(bookInfo.id, it)
-    }
+    importContent(descriptor.id, content, descriptor)
   }
 }
 
-@Serializable
-class ContentInfo(
-  val url: String,
-  val language: String,
-  @Serializable(with = DateSerializer::class) val lastModified: LocalDateTime,
-)
+fun Connection.ensureAuthor(name: String, language: String) =
+  findAuthorIdByName(name, language) ?: insertAuthor(name, language)

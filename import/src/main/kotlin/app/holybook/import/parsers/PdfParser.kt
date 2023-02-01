@@ -38,6 +38,7 @@ class PdfParser {
         return BookContent(
             title = "",
             author = "",
+            publishedAt = null,
             paragraphs = mergedParagraphs.mapIndexed { i, text ->
                 Paragraph(
                     i,

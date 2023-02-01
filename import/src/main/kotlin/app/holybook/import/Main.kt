@@ -12,7 +12,7 @@ import org.apache.commons.cli.Options
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
   options.addOption(
-    "c",
+    "r",
     "recreate-db",
     false,
     "Recreate the database and populate it from scratch."
@@ -22,32 +22,22 @@ fun main(args: Array<String>): Unit = runBlocking {
   options.addOption("d", "database", true, "Database name")
   options.addOption("u", "user", true, "Database username")
   options.addOption("pwd", "password", false, "Use password")
-  options.addOption("o", "output", true, "Target directory for source indices")
+  options.addOption("c", "cache", true, "Target directory for source index caching")
 
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
 
-  when (cmd.args.firstOrNull() ?: "import") {
-    "import" -> import(cmd.getJdbcUrl())
-    "reset" -> reset(cmd.getJdbcUrl())
-    "fetch-sources" -> fetchSources(cmd.getTargetDirectory())
-    else -> import(cmd.getJdbcUrl())
+  Database.init(cmd.getJdbcUrl())
+  if (cmd.hasOption("r")) {
+    resetDatabase()
   }
+  createDatabase()
+  fetchAndImportIndex(fetchSources(cmd.getCacheDirectory()))
+
 }
 
-suspend fun import(jdbcUrl: String) {
-  Database.init(jdbcUrl)
-  fetchAndImportIndex()
-}
-
-suspend fun reset(jdbcUrl: String) {
-  Database.init(jdbcUrl)
-  resetDatabase()
-  fetchAndImportIndex()
-}
-
-fun CommandLine.getTargetDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("o", "cache"))
+fun CommandLine.getCacheDirectory(): Path =
+  FileSystems.getDefault().getPath(getOptionValue("c", "cache"))
 
 fun CommandLine.getJdbcUrl() = getJdbcUrl(
   host = getOptionValue("h", "127.0.0.1"),

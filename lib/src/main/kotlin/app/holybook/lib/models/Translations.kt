@@ -12,7 +12,6 @@ fun Connection.createTranslationsTable() {
         book VARCHAR(32) NOT NULL,
         language VARCHAR(3) NOT NULL,
         title VARCHAR(512) NOT NULL,
-        last_modified TIMESTAMP NOT NULL,
     
         PRIMARY KEY (book, language),
         FOREIGN KEY (book) REFERENCES books(id)
@@ -39,40 +38,18 @@ fun Connection.getTranslations(bookId: String): List<Translation> {
   }
 }
 
-fun Connection.getTranslationLastModified(bookId: String, language: String): LocalDateTime? {
-  val getExistingTranslation = prepareStatement("""
-      SELECT last_modified FROM translations WHERE book = ? AND language = ?
-    """.trimIndent())
-  getExistingTranslation.setString(1, bookId)
-  getExistingTranslation.setString(2, language)
-  val existingTranslation = getExistingTranslation.executeQuery()
-
-  if (!existingTranslation.next()) {
-    return null
-  }
-
-  return existingTranslation.getTimestamp("last_modified").toLocalDateTime()
-}
-
-fun Connection.upsertTranslation(
+fun Connection.insertTranslation(
   book: String,
   language: String,
-  title: String,
-  lastModified: LocalDateTime,
+  title: String
 ) {
   val upsertTranslation = prepareStatement("""
-      INSERT INTO translations(book, language, title, last_modified) VALUES (?, ?, ?, ?)
-      ON CONFLICT (book, language) DO UPDATE SET 
-        title = ?,
-        last_modified = ? 
+      INSERT INTO translations(book, language, title) VALUES (?, ?, ?)
+      ON CONFLICT DO NOTHING
     """.trimIndent())
-  val lastModifiedTimestamp = Timestamp.valueOf(lastModified)
   upsertTranslation.setString(1, book)
   upsertTranslation.setString(2, language)
   upsertTranslation.setString(3, title)
-  upsertTranslation.setTimestamp(4, lastModifiedTimestamp)
-  upsertTranslation.setString(5, title)
-  upsertTranslation.setTimestamp(6, lastModifiedTimestamp)
   upsertTranslation.executeUpdate()
 }
 

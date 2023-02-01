@@ -2,22 +2,14 @@
 
 package app.holybook.import
 
+import app.holybook.import.model.ContentDescriptor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 
-suspend fun fetchAndImportIndex() {
-  val index: List<BookInfo> =
-    Json.decodeFromStream(Json::class.java.getResourceAsStream("/index.json"))
-
-  createDatabase()
-  index.forEach { fetchAndImportBook(it) }
+suspend fun fetchAndImportIndex(descriptors: Flow<ContentDescriptor>) {
+  descriptors.collect { fetchAndImport(it) }
 }
-
-@Serializable
-data class BookInfo(
-  val id: String,
-  val original: ContentInfo,
-  val translations: List<ContentInfo> = listOf(),
-)
