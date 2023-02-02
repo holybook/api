@@ -247,4 +247,16 @@ class ParagraphListBuilder {
     } else {
       null
     }
+
+
+}
+
+class ParagraphElement(val text: String, val type: ParagraphType = ParagraphType.BODY)
+
+fun Iterable<ParagraphElement>.withIndices(): List<Paragraph> {
+  val builder = ParagraphListBuilder()
+  forEach {
+    builder.addParagraph(it.text, it.type)
+  }
+  return builder.build()
 }

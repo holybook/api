@@ -31,7 +31,7 @@ object SourceFetcher {
     )
   private val log = LoggerFactory.getLogger("fetch-sources")
 
-  suspend fun fetchSources(cacheDirectory: Path): Flow<ContentDescriptor> = flow {
+  suspend fun fetchSources(cacheDirectory: Path): Flow<List<ContentDescriptor>> = flow {
     fetchers.forEach { source ->
       log.info("Fetching sources from ${source.url}")
       val response = client.get(source.url)
@@ -42,9 +42,7 @@ object SourceFetcher {
         FileSystems.getDefault().getPath(cacheDirectory.absolutePathString() + "/${source.fileName}")
       cacheFilePath.outputStream().bufferedWriter().writeDescriptors(contentDescriptors)
 
-      contentDescriptors.forEach {
-        emit(it)
-      }
+      emit(contentDescriptors)
     }
   }
 
