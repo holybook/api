@@ -30,46 +30,6 @@ object ReferenceLibrary {
       paragraphs = paragraphs
     )
   }
-
-  // private fun Konsumer.parse(): BookContent {
-  //   var title = ""
-  //   var author = ""
-  //   var date: LocalDate? = null
-  //   val paragraphs = ParagraphListBuilder()
-  //   child("html") {
-  //     child("head") {
-  //       allChildrenAutoIgnore(Names.of("meta", "title")) {
-  //         when (localName) {
-  //           "meta" ->
-  //             when (attributes.getValueOrNull("name")) {
-  //               "author" -> author = attributes.getValue("content")
-  //               "date" -> date = LocalDate.parse(attributes.getValue("content"), BASIC_ISO_DATE)
-  //             }
-  //           "title" -> {
-  //             title = text()
-  //           }
-  //         }
-  //       }
-  //     }
-  //     child("body") {
-  //       child("div") { recursiveGetParagraphs(paragraphs) }
-  //       skipContents()
-  //     }
-  //   }
-  //   return BookContent(title, author, date, paragraphs.build())
-  // }
-  //
-  // private fun Konsumer.recursiveGetParagraphs(paragraphs: ParagraphListBuilder) {
-  //   allChildrenAutoIgnore(Names.of("div", "p")) {
-  //     when (localName) {
-  //       "div" -> recursiveGetParagraphs(paragraphs)
-  //       "p" -> {
-  //         val classNames = attributes.getValueOrNull("class")
-  //         paragraphs.addParagraph(textRecursively(), getParagraphType(classNames))
-  //       }
-  //     }
-  //   }
-  // }
 }
 
 private fun getParagraphType(classNames: String?): ParagraphType {

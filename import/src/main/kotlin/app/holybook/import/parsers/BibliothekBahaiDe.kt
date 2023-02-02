@@ -4,54 +4,35 @@ import app.holybook.import.BookContent
 import app.holybook.import.common.CONTENT_TYPES_XML
 import app.holybook.import.common.ContentMatcher
 import app.holybook.import.common.ContentParsingRule
-import app.holybook.lib.models.ParagraphListBuilder
+import app.holybook.lib.models.ParagraphElement
 import app.holybook.lib.models.ParagraphType
-import com.gitlab.mvysny.konsumexml.Konsumer
-import com.gitlab.mvysny.konsumexml.Names
-import com.gitlab.mvysny.konsumexml.allChildrenAutoIgnore
-import com.gitlab.mvysny.konsumexml.textRecursively
+import app.holybook.lib.models.withIndices
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import org.jsoup.nodes.Document
 
 object BibliothekBahaiDe {
 
-  val rule = ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bibliothek.bahai.de")) {
-    it.parseWithKonsumer {
-      parse()
+  val rule =
+    ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bibliothek.bahai.de")) {
+      it.parse { parse() }
     }
-  }
 
-  private fun Konsumer.parse(): BookContent {
-    var title = ""
-    var author = ""
-    val paragraphs = ParagraphListBuilder()
-    child("doc") {
-      child("metadata") {
-        allChildrenAutoIgnore(Names.of("titleName", "authorName")) {
-          when (localName) {
-            "titleName" -> title = text()
-            "authorName" -> author = text()
-          }
-        }
-      }
-      child("main") { processDiv(paragraphs) }
-    }
-    return BookContent(title, author, null, paragraphs.build())
-  }
-
-  private fun Konsumer.processDiv(paragraphs: ParagraphListBuilder) {
-    children(Names.of("div", "par", "heading")) {
-      when (localName) {
-        "div" -> processDiv(paragraphs)
-        "par" -> processPar(paragraphs)
-        "heading" -> paragraphs.addParagraph(text(), ParagraphType.HEADER)
-        else -> throw AssertionError("error")
-      }
-    }
-  }
-
-  private fun Konsumer.processPar(paragraphs: ParagraphListBuilder) {
-    val classNames = attributes.getValueOrNull("class")
-    childOrNull("address") { skipContents() }
-    paragraphs.addParagraph(textRecursively(), getParagraphType(classNames))
+  private fun Document.parse(): BookContent {
+    val paragraphs =
+      select("par")
+        .map { ParagraphElement(it.text(), getParagraphType(it.className())) }
+        .withIndices()
+    return BookContent(
+      title = select("metadata titleName").text(),
+      author = select("metadata authorName").text(),
+      publishedAt =
+        LocalDate.parse(
+          select("metadata translFromEditionCode").text(),
+          DateTimeFormatter.ISO_DATE
+        ),
+      paragraphs = paragraphs
+    )
   }
 
   private fun getParagraphType(classNames: String?): ParagraphType {
