@@ -4,7 +4,9 @@ import app.holybook.import.content.parsers.BibliothekBahaiDe
 import app.holybook.import.content.parsers.ReferenceLibrary
 import app.holybook.lib.models.BookContent
 import app.holybook.lib.models.ContentDescriptor
+import app.holybook.lib.models.toXmlDocument
 import app.holybook.lib.network.Http.client
+import app.holybook.lib.parsers.writeDocument
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
@@ -16,11 +18,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.outputStream
-import nl.adaptivity.xmlutil.XmlStreaming
-import nl.adaptivity.xmlutil.serialization.XML
 import org.slf4j.LoggerFactory
 
-private val xml = XML {}
 private val log = LoggerFactory.getLogger("fetch-content")
 val rules = listOf(ReferenceLibrary.rule, BibliothekBahaiDe.rule)
 
@@ -52,8 +51,7 @@ suspend fun fetchAll(descriptors: List<ContentDescriptor>, targetDirectory: Path
 
 fun BookContent.writeToDisk(path: Path) {
   Files.createDirectories(path.parent)
-  val writer = XmlStreaming.newWriter(path.outputStream(), "UTF-8")
-  xml.encodeToWriter(writer, this, null)
+  path.outputStream().writeDocument(toXmlDocument())
 }
 
 fun getFilePath(targetDirectory: Path, content: BookContent, descriptor: ContentDescriptor): Path {

@@ -9,8 +9,8 @@ val logbackVersion: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.7.20"
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.serialization") version "1.8.10"
 }
 
 group = "app.holybook:import"
@@ -37,8 +37,6 @@ dependencies {
     implementation("com.typesafe:config:1.4.2")
     implementation("commons-cli:commons-cli:1.5.0")
     implementation("org.jsoup:jsoup:1.15.3")
-    implementation("io.github.pdvrieze.xmlutil:core-jvm:0.84.3")
-    implementation("io.github.pdvrieze.xmlutil:serialization-jvm:0.84.3")
 }
 
 tasks.test {
