@@ -32,7 +32,6 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("org.slf4j:slf4j-simple:1.7.32")
     implementation("org.apache.pdfbox:pdfbox:2.0.27")
-    implementation("com.gitlab.mvysny.konsume-xml:konsume-xml:1.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("com.typesafe:config:1.4.2")
     implementation("commons-cli:commons-cli:1.5.0")

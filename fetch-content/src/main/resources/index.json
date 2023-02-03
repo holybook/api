@@ -1,0 +1,102 @@
+[
+  {
+    "id": "uhj20221101",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20221101_001/20221101_001.xhtml"
+    }
+  },
+  {
+    "id": "uhj20220704",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220704_001/20220704_001.xhtml"
+    }
+  },
+  {
+    "id": "uhj2022ridvan",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220421_001/20220421_001.xhtml"
+    },
+    "translations": [
+      {
+        "language": "de",
+        "lastModified": "2023-01-22T20:34:00",
+        "url": "https://bibliothek.bahai.de/download/xml/export_UHJ_2022-04-21_de%20(1.01)%20MAS-XML.xml"
+      }
+    ]
+  },
+  {
+    "id": "uhj20220414",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220414_001/20220414_001.xhtml"
+    }
+  },
+  {
+    "id": "uhj20220408",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220408_001/20220408_001.xhtml"
+    }
+  },
+  {
+    "id": "uhj20220104",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220104_001/20220104_001.xhtml"
+    },
+    "translations": [
+      {
+        "language": "de",
+        "lastModified": "2023-01-22T20:34:00",
+        "url": "https://bibliothek.bahai.de/download/xml/export_UHJ_2022-01-04_de%20(1.01)%20MAS-XML.xml"
+      }
+    ]
+  },
+  {
+    "id": "uhj20220103",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220103_001/20220103_001.xhtml"
+    },
+    "translations": [
+      {
+        "language": "de",
+        "lastModified": "2023-01-22T20:34:00",
+        "url": "https://bibliothek.bahai.de/download/xml/export_UHJ_2022-01-03_de%20(1.01)%20MAS-XML.xml"
+      }
+    ]
+  },
+  {
+    "id": "uhj20220101",
+    "original": {
+      "language": "en",
+      "lastModified": "2023-01-22T20:34:00",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20220101_001/20220101_001.xhtml"
+    }
+  },
+  {
+    "id": "uhj20211230",
+    "original": {
+      "language": "en",
+      "lastModified": "2022-12-20T06:00:08",
+      "url": "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/20211230_001/20211230_001.xhtml"
+    },
+    "translations": [
+      {
+        "language": "de",
+        "lastModified": "2022-12-20T06:00:08",
+        "url": "https://bibliothek.bahai.de/download/xml/export_UHJ_2021-12-30_de%20(1.02)%20MAS-XML.xml"
+      }
+    ]
+  }
+]

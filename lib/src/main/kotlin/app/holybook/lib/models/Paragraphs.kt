@@ -8,6 +8,7 @@ import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.Types
 import kotlinx.serialization.Serializable
+import nl.adaptivity.xmlutil.serialization.XmlValue
 
 fun Connection.createParagraphsTable() {
   createStatement()
@@ -200,6 +201,7 @@ data class TranslateResponse(
 @Serializable
 data class Paragraph(
   val index: Int,
+  @XmlValue(true)
   val text: String,
   @Serializable(with = ParagraphTypeSerializer::class) val type: ParagraphType,
   val number: Int?
