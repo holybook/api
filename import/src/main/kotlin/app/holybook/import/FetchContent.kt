@@ -45,19 +45,18 @@ fun Connection.importContent(bookId: String, content: BookContent, descriptor: C
   insertParagraphs(bookId, descriptor.language, content.paragraphs)
 }
 
-suspend fun Connection.fetchAndImportContent(bookId: String, descriptor: ContentDescriptor) {
-  val fetchResult = fetchContent(descriptor)
-  importContent(bookId, fetchResult, descriptor)
-}
-
 suspend fun fetchAndImport(descriptor: ContentDescriptor) {
-  log.info("Importing from ${descriptor.url}")
-  val content = fetchContent(descriptor)
-  transactionSuspending {
-    val authorId = ensureAuthor(content.author, descriptor.language)
-    insertBook(descriptor.id, authorId, content.publishedAt)
+  try {
+    log.info("Importing from ${descriptor.url}")
+    val content = fetchContent(descriptor)
+    transactionSuspending {
+      val authorId = ensureAuthor(content.author, descriptor.language)
+      insertBook(descriptor.id, authorId, content.publishedAt)
 
-    importContent(descriptor.id, content, descriptor)
+      importContent(descriptor.id, content, descriptor)
+    }
+  } catch (e: Throwable) {
+    log.warn("Failed to fetch and import ${descriptor.url}", e)
   }
 }
 

@@ -14,7 +14,7 @@ object ReferenceLibrary {
     return ids.map {
       val id = it.replace("/1", "")
       ContentDescriptor(
-        id,
+        "uhj$id",
         "en",
         "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}/${id}.xhtml"
       )
