@@ -34,8 +34,11 @@ object ReferenceLibrary {
 
 private fun getParagraphType(classNames: String?): ParagraphType {
   return when (classNames) {
+    "c xb" -> ParagraphType.LETTER_HEAD
     "c yb" -> ParagraphType.LETTER_HEAD
     "c zb" -> ParagraphType.LETTER_HEAD
+    "c ab" -> ParagraphType.LETTER_HEAD
+    "cc" -> ParagraphType.DATE
     "wb" -> ParagraphType.DATE
     "ub" -> ParagraphType.ADDRESSEE
     "tb" -> ParagraphType.SALUTATION
