@@ -2,12 +2,16 @@ package app.holybook.import
 
 import app.holybook.import.sources.SourceFetcher.fetchSources
 import app.holybook.lib.db.Database
+import app.holybook.lib.models.readContentDescriptors
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
+import java.nio.file.Files
+import kotlin.io.path.inputStream
+import kotlin.io.path.isDirectory
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
@@ -22,7 +26,7 @@ fun main(args: Array<String>): Unit = runBlocking {
   options.addOption("d", "database", true, "Database name")
   options.addOption("u", "user", true, "Database username")
   options.addOption("pwd", "password", false, "Use password")
-  options.addOption("c", "cache", true, "Target directory for source index caching")
+  options.addOption("i", "input", true, "Input directory")
 
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
@@ -32,8 +36,21 @@ fun main(args: Array<String>): Unit = runBlocking {
     resetDatabase()
   }
   createDatabase()
-  fetchAndImportIndex(fetchSources(cmd.getCacheDirectory()))
 
+
+}
+
+fun processPath(path: Path) {
+  if (path.isDirectory()) {
+    Files.list(path).forEach { processPath(it) }
+    return
+  }
+
+  runBlocking {
+    val descriptors = readContentDescriptors(path.inputStream())
+    log.info("Processing ${descriptors.size} descriptors from ${path.fileName}")
+    fetchAll(descriptors, outputDirectory)
+  }
 }
 
 fun CommandLine.getCacheDirectory(): Path =

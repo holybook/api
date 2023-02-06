@@ -2,11 +2,13 @@ package app.holybook.lib.parsers
 
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import org.w3c.dom.Document
-import javax.xml.transform.OutputKeys
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 
 private val documentBuilderFactory = DocumentBuilderFactory.newInstance()
 
@@ -28,3 +30,13 @@ fun OutputStream.writeDocument(document: Document) {
   transformer.transform(source, result)
   close()
 }
+
+fun <T> NodeList.map(body: (Node) -> T): List<T> {
+  val result = mutableListOf<T>()
+  for (i in 0 until length) {
+    result.add(body(item(i)))
+  }
+  return result
+}
+
+fun Node.getAttributeString(name: String) = attributes.getNamedItem(name)?.nodeValue
