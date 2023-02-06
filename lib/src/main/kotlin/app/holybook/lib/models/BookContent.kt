@@ -1,14 +1,15 @@
 package app.holybook.lib.models
 
 import app.holybook.lib.parsers.buildDocument
-import app.holybook.lib.parsers.getAttribute
-import app.holybook.lib.parsers.getAttributeString
+import app.holybook.lib.parsers.getAttributeOrNull
 import app.holybook.lib.parsers.map
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.w3c.dom.Document
 
 data class BookContent(
+  val id: String,
+  val language: String,
   val title: String,
   val author: String,
   val publishedAt: LocalDate?,
@@ -22,15 +23,17 @@ fun Document.toBookContent(): BookContent {
       .map { node ->
         ParagraphElement(
           node.textContent,
-          node.getAttributeString("type")?.let { ParagraphType.fromValue(it) } ?: ParagraphType.BODY
+          node.getAttributeOrNull("type")?.let { ParagraphType.fromValue(it) } ?: ParagraphType.BODY
         )
       }
       .withIndices()
   return BookContent(
+    id = bookElement.getAttribute("id"),
+    language = bookElement.getAttribute("language"),
     title = bookElement.getAttribute("title"),
     author = bookElement.getAttribute("author"),
     publishedAt =
-      bookElement.getAttributeString("publishedAt")?.let {
+      bookElement.getAttributeOrNull("publishedAt")?.let {
         LocalDate.parse(it, DateTimeFormatter.ISO_DATE)
       },
     paragraphs = paragraphs
@@ -39,6 +42,7 @@ fun Document.toBookContent(): BookContent {
 
 fun BookContent.toXmlDocument() = buildDocument { doc ->
   val bookElement = doc.createElement("book")
+  bookElement.setAttribute("id", id)
   bookElement.setAttribute("title", title)
   bookElement.setAttribute("author", author)
   if (publishedAt != null) {

@@ -8,49 +8,67 @@ import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 fun Connection.createBooksTable() {
-  createStatement().executeUpdate("""
+  createStatement()
+    .executeUpdate(
+      """
     CREATE TABLE IF NOT EXISTS books (
         id VARCHAR(32) NOT NULL,
-        author SERIAL NOT NULL REFERENCES authors,
+        author VARCHAR(32) NOT NULL,
         published_at DATE NULL,
 
         PRIMARY KEY (id)
     );
-  """.trimIndent())
+  """
+        .trimIndent()
+    )
 }
 
 fun Connection.dropBooksTable() {
-  createStatement().executeUpdate("""
+  createStatement()
+    .executeUpdate(
+      """
     DROP TABLE IF EXISTS books;
-  """.trimIndent())
+  """
+        .trimIndent()
+    )
 }
 
 fun getAllBooks() = transaction {
-  prepareStatement("""
-    SELECT books.id, author_names.name, translations.language, translations.title 
+  prepareStatement(
+      """
+    SELECT books.id, books.author, translations.language, translations.title 
     FROM translations 
-    INNER JOIN books ON 
-        translations.book = books.id
-    INNER JOIN author_names ON 
-        author_names.language = translations.language AND
-        author_names.id = books.author
-  """.trimIndent()).executeQuery().map {
-    Pair(Pair(getString("id"), getString("name")),
-         Translation(getString("language"), getString("title"))
+    INNER JOIN books ON translations.book = books.id
+  """
+        .trimIndent()
     )
-  }.groupBy {
-    it.first
-  }.entries.map {
-    Book(it.key.first, it.key.second, null, it.value.map {
-      it.second
-    })
-  }
+    .executeQuery()
+    .map {
+      Pair(
+        BookRow(getString("id"), getString("author")),
+        Translation(getString("language"), getString("title"))
+      )
+    }
+    .groupBy { (bookRow, _) -> bookRow }
+    .entries
+    .map { entry ->
+      Book(
+        id = entry.key.id,
+        author = entry.key.author,
+        paragraphCount = null,
+        translations = entry.value.map { (_, translation) -> translation }
+      )
+    }
 }
 
 fun getBook(id: String): Book? = transaction {
-  val getBook = prepareStatement("""
+  val getBook =
+    prepareStatement(
+      """
         SELECT id, author FROM books WHERE id = ?
-      """.trimIndent())
+      """
+        .trimIndent()
+    )
   getBook.setString(1, id)
   val bookRow = getBook.executeQuery()
   if (!bookRow.next()) {
@@ -64,9 +82,13 @@ fun getBook(id: String): Book? = transaction {
 }
 
 private fun Connection.getParagraphCount(id: String): Long {
-  val getParagraphCount = prepareStatement("""
+  val getParagraphCount =
+    prepareStatement(
+      """
         SELECT COUNT(*) FROM paragraphs WHERE book = ? GROUP BY language
-      """.trimIndent())
+      """
+        .trimIndent()
+    )
   getParagraphCount.setString(1, id)
   val paragraphCountRows = getParagraphCount.executeQuery()
   return if (paragraphCountRows.next()) {
@@ -76,16 +98,22 @@ private fun Connection.getParagraphCount(id: String): Long {
   }
 }
 
-fun Connection.insertBook(id: String, authorId: Int, publishedAt: LocalDate?) {
-  val preparedStatement = prepareStatement("""
+fun Connection.insertBook(id: String, author: String, publishedAt: LocalDate?) {
+  val preparedStatement =
+    prepareStatement(
+      """
       INSERT INTO books(id, author, published_at) VALUES (?, ?, ?) ON CONFLICT DO NOTHING
-    """.trimIndent())
+    """
+        .trimIndent()
+    )
 
   preparedStatement.setString(1, id)
-  preparedStatement.setInt(2, authorId)
+  preparedStatement.setString(2, author)
   preparedStatement.setDate(3, publishedAt?.let(Date::valueOf))
   preparedStatement.executeUpdate()
 }
+
+class BookRow(val id: String, val author: String)
 
 @Serializable
 data class Book(

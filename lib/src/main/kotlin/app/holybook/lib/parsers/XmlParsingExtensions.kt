@@ -1,5 +1,6 @@
 package app.holybook.lib.parsers
 
+import java.io.InputStream
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -31,6 +32,12 @@ fun OutputStream.writeDocument(document: Document) {
   close()
 }
 
+fun InputStream.readDocument(): Document {
+  val document = documentBuilderFactory.newDocumentBuilder().parse(this)
+  close()
+  return document
+}
+
 fun <T> NodeList.map(body: (Node) -> T): List<T> {
   val result = mutableListOf<T>()
   for (i in 0 until length) {
@@ -39,4 +46,4 @@ fun <T> NodeList.map(body: (Node) -> T): List<T> {
   return result
 }
 
-fun Node.getAttributeString(name: String) = attributes.getNamedItem(name)?.nodeValue
+fun Node.getAttributeOrNull(name: String) = attributes.getNamedItem(name)?.nodeValue

@@ -1,17 +1,16 @@
 package app.holybook.import
 
-import app.holybook.import.sources.SourceFetcher.fetchSources
 import app.holybook.lib.db.Database
-import app.holybook.lib.models.readContentDescriptors
+import app.holybook.lib.models.toBookContent
+import app.holybook.lib.parsers.readDocument
+import app.holybook.lib.path.PathExtensions.listFilesRecursive
 import java.nio.file.FileSystems
 import java.nio.file.Path
+import kotlin.io.path.inputStream
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
-import java.nio.file.Files
-import kotlin.io.path.inputStream
-import kotlin.io.path.isDirectory
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
@@ -36,30 +35,22 @@ fun main(args: Array<String>): Unit = runBlocking {
     resetDatabase()
   }
   createDatabase()
-
-
+  cmd.getInputDirectory().listFilesRecursive().forEach { processFile(it) }
 }
 
-fun processPath(path: Path) {
-  if (path.isDirectory()) {
-    Files.list(path).forEach { processPath(it) }
-    return
-  }
-
-  runBlocking {
-    val descriptors = readContentDescriptors(path.inputStream())
-    log.info("Processing ${descriptors.size} descriptors from ${path.fileName}")
-    fetchAll(descriptors, outputDirectory)
-  }
+fun processFile(path: Path) {
+  val content = path.inputStream().readDocument().toBookContent()
+  runBlocking { importContent(content) }
 }
 
-fun CommandLine.getCacheDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("c", "cache"))
+fun CommandLine.getInputDirectory(): Path =
+  FileSystems.getDefault().getPath(getOptionValue("i"), "raw/content")
 
-fun CommandLine.getJdbcUrl() = getJdbcUrl(
-  host = getOptionValue("h", "127.0.0.1"),
-  port = getOptionValue("p", "5432"),
-  database = getOptionValue("d", "holybook"),
-  user = getOptionValue("u", "server"),
-  usePassword = hasOption("pwd")
-)
+fun CommandLine.getJdbcUrl() =
+  getJdbcUrl(
+    host = getOptionValue("h", "127.0.0.1"),
+    port = getOptionValue("p", "5432"),
+    database = getOptionValue("d", "holybook"),
+    user = getOptionValue("u", "server"),
+    usePassword = hasOption("pwd")
+  )
