@@ -8,7 +8,7 @@ import org.apache.pdfbox.text.PDFTextStripper
 
 class PdfParser {
 
-    fun parse(content: ByteArray): BookContent {
+    fun parse(content: ByteArray): ParsedBook {
         val pdfDocument = PDDocument.load(content)
         val pdfTextStripper = PDFTextStripper()
         pdfTextStripper.paragraphStart = "/t"
@@ -34,7 +34,7 @@ class PdfParser {
             }
         }
 
-        return BookContent(
+        return ParsedBook(
             title = "",
             author = "",
             publishedAt = null,

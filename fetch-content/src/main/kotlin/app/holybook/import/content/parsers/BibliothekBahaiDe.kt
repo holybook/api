@@ -2,12 +2,11 @@ package app.holybook.import.content.parsers
 
 import app.holybook.import.common.CONTENT_TYPES_XML
 import app.holybook.import.common.ContentMatcher
-import app.holybook.import.common.ContentParsingRule
-import app.holybook.lib.models.BookContent
 import app.holybook.lib.models.ParagraphElement
 import app.holybook.lib.models.ParagraphType
 import app.holybook.lib.models.getAuthorIdByName
 import app.holybook.lib.models.withIndices
+import app.holybook.lib.parsers.ContentParsingRule
 import app.holybook.lib.parsers.parse
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -20,12 +19,12 @@ object BibliothekBahaiDe {
       it.parse { parse() }
     }
 
-  private fun Document.parse(): BookContent {
+  private fun Document.parse(): ParsedBook {
     val paragraphs =
       select("par")
         .map { ParagraphElement(it.text(), getParagraphType(it.className())) }
         .withIndices()
-    return BookContent(
+    return ParsedBook(
       title = select("metadata titleName").text(),
       author = getAuthorIdByName(select("metadata authorName").text()),
       publishedAt =

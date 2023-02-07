@@ -1,6 +1,6 @@
 package app.holybook.import.sources.parsers
 
-import app.holybook.import.common.ContentParser
+import app.holybook.lib.parsers.ContentParser
 import app.holybook.lib.models.ContentDescriptor
 import app.holybook.lib.parsers.parse
 import org.jsoup.nodes.Document

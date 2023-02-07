@@ -1,6 +1,6 @@
-package app.holybook.import.common
+package app.holybook.lib.parsers
 
-import io.ktor.http.*
+import app.holybook.import.common.ContentMatcher
 
 /** Abstract type for parsing a file into a data type. */
 typealias ContentParser<T> = (ByteArray) -> T

@@ -3,7 +3,7 @@ package app.holybook.import.common
 import io.ktor.http.ContentType
 import io.ktor.http.Url
 
-val CONTENT_TYPES_XML = listOf("application/xml", "application/xhtml+xml")
+val CONTENT_TYPES_XML = listOf("application/xml", "application/xhtml+xml", "text/html")
 
 /**
  * Matcher that specifies whether an url and content type can be handled by an associated

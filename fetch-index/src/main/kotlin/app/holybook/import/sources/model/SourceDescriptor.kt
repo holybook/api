@@ -1,6 +1,6 @@
 package app.holybook.import.sources.model
 
-import app.holybook.import.common.ContentParser
+import app.holybook.lib.parsers.ContentParser
 import app.holybook.lib.models.ContentDescriptor
 import io.ktor.http.Url
 

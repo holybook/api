@@ -13,8 +13,7 @@ private val log = LoggerFactory.getLogger("import")
 suspend fun importContent(book: BookContent) {
   try {
     transactionSuspending {
-      val authorId = getAuthorIdByName(book.author)
-      insertBook(book.id, authorId, book.publishedAt)
+      insertBook(book.id, book.author, book.publishedAt)
       insertTranslation(book.id, book.language, book.title)
       insertParagraphs(book.id, book.language, book.paragraphs)
     }
