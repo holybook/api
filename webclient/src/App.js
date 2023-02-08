@@ -9,7 +9,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     loader: async ({params}) => {
-      return fetch(`/api/books`);
+      return fetch(`/api/languages`);
     },
     element: <Overview />,
   },

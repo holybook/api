@@ -33,32 +33,30 @@ fun Connection.dropBooksTable() {
     )
 }
 
-fun getAllBooks() = transaction {
-  prepareStatement(
+fun getAllBooks(language: String) = transaction {
+  val getBooks =
+    prepareStatement(
       """
     SELECT books.id, books.author, translations.language, translations.title 
     FROM translations 
     INNER JOIN books ON translations.book = books.id
+    WHERE translations.language = ?
+    ORDER BY books.id DESC
   """
         .trimIndent()
     )
+  getBooks.setString(1, language)
+  getBooks
     .executeQuery()
     .map {
-      Pair(
-        BookRow(getString("id"), getString("author")),
-        Translation(getString("language"), getString("title"))
+      Translation(
+        bookId = getString("id"),
+        language = language,
+        title = getString("title"),
+        author = getAuthorName(getString("author"), language)
       )
     }
-    .groupBy { (bookRow, _) -> bookRow }
-    .entries
-    .map { entry ->
-      Book(
-        id = entry.key.id,
-        author = entry.key.author,
-        paragraphCount = null,
-        translations = entry.value.map { (_, translation) -> translation }
-      )
-    }
+    .groupBy { it.author }
 }
 
 fun getBook(id: String): Book? = transaction {
@@ -74,11 +72,11 @@ fun getBook(id: String): Book? = transaction {
   if (!bookRow.next()) {
     return@transaction null
   }
-  val author = bookRow.getString("author")
+  val authorCode = bookRow.getString("author")
 
   val paragraphCount = getParagraphCount(id)
-  val translations = getTranslations(id)
-  Book(id, author, paragraphCount, translations)
+  val translations = getTranslations(id, authorCode)
+  Book(id, paragraphCount, translations)
 }
 
 private fun Connection.getParagraphCount(id: String): Long {
@@ -118,7 +116,6 @@ class BookRow(val id: String, val author: String)
 @Serializable
 data class Book(
   val id: String,
-  val author: String,
   val paragraphCount: Long?,
   val translations: List<Translation>,
 )

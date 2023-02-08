@@ -14,8 +14,10 @@ private val universalHouseOfJustice =
 
 val authors = listOf(universalHouseOfJustice).associateBy { it.id }
 
-@Serializable
-data class Author(val id: String, val names: Map<String, String>)
+@Serializable data class Author(val id: String, val names: Map<String, String>)
 
-fun getAuthorName(authorCode: String, language: String): String? =
+fun getAuthorName(authorCode: String, language: String): String =
   authors[authorCode]?.names?.get(language)
+    ?: throw IllegalArgumentException(
+      "Could not find an author name for $authorCode in language $language"
+    )

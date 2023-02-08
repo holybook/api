@@ -2,6 +2,7 @@ package app.holybook.api.plugins
 
 import app.holybook.lib.models.getAllBooks
 import app.holybook.lib.models.getBook
+import app.holybook.lib.models.getSupportedLanguages
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
@@ -10,8 +11,13 @@ import io.ktor.server.routing.get
 
 fun Routing.configureBooks() {
 
+  get("/api/languages") {
+    call.respond(getSupportedLanguages())
+  }
+
   get("/api/books") {
-    call.respond(getAllBooks())
+    val language = call.parameters["lang"] ?: "en"
+    call.respond(getAllBooks(language))
   }
 
   get("/api/books/{id}") {
