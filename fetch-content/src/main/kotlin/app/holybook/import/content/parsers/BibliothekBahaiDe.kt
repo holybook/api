@@ -26,12 +26,6 @@ object BibliothekBahaiDe {
         .withIndices()
     return ParsedBook(
       title = select("metadata titleName").text(),
-      author = getAuthorIdByName(select("metadata authorName").text()),
-      publishedAt =
-        LocalDate.parse(
-          select("metadata translFromEditionCode").text(),
-          DateTimeFormatter.ISO_DATE
-        ),
       paragraphs = paragraphs
     )
   }

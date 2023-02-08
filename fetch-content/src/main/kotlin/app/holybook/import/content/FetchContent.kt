@@ -1,9 +1,6 @@
 package app.holybook.import.content
 
-import app.holybook.import.content.parsers.BibliothekBahaiDe
-import app.holybook.import.content.parsers.ParsedBook
-import app.holybook.import.content.parsers.ReferenceLibrary
-import app.holybook.import.content.parsers.withIdAndLanguage
+import app.holybook.import.content.parsers.*
 import app.holybook.lib.models.BookContent
 import app.holybook.lib.models.ContentDescriptor
 import app.holybook.lib.models.toXmlDocument
@@ -35,12 +32,13 @@ fun parseParagraphs(contentType: ContentType?, url: Url, content: ByteArray): Pa
   return null
 }
 
-suspend fun fetchContent(descriptor: ContentDescriptor): ParsedBook {
+suspend fun fetchContent(descriptor: ContentDescriptor): BookContent {
   log.info("Fetching content from ${descriptor.url}")
   val paragraphContent = client.get(descriptor.url)
   val contentType = paragraphContent.contentType()
 
   return parseParagraphs(contentType, Url(descriptor.url), paragraphContent.body())
+    ?.withContentDescriptor(descriptor)
     ?: throw IOException(
       "Could not parse content from content type $contentType and url ${descriptor.url}"
     )
@@ -49,8 +47,8 @@ suspend fun fetchContent(descriptor: ContentDescriptor): ParsedBook {
 suspend fun fetchAll(descriptors: List<ContentDescriptor>, targetDirectory: Path) {
   descriptors.forEach {
     try {
-      val content = fetchContent(it).withIdAndLanguage(it.id, it.language)
-      content.writeToDisk(getFilePath(targetDirectory, content, it))
+      val content = fetchContent(it)
+      content.writeToDisk(getFilePath(targetDirectory, it))
     } catch (e: Throwable) {
       log.warn("Failed to process ${it.url}", e)
     }
@@ -62,10 +60,13 @@ fun BookContent.writeToDisk(path: Path) {
   path.outputStream().writeDocument(toXmlDocument())
 }
 
-fun getFilePath(targetDirectory: Path, content: BookContent, descriptor: ContentDescriptor): Path {
+fun getFilePath(targetDirectory: Path, descriptor: ContentDescriptor): Path {
+  val yearFolder = descriptor.publishedAt?.let {
+    "/${it.year}"
+  } ?: ""
   return FileSystems.getDefault()
     .getPath(
       targetDirectory.absolutePathString(),
-      "/${descriptor.language}/${content.author}/${descriptor.id}.xml"
+      "/${descriptor.language}/${descriptor.authorCode}$yearFolder/${descriptor.id}.xml"
     )
 }

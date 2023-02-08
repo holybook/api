@@ -24,8 +24,6 @@ object ReferenceLibrary {
         .withIndices()
     return ParsedBook(
       title = select("head title").text(),
-      author = getAuthorIdByName(select("head meta[name=author]").attr("content")),
-      publishedAt = LocalDate.parse(select("head meta[name=date]").attr("content"), BASIC_ISO_DATE),
       paragraphs = paragraphs
     )
   }

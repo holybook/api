@@ -1,6 +1,8 @@
 package app.holybook.lib.models
 
 import java.io.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlinx.serialization.Serializable
 
 /** Describes the location of an original document containing the data of a book. */
@@ -10,7 +12,15 @@ data class ContentDescriptor(
   val language: String,
   val authorCode: String,
   val url: String
-)
+) {
+  val publishedAt: LocalDate?
+    get() =
+      if (authorCode == "uhj") {
+        LocalDate.parse(id.substring(3, 11), DateTimeFormatter.BASIC_ISO_DATE)
+      } else {
+        null
+      }
+}
 
 fun readContentDescriptors(input: InputStream): List<ContentDescriptor> {
   val resultList = mutableListOf<ContentDescriptor>()
