@@ -8,6 +8,7 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import org.w3c.dom.Document
+import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 
@@ -38,12 +39,18 @@ fun InputStream.readDocument(): Document {
   return document
 }
 
-fun <T> NodeList.map(body: (Node) -> T): List<T> {
-  val result = mutableListOf<T>()
+fun NodeList.toList(): List<Node> {
+  val result = mutableListOf<Node>()
   for (i in 0 until length) {
-    result.add(body(item(i)))
+    result.add(item(i))
   }
   return result
 }
 
-fun Node.getAttributeOrNull(name: String) = attributes.getNamedItem(name)?.nodeValue
+fun Element.getAttributeOrNull(name: String): String? {
+  val attributeValue = getAttribute(name)
+  if (attributeValue == "") {
+    return null
+  }
+  return attributeValue
+}

@@ -2,10 +2,11 @@ package app.holybook.lib.models
 
 import app.holybook.lib.parsers.buildDocument
 import app.holybook.lib.parsers.getAttributeOrNull
-import app.holybook.lib.parsers.map
+import app.holybook.lib.parsers.toList
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.w3c.dom.Document
+import org.w3c.dom.Element
 
 data class BookContent(
   val id: String,
@@ -20,10 +21,14 @@ fun Document.toBookContent(): BookContent {
   val bookElement = this.documentElement
   val paragraphs =
     bookElement.childNodes
-      .map { node ->
+      .toList()
+      .filter { node -> (node is Element) && (node.tagName == "p") }
+      .map { it as Element }
+      .map { element ->
         ParagraphElement(
-          node.textContent,
-          node.getAttributeOrNull("type")?.let { ParagraphType.fromValue(it) } ?: ParagraphType.BODY
+          element.textContent,
+          element.getAttributeOrNull("type")?.let { ParagraphType.fromValue(it) }
+            ?: ParagraphType.BODY
         )
       }
       .withIndices()
@@ -43,6 +48,7 @@ fun Document.toBookContent(): BookContent {
 fun BookContent.toXmlDocument() = buildDocument { doc ->
   val bookElement = doc.createElement("book")
   bookElement.setAttribute("id", id)
+  bookElement.setAttribute("language", language)
   bookElement.setAttribute("title", title)
   bookElement.setAttribute("author", author)
   if (publishedAt != null) {

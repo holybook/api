@@ -11,6 +11,11 @@ import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
+import app.holybook.import.ImportLogger.log
+import app.holybook.lib.models.BookContent
+import app.holybook.lib.models.toXmlDocument
+import app.holybook.lib.parsers.writeDocument
+import kotlin.io.path.outputStream
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
@@ -35,10 +40,12 @@ fun main(args: Array<String>): Unit = runBlocking {
     resetDatabase()
   }
   createDatabase()
+
   cmd.getInputDirectory().listFilesRecursive().forEach { processFile(it) }
 }
 
 fun processFile(path: Path) {
+  log.info("Importing ${path.fileName}")
   val content = path.inputStream().readDocument().toBookContent()
   runBlocking { importContent(content) }
 }
