@@ -11,6 +11,7 @@ fun Application.configureRouting() {
       useResources = true
       react("client")
     }
+    configureAuthors()
     configureBooks()
     configureParagraphs()
     configureSearch()
