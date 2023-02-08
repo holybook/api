@@ -6,7 +6,7 @@ export function setTopPosition(index, position) {
 
 export function getScrollPosition() {
     console.log('getScrollPosition: ', topPositions);
-    const contentElement = document.getElementById('content');
+    const contentElement = document.getElementById('content-container');
     const scrollPosition = contentElement.scrollTop;
     console.log('scrollPosition', scrollPosition);
 

@@ -8,15 +8,23 @@ export function Overview() {
   const supportedLanguages = useLoaderData();
   const [params,] = useSearchParams();
   const language = params.get('lang') ?? 'en';
-  const [books, setBooks] = useState(null);
+  const [books, setBooks] = useState({
+    language: null,
+    books: {}
+  });
 
   function fetchBooks() {
     fetch(`/api/books?lang=${language}`).then(response => {
       return response.json()
-    }).then(setBooks)
+    }).then((booksJson) => {
+      setBooks({
+        language: language,
+        books: booksJson
+      })
+    })
   }
 
-  if (books === null) {
+  if (books.language !== language) {
     fetchBooks();
     return <div>
       Loading...
@@ -29,8 +37,8 @@ export function Overview() {
               activeLanguage={language}/>
       <div id="content-container">
         <div id="content">
-          {Object.keys(books).map(author =>
-            <AuthorBookItems author={author} books={books[author]}/>
+          {Object.keys(books.books).map(author =>
+            <AuthorBookItems author={author} books={books.books[author]}/>
           )}
         </div>
       </div>

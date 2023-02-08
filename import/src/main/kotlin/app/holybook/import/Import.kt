@@ -2,7 +2,6 @@ package app.holybook.import
 
 import app.holybook.lib.db.Database.transactionSuspending
 import app.holybook.lib.models.BookContent
-import app.holybook.lib.models.getAuthorIdByName
 import app.holybook.lib.models.insertBook
 import app.holybook.lib.models.insertParagraphs
 import app.holybook.lib.models.insertTranslation

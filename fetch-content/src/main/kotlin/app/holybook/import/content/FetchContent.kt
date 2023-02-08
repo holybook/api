@@ -18,6 +18,7 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.outputStream
 import org.slf4j.LoggerFactory
+import kotlin.io.path.exists
 
 private val log = LoggerFactory.getLogger("fetch-content")
 val rules = listOf(ReferenceLibrary.rule, BibliothekBahaiDe.rule)
@@ -47,8 +48,13 @@ suspend fun fetchContent(descriptor: ContentDescriptor): BookContent {
 suspend fun fetchAll(descriptors: List<ContentDescriptor>, targetDirectory: Path) {
   descriptors.forEach {
     try {
+      val targetFile = getFilePath(targetDirectory, it)
+      if (targetFile.exists()) {
+        log.info("File already exists: ${targetFile.fileName}")
+        return@forEach
+      }
       val content = fetchContent(it)
-      content.writeToDisk(getFilePath(targetDirectory, it))
+      content.writeToDisk(targetFile)
     } catch (e: Throwable) {
       log.warn("Failed to process ${it.url}", e)
     }
