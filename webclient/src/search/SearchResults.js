@@ -1,18 +1,17 @@
 import {TopBar} from "./TopBar";
 import {useLoaderData, useSearchParams} from "react-router-dom";
 import React, {useState} from "react";
-import {getSupportedLanguages} from "../common/Utils";
 import './SearchResult.scss';
 
 export function SearchResultsPage() {
-    const books = useLoaderData();
+    const supportedLanguages = useLoaderData();
     const [params,] = useSearchParams();
     const query = params.get('q');
     const language = params.get('lang') ?? 'en';
 
     return (<div className="search-results">
         <TopBar
-            supportedLanguages={getSupportedLanguages(books)}
+            supportedLanguages={supportedLanguages}
             activeLanguage={language}/>
         <div id="content">
             <SearchResults
