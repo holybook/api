@@ -19,7 +19,7 @@ object BibliothekBahaiDe {
   private fun Document.parse(): ParsedBook {
     val paragraphs =
       select("par")
-        .map { ParagraphElement(it.text(), getParagraphType(it.className())) }
+        .map { ParagraphElement(it.ownText(), getParagraphType(it.className())) }
         .withIndices()
     return ParsedBook(title = select("metadata titleName").text(), paragraphs = paragraphs)
   }
