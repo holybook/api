@@ -4,6 +4,7 @@ import app.holybook.import.sources.model.SourceDescriptor
 import app.holybook.import.sources.parsers.BibliothekBahaiDe
 import app.holybook.import.sources.parsers.ReferenceLibrary
 import app.holybook.lib.models.ContentDescriptor
+import app.holybook.lib.models.writeDescriptor
 import app.holybook.lib.network.Http.client
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -52,9 +53,5 @@ object SourceFetcher {
   private fun Writer.writeDescriptors(descriptors: List<ContentDescriptor>) {
     descriptors.forEach { writeDescriptor(it) }
     flush()
-  }
-
-  private fun Writer.writeDescriptor(descriptor: ContentDescriptor) {
-    write("${descriptor.language} ${descriptor.id} ${descriptor.url}\n")
   }
 }

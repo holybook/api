@@ -1,12 +1,16 @@
 package app.holybook.lib.models
 
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.io.LineNumberReader
+import java.io.*
 import kotlinx.serialization.Serializable
 
 /** Describes the location of an original document containing the data of a book. */
-@Serializable data class ContentDescriptor(val id: String, val language: String, val url: String)
+@Serializable
+data class ContentDescriptor(
+  val id: String,
+  val language: String,
+  val authorCode: String,
+  val url: String
+)
 
 fun readContentDescriptors(input: InputStream): List<ContentDescriptor> {
   val resultList = mutableListOf<ContentDescriptor>()
@@ -19,11 +23,16 @@ fun readContentDescriptors(input: InputStream): List<ContentDescriptor> {
   return resultList
 }
 
-fun String.readContentDescriptor() : ContentDescriptor {
+fun String.readContentDescriptor(): ContentDescriptor {
   val parts = split(' ')
   return ContentDescriptor(
-    id = parts[1],
     language = parts[0],
-    url = parts[2]
+    authorCode = parts[1],
+    id = parts[2],
+    url = parts[3]
   )
+}
+
+fun Writer.writeDescriptor(descriptor: ContentDescriptor) {
+  write("${descriptor.language} ${descriptor.authorCode} ${descriptor.id} ${descriptor.url}\n")
 }

@@ -1,7 +1,7 @@
 package app.holybook.import.sources.parsers
 
-import app.holybook.lib.parsers.ContentParser
 import app.holybook.lib.models.ContentDescriptor
+import app.holybook.lib.parsers.ContentParser
 import app.holybook.lib.parsers.parse
 import org.jsoup.nodes.Document
 
@@ -20,9 +20,11 @@ object BibliothekBahaiDe {
           "-" +
           dateString.substring(6, 8)
       ContentDescriptor(
-        "uhj${dateString}_001",
-        "de",
-        "https://bibliothek.bahai.de/download/xml/export_UHJ_${dateStringWithHyphens}_de%20(1.01)%20MAS-XML.xml"
+        id = "uhj${dateString}_001",
+        language = "de",
+        authorCode = "uhj",
+        url =
+          "https://bibliothek.bahai.de/download/xml/export_UHJ_${dateStringWithHyphens}_de%20(1.01)%20MAS-XML.xml"
       )
     }
   }
