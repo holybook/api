@@ -8,8 +8,14 @@ import {Translate} from './translate/Translate';
 const router = createBrowserRouter([
   {
     path: '/',
-    loader: async ({params}) => {
-      return fetch(`/api/languages`);
+    loader: async ({request}) => {
+      const currentLanguage = new URL(request.url).searchParams.get("lang");
+      const supportedLanguages = await fetch(`/api/languages`);
+      const books = await fetch(`/api/books?lang=${currentLanguage}`);
+      return {
+        supportedLanguages: await supportedLanguages.json(),
+        books: await books.json()
+      };
     },
     element: <Overview />,
   },
