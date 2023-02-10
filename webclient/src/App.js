@@ -21,8 +21,14 @@ const router = createBrowserRouter([
   },
   {
     path: '/books/:id',
-    loader: async ({params}) => {
-      return fetch(`/api/books/${params.id}`);
+    loader: async ({params, request}) => {
+      const currentLanguage = new URL(request.url).searchParams.get("lang");
+      const book = await fetch(`/api/books/${params.id}`);
+      const paragraphs = await fetch(`/api/books/${params.id}/paragraphs?lang=${currentLanguage}`)
+      return {
+        book: await book.json(),
+        paragraphs: await paragraphs.json()
+      };
     },
     element: <Reader />
   },

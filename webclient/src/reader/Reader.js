@@ -10,7 +10,7 @@ import {parsePosition} from "./ScrollPosition";
 import './Reader.scss';
 
 export function Reader() {
-  const book = useLoaderData();
+  const {book, paragraphs} = useLoaderData();
   const [params,] = useSearchParams();
   const encodedPosition = params.get('pos');
   const position = (encodedPosition !== null) ? parsePosition(encodedPosition)
@@ -25,8 +25,7 @@ export function Reader() {
         <div id="content-container">
           <div id="content">
             <Paragraphs
-                book={book}
-                language={language}
+                paragraphs={paragraphs}
                 scrollPosition={position}/>
           </div>
         </div>

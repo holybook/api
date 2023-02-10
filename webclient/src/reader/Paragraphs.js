@@ -1,39 +1,8 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {setTopPosition} from "./ScrollPosition";
 
-export function Paragraphs({book, language, scrollPosition}) {
-
-  const [state, setState] = useState({
-    language: null,
-    paragraphs: []
-  });
-
-  function fetchParagraphs(language) {
-    fetch(
-      `/api/books/${book.id}/paragraphs?lang=${language}`)
-      .then(response => {
-        return response.json()
-      })
-      .then(paragraphs => {
-        setState({
-          language: language,
-          paragraphs: paragraphs
-        })
-      })
-  }
-
-  if (state.language !== language) {
-    // refetch
-    fetchParagraphs(language)
-  }
-
-  if (state.language === null) {
-    return <div>
-      Loading...
-    </div>
-  }
-
-  return state.paragraphs.map((paragraph) =>
+export function Paragraphs({paragraphs, scrollPosition}) {
+  return paragraphs.map((paragraph) =>
     <Paragraph
       paragraph={paragraph}
       key={paragraph.index}
