@@ -1,3 +1,5 @@
+import 'bulma/bulma.sass';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import './App.css';
 import {createBrowserRouter, RouterProvider, useParams,} from 'react-router-dom';
 import {Reader} from './reader/Reader.js';

@@ -1,6 +1,5 @@
-import {LanguageSelect} from '../common/LanguageSelect';
 import {useNavigate} from 'react-router-dom';
-import {SearchBar} from '../search/SearchBar';
+import {Dropdown, Icon, Navbar} from 'react-bulma-components';
 
 export function TopBar({supportedLanguages, activeLanguage}) {
 
@@ -10,12 +9,36 @@ export function TopBar({supportedLanguages, activeLanguage}) {
     navigate(`/?lang=${language}`);
   }
 
-  return (<div className="topbar">
-    <LanguageSelect
-        supportedLanguages={supportedLanguages}
-        activeLanguage={activeLanguage}
-        onLanguageChanged={setLanguage}
-    />
-    <SearchBar />
-  </div>);
+  return (<Navbar color="primary" active={true} fixed="top">
+    <Navbar.Brand>
+      <Navbar.Burger/>
+    </Navbar.Brand>
+    <Navbar.Menu>
+      <Navbar.Container>
+      </Navbar.Container>
+      <Navbar.Container align="right">
+        <Navbar.Item href="/">
+          <Icon><i aria-hidden="true" className="fa-solid fa-list"/></Icon>
+        </Navbar.Item>
+        <Navbar.Item href="/translate">
+          <Icon><i aria-hidden="true" className="fa-solid fa-language"/></Icon>
+        </Navbar.Item>
+        <Navbar.Item>
+          <Dropdown
+              value={activeLanguage}
+              onChange={setLanguage}
+              icon={<Icon><i aria-hidden="true"
+                             className="fa-solid fa-angle-down"/></Icon>}>
+            {
+              supportedLanguages.map((language) => (
+                  <Dropdown.Item value={language}>
+                    {language}
+                  </Dropdown.Item>
+              ))
+            }
+          </Dropdown>
+        </Navbar.Item>
+      </Navbar.Container>
+    </Navbar.Menu>
+  </Navbar>);
 }
