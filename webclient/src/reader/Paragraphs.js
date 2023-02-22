@@ -25,6 +25,6 @@ function Paragraph({paragraph, scrollPosition}) {
   });
 
   return (<p ref={ref} className={`par ${paragraph.type}`}>
-    {paragraph.number && <span className="number">{paragraph.number}</span>} {paragraph.text}
+    {paragraph.number && <span className="par-number">{paragraph.number}</span>} {paragraph.text}
   </p>);
 }

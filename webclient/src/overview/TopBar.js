@@ -1,5 +1,5 @@
 import {useNavigate} from 'react-router-dom';
-import {Dropdown, Icon, Navbar} from 'react-bulma-components';
+import {Dropdown, Icon, Navbar, Form} from 'react-bulma-components';
 
 export function TopBar({supportedLanguages, activeLanguage}) {
 
@@ -11,6 +11,9 @@ export function TopBar({supportedLanguages, activeLanguage}) {
 
   return (<Navbar color="primary" active={true} fixed="top">
     <Navbar.Brand>
+      <Navbar.Item renderAs="div">
+        <Form.Input />
+      </Navbar.Item>
       <Navbar.Burger/>
     </Navbar.Brand>
     <Navbar.Menu>
@@ -23,7 +26,7 @@ export function TopBar({supportedLanguages, activeLanguage}) {
         <Navbar.Item href="/translate">
           <Icon><i aria-hidden="true" className="fa-solid fa-language"/></Icon>
         </Navbar.Item>
-        <Navbar.Item>
+        <Navbar.Item renderAs="div">
           <Dropdown
               value={activeLanguage}
               onChange={setLanguage}
