@@ -11,7 +11,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     loader: async ({request}) => {
-      const currentLanguage = new URL(request.url).searchParams.get("lang");
+      const currentLanguage = new URL(request.url).searchParams.get('lang') ?? 'en';
       const supportedLanguages = await fetch(`/api/languages`);
       const books = await fetch(`/api/books?lang=${currentLanguage}`);
       return {
