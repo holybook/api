@@ -15,6 +15,7 @@ import app.holybook.import.ImportLogger.log
 import app.holybook.lib.models.BookContent
 import app.holybook.lib.models.toXmlDocument
 import app.holybook.lib.parsers.writeDocument
+import kotlin.io.path.name
 import kotlin.io.path.outputStream
 
 fun main(args: Array<String>): Unit = runBlocking {
@@ -45,7 +46,7 @@ fun main(args: Array<String>): Unit = runBlocking {
 }
 
 fun processFile(path: Path) {
-  log.info("Importing ${path.fileName}")
+  log.info("Importing ${path.toAbsolutePath()}")
   val content = path.inputStream().readDocument().toBookContent()
   runBlocking { importContent(content) }
 }
