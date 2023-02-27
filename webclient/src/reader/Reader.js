@@ -5,7 +5,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import {TopBar} from "./TopBar";
+import {TopBar} from "../common/TopBar";
 import {parsePosition} from "./ScrollPosition";
 import './Reader.scss';
 
@@ -17,11 +17,15 @@ export function Reader() {
       : null;
   const language = params.get('lang') ?? 'en';
 
+  const supportedLanguages = book.translations.map(
+      (translation) => translation.language);
+
   return (
       <div className="reader">
         <TopBar
             book={book}
-            activeLanguage={language}/>
+            activeLanguage={language}
+            supportedLanguages={supportedLanguages}/>
         <div id="content-container">
           <div id="content">
             <Paragraphs

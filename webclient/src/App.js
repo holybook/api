@@ -43,6 +43,9 @@ const router = createBrowserRouter([
   },
   {
     path: '/translate',
+    loader: async ({params}) => {
+      return fetch(`/api/languages`);
+    },
     element: <Translate />
   }
 ]);

@@ -1,18 +1,28 @@
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Dropdown, Icon, Navbar, Form} from 'react-bulma-components';
+import {SearchBar} from '../search/SearchBar';
 
 export function TopBar({supportedLanguages, activeLanguage}) {
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   function setLanguage(language) {
-    navigate(`/?lang=${language}`);
+    console.log('setLanguage: ', language);
+    const queryFromParam = searchParams.get('q');
+    const newSearchParams = {
+      lang: language
+    };
+    if (queryFromParam !== null) {
+      newSearchParams.query = queryFromParam;
+    }
+    setSearchParams(newSearchParams);
   }
 
   return (<Navbar color="primary" active={true} fixed="top">
     <Navbar.Brand>
       <Navbar.Item renderAs="div">
-        <Form.Input />
+        <SearchBar/>
       </Navbar.Item>
       <Navbar.Burger/>
     </Navbar.Brand>

@@ -1,28 +1,32 @@
 import {TextField} from '@mui/material';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {Form} from 'react-bulma-components';
+import {useState} from 'react';
 
 export function SearchBar() {
   const navigate = useNavigate();
   const [params,] = useSearchParams();
-  const query = params.get('q');
+  const queryFromParam = params.get('q');
   const language = params.get('lang') ?? 'en';
+
+  const [query, setQuery] = useState(queryFromParam);
 
   function keyPress(e) {
     if (e.keyCode === 13) {
-      search(e.target.value);
+      search();
     }
   }
 
-  function search(query) {
+  function search() {
     navigate(`/search?q=${encodeURIComponent(query)}&lang=${language}`)
   }
 
   return (
-      <TextField variant="outlined"
-                 size="small"
-                 placeholder="Search"
-                 defaultValue={query}
-                 onKeyDown={keyPress}
-                 fullWidth/>
+      <Form.Input
+          placeholder="Search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={keyPress}
+      />
   );
 }

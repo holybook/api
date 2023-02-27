@@ -1,4 +1,4 @@
-import {TopBar} from './TopBar';
+import {TopBar} from '../common/TopBar';
 import {useLoaderData, useSearchParams} from 'react-router-dom';
 import './Overview.scss';
 import {AuthorBookItems} from './AuthorBookItems';

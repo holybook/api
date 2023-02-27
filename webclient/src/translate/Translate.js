@@ -1,15 +1,16 @@
 import {useEffect, useState} from 'react';
-import {TopBar} from './TopBar';
+import {TopBar} from '../common/TopBar';
 import {TextField} from '@mui/material';
 import './Translate.scss';
 import {LanguageSelect} from '../common/LanguageSelect';
+import {useLoaderData} from 'react-router-dom';
 
 export function Translate() {
   const [fromLanguage, setFromLanguage] = useState('en');
   const [toLanguage, setToLanguage] = useState('de');
   const [translationResult, setTranslationResult] = useState(null);
   const [textToBeTranslated, setTextToBeTranslated] = useState('');
-  const supportedLanguages = ['en', 'de'];
+  const supportedLanguages = useLoaderData();
 
   function submitTranslation() {
     const translationRequest = {
@@ -45,9 +46,10 @@ export function Translate() {
     }
   }, [fromLanguage, toLanguage, textToBeTranslated])
 
-
   return (<div id="translate">
-        <TopBar activeLanguage={fromLanguage}/>
+        <TopBar
+            activeLanguage={fromLanguage}
+            supportedLanguages={supportedLanguages}/>
         <div className="language-header">
           <div className="language-container">
             <LanguageSelect
