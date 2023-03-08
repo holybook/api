@@ -1,23 +1,9 @@
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Dropdown, Icon, Navbar, Form} from 'react-bulma-components';
 import {SearchBar} from '../search/SearchBar';
+import {LanguageSelect} from "./LanguageSelect";
 
 export function TopBar({supportedLanguages, activeLanguage}) {
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  function setLanguage(language) {
-    console.log('setLanguage: ', language);
-    const queryFromParam = searchParams.get('q');
-    const newSearchParams = {
-      lang: language
-    };
-    if (queryFromParam !== null) {
-      newSearchParams.query = queryFromParam;
-    }
-    setSearchParams(newSearchParams);
-  }
 
   return (<Navbar color="primary" active={true} fixed="top">
     <Navbar.Brand>
@@ -37,19 +23,9 @@ export function TopBar({supportedLanguages, activeLanguage}) {
           <Icon><i aria-hidden="true" className="fa-solid fa-language"/></Icon>
         </Navbar.Item>
         <Navbar.Item renderAs="div">
-          <Dropdown
-              value={activeLanguage}
-              onChange={setLanguage}
-              icon={<Icon><i aria-hidden="true"
-                             className="fa-solid fa-angle-down"/></Icon>}>
-            {
-              supportedLanguages.map((language) => (
-                  <Dropdown.Item value={language}>
-                    {language}
-                  </Dropdown.Item>
-              ))
-            }
-          </Dropdown>
+          <LanguageSelect
+            activeLanguage={activeLanguage}
+            supportedLanguages={supportedLanguages} />
         </Navbar.Item>
       </Navbar.Container>
     </Navbar.Menu>
