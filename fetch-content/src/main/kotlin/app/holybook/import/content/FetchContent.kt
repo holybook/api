@@ -8,17 +8,15 @@ import app.holybook.lib.network.Http.client
 import app.holybook.lib.parsers.writeDocument
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.http.ContentType
-import io.ktor.http.Url
-import io.ktor.http.contentType
+import io.ktor.http.*
 import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.outputStream
 import org.slf4j.LoggerFactory
-import kotlin.io.path.exists
 
 private val log = LoggerFactory.getLogger("fetch-content")
 val rules = listOf(ReferenceLibrary.rule, BibliothekBahaiDe.rule)
@@ -36,6 +34,11 @@ fun parseParagraphs(contentType: ContentType?, url: Url, content: ByteArray): Pa
 suspend fun fetchContent(descriptor: ContentDescriptor): BookContent {
   log.info("Fetching content from ${descriptor.url}")
   val paragraphContent = client.get(descriptor.url)
+
+  if (paragraphContent.status != HttpStatusCode.OK) {
+    throw IOException("Fetching content failed with status code ${paragraphContent.status}")
+  }
+
   val contentType = paragraphContent.contentType()
 
   return parseParagraphs(contentType, Url(descriptor.url), paragraphContent.body())
@@ -67,9 +70,7 @@ fun BookContent.writeToDisk(path: Path) {
 }
 
 fun getFilePath(targetDirectory: Path, descriptor: ContentDescriptor): Path {
-  val yearFolder = descriptor.publishedAt?.let {
-    "/${it.year}"
-  } ?: ""
+  val yearFolder = descriptor.publishedAt?.let { "/${it.year}" } ?: ""
   return FileSystems.getDefault()
     .getPath(
       targetDirectory.absolutePathString(),
