@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import {TopBar} from '../common/TopBar';
-import {TextField} from '@mui/material';
 import './Translate.scss';
 import {LanguageSelect} from '../common/LanguageSelect';
 import {useLoaderData} from 'react-router-dom';
+import {Form} from 'react-bulma-components';
 
 export function Translate() {
   const [fromLanguage, setFromLanguage] = useState('en');
@@ -67,18 +67,14 @@ export function Translate() {
           </div>
         </div>
         <div className="text-container">
-          <TextField
+          <Form.Textarea
               className="translate-text"
-              multiline={true}
-              minRows="15"
-              maxRows="15"
+              fixedSize={true}
               onChange={(event) => setTextToBeTranslated(event.target.value)}
           />
-          <TextField
+          <Form.Textarea
               className="translate-text"
-              multiline={true}
-              minRows="15"
-              maxRows="15"
+              fixedSize={true}
               value={getTranslatedText()}
           />
         </div>

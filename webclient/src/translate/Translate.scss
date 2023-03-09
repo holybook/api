@@ -1,4 +1,8 @@
 #translate {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
   .language-header {
     height:60px;
     display: flex;
@@ -24,10 +28,16 @@
     min-width: 600px;
     padding-left: 20px;
     padding-right: 20px;
+    flex-grow: 1;
 
-    .translate-text {
+    textarea.translate-text {
       flex-grow: 1;
       max-width: 900px;
+      min-width: 200px;
+      height: auto;
+      max-height: 800px;
+      margin-right: 10px;
+      margin-bottom: 10px;
     }
   }
 }
