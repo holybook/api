@@ -78,9 +78,11 @@ fun searchParagraphs(language: String, query: String) = transaction {
   val getParagraphs =
     prepareStatement(
       """
-      SELECT book, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
-      FROM paragraphs 
-      WHERE language = ? AND text_tokens @@ websearch_to_tsquery(?::REGCONFIG, ?)
+      SELECT paragraphs.book, author, title, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+      FROM paragraphs
+      INNER JOIN books on paragraphs.book = books.id
+      INNER JOIN translations on books.id = translations.book and translations.language = ?
+      WHERE paragraphs.language = ? AND text_tokens @@ websearch_to_tsquery(?::REGCONFIG, ?)
     """
         .trimIndent()
     )
@@ -88,11 +90,14 @@ fun searchParagraphs(language: String, query: String) = transaction {
   getParagraphs.setString(2, languageConfiguration)
   getParagraphs.setString(3, query)
   getParagraphs.setString(4, language)
-  getParagraphs.setString(5, languageConfiguration)
-  getParagraphs.setString(6, query)
+  getParagraphs.setString(5, language)
+  getParagraphs.setString(6, languageConfiguration)
+  getParagraphs.setString(7, query)
   getParagraphs.executeQuery().map {
     SearchResult(
       bookId = getString("book"),
+      author = getAuthorName(getString("author"), language),
+      title = getString("title"),
       highlightedText = getString("highlighted"),
       paragraph = currentParagraph()
     )
@@ -104,9 +109,11 @@ fun translate(request: TranslateRequest) = transaction {
   val getParagraphs =
     prepareStatement(
       """
-    SELECT book, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
-    FROM paragraphs 
-    WHERE language = ? AND text ILIKE ?
+    SELECT paragraphs.book, author, title, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+    FROM paragraphs
+    INNER JOIN books on books.id = paragraphs.book
+    INNER JOIN translations on books.id = translations.book and translations.language = ?
+    WHERE paragraphs.language = ? AND text ILIKE ?
   """
         .trimIndent()
     )
@@ -114,11 +121,14 @@ fun translate(request: TranslateRequest) = transaction {
   getParagraphs.setString(2, languageConfiguration)
   getParagraphs.setString(3, request.text)
   getParagraphs.setString(4, request.fromLanguage)
-  getParagraphs.setString(5, "%${request.text}%")
+  getParagraphs.setString(5, request.fromLanguage)
+  getParagraphs.setString(6, "%${request.text}%")
   val searchResults =
     getParagraphs.executeQuery().map {
       SearchResult(
         bookId = getString("book"),
+        author = getAuthorName(getString("author"), request.fromLanguage),
+        title = getString("title"),
         highlightedText = getString("highlighted"),
         paragraph = currentParagraph()
       )
@@ -208,6 +218,8 @@ data class Paragraph(
 @Serializable
 data class SearchResult(
   val bookId: String,
+  val author: String,
+  val title: String,
   val highlightedText: String,
   val paragraph: Paragraph,
 )

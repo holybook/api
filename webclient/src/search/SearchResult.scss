@@ -1,8 +1,16 @@
 .search-result {
   display: block;
   padding: 12px;
-  text-decoration: none;
+  font-family: Libertine, serif;
   color: #2d2835;
+  text-decoration: none;
+  font-size: 16pt;
+
+  .search-result-author {
+    font-size: 12pt;
+    text-align: end;
+    font-style: italic;
+  }
 }
 
 .search-result:hover {
