@@ -25,11 +25,11 @@ export function Translate() {
       },
       body: JSON.stringify(translationRequest)
     }).then(response => {
-          return response.json()
-        })
-        .then(result => {
-          setTranslationResult(result);
-        });
+      return response.json()
+    })
+      .then(result => {
+        setTranslationResult(result);
+      });
   }
 
   function getTranslatedText() {
@@ -47,37 +47,55 @@ export function Translate() {
   }, [fromLanguage, toLanguage, textToBeTranslated])
 
   return (<div id="translate">
-        <TopBar
+      <TopBar
+        activeLanguage={fromLanguage}
+        supportedLanguages={supportedLanguages}/>
+      <div className="language-header">
+        <div className="language-container">
+          <LanguageSelect
+            supportedLanguages={supportedLanguages}
             activeLanguage={fromLanguage}
-            supportedLanguages={supportedLanguages}/>
-        <div className="language-header">
-          <div className="language-container">
-            <LanguageSelect
-                supportedLanguages={supportedLanguages}
-                activeLanguage={fromLanguage}
-                onLanguageChanged={setFromLanguage}
-            />
-          </div>
-          <div className="language-container">
-            <LanguageSelect
-                supportedLanguages={supportedLanguages}
-                activeLanguage={toLanguage}
-                onLanguageChanged={setToLanguage}
-            />
-          </div>
-        </div>
-        <div className="text-container">
-          <Form.Textarea
-              className="translate-text"
-              fixedSize={true}
-              onChange={(event) => setTextToBeTranslated(event.target.value)}
+            onLanguageChanged={setFromLanguage}
           />
-          <Form.Textarea
-              className="translate-text"
-              fixedSize={true}
-              value={getTranslatedText()}
+        </div>
+        <div className="language-container">
+          <LanguageSelect
+            supportedLanguages={supportedLanguages}
+            activeLanguage={toLanguage}
+            onLanguageChanged={setToLanguage}
+          />
+          <Attribution
+            translationResult={translationResult}
+            toLanguage={toLanguage}
           />
         </div>
       </div>
+      <div className="text-container">
+        <Form.Textarea
+          className="translate-text"
+          fixedSize={true}
+          onChange={(event) => setTextToBeTranslated(event.target.value)}
+        />
+        <Form.Textarea
+          className="translate-text"
+          fixedSize={true}
+          value={getTranslatedText()}
+        />
+      </div>
+    </div>
   )
+}
+
+function Attribution({translationResult, toLanguage}) {
+  if (translationResult === null) {
+    return <div/>;
+  }
+
+  const originalResult = translationResult.allOriginalResults[0];
+
+  return (<a
+    href={`/books/${originalResult.bookId}?lang=${toLanguage}&pos=${translationResult.translatedParagraph.index}:60`}
+    className="translation-attribution">
+    &mdash; {originalResult.author}, {originalResult.title}, par. {translationResult.translatedParagraph.number}
+  </a>);
 }
