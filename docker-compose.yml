@@ -1,4 +1,13 @@
 services:
+  nginx:
+    image: nginx:1.15-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
   web:
     build: .
     ports:
@@ -11,10 +20,10 @@ services:
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: books
+      POSTGRES_DB: holybook
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "54333:5432"
+      - "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 1s

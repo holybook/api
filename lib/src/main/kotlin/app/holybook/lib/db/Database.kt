@@ -23,7 +23,7 @@ object Database {
             connection.commit()
             result
         } catch (e: SQLException) {
-            log?.error("transaction failed", e)
+            log.error("transaction failed", e)
             connection.rollback()
             throw e
         } finally {
@@ -39,7 +39,7 @@ object Database {
             connection.commit()
             result
         } catch (e: SQLException) {
-            log?.error("transaction failed", e)
+            log.error("transaction failed", e)
             connection.rollback()
             throw e
         } finally {

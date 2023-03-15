@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "app.holybook:server"
-version = "0.1.0-RC5"
+version = "0.1.1"
 
 
 repositories {
