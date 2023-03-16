@@ -11,6 +11,7 @@ plugins {
     application
     kotlin("jvm") version "1.8.10"
     kotlin("plugin.serialization") version "1.8.10"
+    id("io.ktor.plugin") version "2.2.2"
 }
 
 group = "app.holybook:import"
@@ -18,6 +19,7 @@ version = "0.1.0-RC5"
 
 
 repositories {
+    jcenter()
     mavenCentral()
     maven("https://jitpack.io")
 }

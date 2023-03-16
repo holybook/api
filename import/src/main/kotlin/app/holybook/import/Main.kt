@@ -20,12 +20,6 @@ import kotlin.io.path.outputStream
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
-  options.addOption(
-    "r",
-    "recreate-db",
-    false,
-    "Recreate the database and populate it from scratch."
-  )
   options.addOption("h", "host", true, "Database host")
   options.addOption("p", "port", true, "Database port")
   options.addOption("d", "database", true, "Database name")
@@ -37,9 +31,7 @@ fun main(args: Array<String>): Unit = runBlocking {
   val cmd = parser.parse(options, args)
 
   Database.init(cmd.getJdbcUrl())
-  if (cmd.hasOption("r")) {
-    resetDatabase()
-  }
+  resetDatabase()
   createDatabase()
 
   cmd.getInputDirectory().listFilesRecursive().forEach { processFile(it) }

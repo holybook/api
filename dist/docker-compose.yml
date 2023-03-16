@@ -6,6 +6,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - /etc/ssl/holybook.app:/etc/ssl/holybook.app
     depends_on:
       - web
   web:
@@ -15,6 +16,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - RDS_USERNAME=postgres
+      - RDS_HOSTNAME=db
   db:
     image: postgres
     volumes:

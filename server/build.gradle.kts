@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     implementation(project(":lib"))
+    implementation("io.ktor:ktor-server-forwarded-header:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")

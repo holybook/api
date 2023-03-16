@@ -7,6 +7,8 @@ static
 server/src/main/resources/client
 import/src/main/resources/application.prod.conf
 raw
+dist/build
+dist/raw
 
 webclient/node_modules
 .DS_Store

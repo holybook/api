@@ -16,32 +16,33 @@ import org.slf4j.event.*
 fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
-    Database.init(environment.config.getJdbcUrl())
-    install(ContentNegotiation) {
-        json()
-    }
-    install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
-    }
-    install(CORS) {
-        allowHost("localhost:3000")
-        allowHeader(HttpHeaders.ContentType)
-    }
-    configureRouting()
+  Database.init(environment.config.getJdbcUrl())
+  install(ContentNegotiation) {
+    json()
+  }
+  install(CallLogging) {
+    level = Level.INFO
+    filter { call -> call.request.path().startsWith("/") }
+  }
+  install(CORS) {
+    allowHost("localhost:3000")
+    allowHost("holybook.app", schemes = listOf("http", "https"))
+    allowHeader(HttpHeaders.ContentType)
+  }
+  configureRouting()
 }
 
 fun ApplicationConfig.getJdbcUrl(): String {
-    val host = property("storage.hostName").getString()
-    val port = property("storage.port").getString()
-    val db = property("storage.dbName").getString()
-    val user = property("storage.userName").getString()
-    val passwordParameter = propertyOrNull("storage.password")?.getString().let {
-        if (it.isNullOrEmpty()) {
-            null
-        } else {
-            "&password=$it"
-        }
-    } ?: ""
-    return "jdbc:postgresql://$host:$port/$db?user=$user$passwordParameter"
+  val host = property("storage.hostName").getString()
+  val port = property("storage.port").getString()
+  val db = property("storage.dbName").getString()
+  val user = property("storage.userName").getString()
+  val passwordParameter = propertyOrNull("storage.password")?.getString().let {
+    if (it.isNullOrEmpty()) {
+      null
+    } else {
+      "&password=$it"
+    }
+  } ?: ""
+  return "jdbc:postgresql://$host:$port/$db?user=$user$passwordParameter"
 }
