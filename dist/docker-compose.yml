@@ -7,6 +7,7 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - /etc/ssl/holybook.app:/etc/ssl/holybook.app
+      - ./client:/client
     depends_on:
       - web
   web:
@@ -22,7 +23,7 @@ services:
   db:
     image: postgres
     volumes:
-      - ./tmp/db:/var/lib/postgresql/data
+      - /var/server/data/db:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: holybook
       POSTGRES_HOST_AUTH_METHOD: trust

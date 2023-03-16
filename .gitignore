@@ -9,6 +9,7 @@ import/src/main/resources/application.prod.conf
 raw
 dist/build
 dist/raw
+dist/client
 
 webclient/node_modules
 .DS_Store
