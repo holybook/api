@@ -2,15 +2,29 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Dropdown, Icon, Navbar, Form} from 'react-bulma-components';
 import {SearchBar} from '../search/SearchBar';
 import {LanguageSelect} from "./LanguageSelect";
+import {useState} from "react";
+import './TobBar.scss';
 
 export function TopBar({supportedLanguages, activeLanguage}) {
 
-  return (<Navbar color="primary" active={true} fixed="top">
+  const [isActive, setActive] = useState(false);
+
+  function toggleActive() {
+    setActive(!isActive);
+  }
+
+  return (<Navbar color="primary" active={isActive} fixed="top">
     <Navbar.Brand>
-      <Navbar.Item renderAs="div">
+      <Navbar.Item renderAs="div" className="language-select-container">
+        <LanguageSelect
+          activeLanguage={activeLanguage}
+          supportedLanguages={supportedLanguages} />
+      </Navbar.Item>
+      <Navbar.Item renderAs="div" className="searchbar-container">
         <SearchBar/>
       </Navbar.Item>
-      <Navbar.Burger/>
+      <Navbar.Burger
+        onClick={toggleActive} />
     </Navbar.Brand>
     <Navbar.Menu>
       <Navbar.Container>
@@ -18,14 +32,11 @@ export function TopBar({supportedLanguages, activeLanguage}) {
       <Navbar.Container align="right">
         <Navbar.Item href="/">
           <Icon><i aria-hidden="true" className="fa-solid fa-list"/></Icon>
+          &nbsp;&nbsp;Document list
         </Navbar.Item>
         <Navbar.Item href="/translate">
           <Icon><i aria-hidden="true" className="fa-solid fa-language"/></Icon>
-        </Navbar.Item>
-        <Navbar.Item renderAs="div">
-          <LanguageSelect
-            activeLanguage={activeLanguage}
-            supportedLanguages={supportedLanguages} />
+          &nbsp;&nbsp;Translate
         </Navbar.Item>
       </Navbar.Container>
     </Navbar.Menu>
