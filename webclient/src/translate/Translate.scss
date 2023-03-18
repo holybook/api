@@ -2,16 +2,16 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 16px;
 
   .language-header {
-    height:60px;
+    height: 60px;
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: center;
-    min-width: 600px;
-    padding-left: 20px;
-    padding-right: 20px;
     margin-top: 8px;
 
     .language-container {
@@ -26,23 +26,13 @@
       .dropdown {
         align-items: flex-end;
       }
-
-      .translation-attribution {
-        flex-grow: 1;
-        flex-basis: 0;
-        padding-left: 20px;
-      }
     }
   }
 
   .text-container {
     display: flex;
-    flex-direction: row;
     align-items: stretch;
     justify-content: center;
-    min-width: 600px;
-    padding-left: 20px;
-    padding-right: 20px;
     flex-grow: 1;
 
     textarea.translate-text {
@@ -55,6 +45,39 @@
       margin-bottom: 10px;
       font-family: Libertine, serif;
       font-size: 16pt;
+    }
+  }
+
+  .attribution-container {
+    max-width: 800px;
+  }
+}
+
+@media screen and (min-width: 801px) {
+  #translate {
+    .language-header {
+      min-width: 800px;
+
+      .language-container.right {
+        justify-content: start;
+      }
+    }
+
+    .text-container {
+      flex-direction: row;
+      min-width: 800px;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  #translate {
+    .language-container.right {
+        justify-content: end;
+    }
+
+    .text-container {
+      flex-direction: column;
     }
   }
 }

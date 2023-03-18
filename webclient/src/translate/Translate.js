@@ -51,22 +51,18 @@ export function Translate() {
         activeLanguage={fromLanguage}
         supportedLanguages={supportedLanguages}/>
       <div className="language-header">
-        <div className="language-container">
+        <div className="language-container left">
           <LanguageSelect
             supportedLanguages={supportedLanguages}
             activeLanguage={fromLanguage}
             onLanguageChanged={setFromLanguage}
           />
         </div>
-        <div className="language-container">
+        <div className="language-container right">
           <LanguageSelect
             supportedLanguages={supportedLanguages}
             activeLanguage={toLanguage}
             onLanguageChanged={setToLanguage}
-          />
-          <Attribution
-            translationResult={translationResult}
-            toLanguage={toLanguage}
           />
         </div>
       </div>
@@ -80,6 +76,12 @@ export function Translate() {
           className="translate-text"
           fixedSize={true}
           value={getTranslatedText()}
+        />
+      </div>
+      <div className="attribution-container">
+        <Attribution
+          translationResult={translationResult}
+          toLanguage={toLanguage}
         />
       </div>
     </div>
