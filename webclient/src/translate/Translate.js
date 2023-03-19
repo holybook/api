@@ -12,24 +12,24 @@ export function Translate() {
   const [textToBeTranslated, setTextToBeTranslated] = useState('');
   const supportedLanguages = useLoaderData();
 
-  function submitTranslation() {
+  async function submitTranslation() {
     const translationRequest = {
       fromLanguage: fromLanguage,
       toLanguage: toLanguage,
       text: textToBeTranslated
     };
-    fetch('/api/translate', {
+    const response = await fetch('/api/translate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(translationRequest)
-    }).then(response => {
-      return response.json()
-    })
-      .then(result => {
-        setTranslationResult(result);
-      });
+    });
+    if (!response.ok) {
+      setTranslationResult(null);
+      return;
+    }
+    setTranslationResult(await response.json());
   }
 
   function getTranslatedText() {
@@ -37,7 +37,11 @@ export function Translate() {
       return translationResult.translatedParagraph.text;
     }
 
-    return '';
+    if (textToBeTranslated === '') {
+      return '';
+    }
+
+    return null;
   }
 
   useEffect(() => {
@@ -67,16 +71,15 @@ export function Translate() {
         </div>
       </div>
       <div className="text-container">
-        <Form.Textarea
-          className="translate-text"
-          fixedSize={true}
-          onChange={(event) => setTextToBeTranslated(event.target.value)}
-        />
-        <Form.Textarea
-          className="translate-text"
-          fixedSize={true}
-          value={getTranslatedText()}
-        />
+        <div className="translate-text">
+          <Form.Textarea
+            fixedSize={true}
+            onChange={(event) => setTextToBeTranslated(event.target.value)}
+          />
+        </div>
+        <ResultText
+          translatedText={getTranslatedText()}
+          language={toLanguage}/>
       </div>
       <div className="attribution-container">
         <Attribution
@@ -100,4 +103,21 @@ function Attribution({translationResult, toLanguage}) {
     className="translation-attribution">
     &mdash; {originalResult.author}, {originalResult.title}, par. {translationResult.translatedParagraph.number}
   </a>);
+}
+
+function ResultText({translatedText, language}) {
+  if (translatedText === null) {
+    return (
+      <div className="translate-text error">
+        Could not find paragraph in language {language}.
+      </div>
+    )
+  }
+
+  return (
+    <div className="translate-text">
+      <Form.Textarea
+        fixedSize={true}
+        value={translatedText}
+      /></div>);
 }

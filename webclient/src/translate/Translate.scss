@@ -35,8 +35,9 @@
     justify-content: center;
     flex-grow: 1;
 
-    textarea.translate-text {
+    .translate-text {
       flex-grow: 1;
+      flex-basis: 0;
       max-width: 900px;
       min-width: 200px;
       height: auto;
@@ -45,6 +46,19 @@
       margin-bottom: 10px;
       font-family: Libertine, serif;
       font-size: 16pt;
+
+      &.error {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #efefef;
+        font-family: Avenir, serif;
+        color: #999;
+      }
+
+      textarea {
+        height: 100%;
+      }
     }
   }
 

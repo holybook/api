@@ -13,13 +13,24 @@
   src: url("fonts/SourceSansPro-Bold.ttf") format("truetype");
 }
 
+@import '../node_modules/bulma/sass/utilities/initial-variables.sass';
+@import '../node_modules/bulma/sass/utilities/derived-variables.sass';
+$family-primary: Avenir, serif;
+$family-secondary: Avenir, serif;
+
+@import '../node_modules/bulma/bulma.sass';
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  font-family: $family-primary;
+}
+
 html {
   height: 100%;
 }
 
 body {
   height: 100%;
-  font-family: Source Sans Pro, sans-serif;
+  font-family: Avenir, sans-serif;
 }
 
 #root {
