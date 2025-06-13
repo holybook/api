@@ -1,15 +1,12 @@
-import Deps.pdfBox
 import Deps.xml
 
 plugins {
     application
     id("cli-application")
-    id("ktor-dependencies")
 }
 
-group = "app.holybook:import"
-version = "0.1.0-RC5"
-
+group = "app.holybook:index"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -19,6 +16,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(project(":lib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.+")
     xml()
 }
 
@@ -27,5 +25,5 @@ tasks.test {
 }
 
 application {
-    mainClass.set("app.holybook.import.MainKt")
+    mainClass.set("app.holybook.index.MainKt")
 }

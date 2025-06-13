@@ -11,7 +11,7 @@ fun Routing.configureParagraphs() {
   get("/api/books/{id}/paragraphs") { fetchParagraphs() }
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.fetchParagraphs() {
+suspend fun RoutingContext.fetchParagraphs() {
   val bookId = call.parameters["id"]
 
   if (bookId == null) {

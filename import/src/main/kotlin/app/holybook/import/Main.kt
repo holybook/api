@@ -20,6 +20,7 @@ import kotlin.io.path.outputStream
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
+  options.addOption("jdbc", true, "Full custom jdbc url")
   options.addOption("h", "host", true, "Database host")
   options.addOption("p", "port", true, "Database port")
   options.addOption("d", "database", true, "Database name")
@@ -46,11 +47,16 @@ fun processFile(path: Path) {
 fun CommandLine.getInputDirectory(): Path =
   FileSystems.getDefault().getPath(getOptionValue("i", "raw/content"))
 
-fun CommandLine.getJdbcUrl() =
-  getJdbcUrl(
+fun CommandLine.getJdbcUrl(): String {
+  if (hasOption("jdbc")) {
+    return getOptionValue("jdbc")
+  }
+
+  return getJdbcUrl(
     host = getOptionValue("h", "127.0.0.1"),
     port = getOptionValue("p", "5432"),
     database = getOptionValue("d", "holybook"),
     user = getOptionValue("u", "server"),
     usePassword = hasOption("pwd")
   )
+}
