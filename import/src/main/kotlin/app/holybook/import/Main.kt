@@ -45,7 +45,7 @@ fun processFile(path: Path) {
 }
 
 fun CommandLine.getInputDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("i", "raw/content"))
+  FileSystems.getDefault().getPath(getOptionValue("i", "../../data/content"))
 
 fun CommandLine.getJdbcUrl(): String {
   if (hasOption("jdbc")) {

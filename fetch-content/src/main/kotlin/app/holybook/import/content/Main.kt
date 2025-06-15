@@ -22,8 +22,8 @@ fun main(args: Array<String>): Unit = runBlocking {
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
 
-  val inputPath = FileSystems.getDefault().getPath(cmd.getOptionValue("i", "raw/index"))
-  val outputDirectory = FileSystems.getDefault().getPath(cmd.getOptionValue("o", "raw/content"))
+  val inputPath = FileSystems.getDefault().getPath(cmd.getOptionValue("i", "../../data/index"))
+  val outputDirectory = FileSystems.getDefault().getPath(cmd.getOptionValue("o", "../../data/content"))
   processPath(inputPath, outputDirectory)
 }
 
@@ -34,11 +34,9 @@ fun processPath(path: Path, outputDirectory: Path) {
   }
 
   runBlocking {
+    log.info("Reading descriptors from ${path.fileName}")
     val descriptors = readContentDescriptors(path.inputStream())
     log.info("Processing ${descriptors.size} descriptors from ${path.fileName}")
     fetchAll(descriptors, outputDirectory)
   }
 }
-
-fun CommandLine.getOutputDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("o", "raw/content"))

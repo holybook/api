@@ -27,5 +27,5 @@ tasks.test {
 }
 
 application {
-    mainClass.set("app.holybook.import.MainKt")
+    mainClass.set("app.holybook.import.content.MainKt")
 }

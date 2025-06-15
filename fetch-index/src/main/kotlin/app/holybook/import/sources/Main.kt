@@ -19,4 +19,4 @@ fun main(args: Array<String>): Unit = runBlocking {
 }
 
 fun CommandLine.getOutputDirectory(): Path =
-  FileSystems.getDefault().getPath(getOptionValue("o", "raw/index"))
+  FileSystems.getDefault().getPath(getOptionValue("o", "../../data/index"))

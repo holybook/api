@@ -41,11 +41,13 @@ object SourceFetcher {
       log.info("Fetching sources from ${source.url}")
       val response = client.get(source.url)
       val contentDescriptors = source.parser(response.body())
+      log.info(" - Extracted ${contentDescriptors.size} content descriptors")
 
       Files.createDirectories(outputDirectory)
       val cacheFilePath =
         FileSystems.getDefault()
           .getPath(outputDirectory.absolutePathString() + "/${source.fileName}")
+      log.info(" - Writing descriptors to $cacheFilePath")
       cacheFilePath.outputStream().bufferedWriter().writeDescriptors(contentDescriptors)
     }
   }
