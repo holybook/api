@@ -1,0 +1,18 @@
+runtime: java21
+entrypoint: 'java -jar server-all.jar'
+env_variables:
+  JDBC_URL: jdbc:postgresql:///holybook?cloudSqlInstance=${DB_INSTANCE}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${DB_USER}&password=${DB_PWD}
+handlers:
+  - url: /api/.*
+    script: auto
+
+  - url: /static
+    static_dir: webclient/static
+
+  - url: /(.*\.(json|ico|js))$
+    static_files: webclient/\1
+    upload: webclient/.*\.(json|ico|js)$
+
+  - url: /.*
+    static_files: webclient/index.html
+    upload: webclient/index.html

@@ -44,3 +44,9 @@ tasks.test {
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

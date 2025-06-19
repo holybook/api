@@ -33,16 +33,5 @@ fun Application.module() {
 }
 
 fun ApplicationConfig.getJdbcUrl(): String {
-  val host = property("storage.hostName").getString()
-  val port = property("storage.port").getString()
-  val db = property("storage.dbName").getString()
-  val user = property("storage.userName").getString()
-  val passwordParameter = propertyOrNull("storage.password")?.getString().let {
-    if (it.isNullOrEmpty()) {
-      null
-    } else {
-      "&password=$it"
-    }
-  } ?: ""
-  return "jdbc:postgresql://$host:$port/$db?user=$user$passwordParameter"
+  return property("storage.jdbcUrl").getString()
 }

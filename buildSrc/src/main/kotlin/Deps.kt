@@ -5,7 +5,6 @@ object Deps {
     fun DependencyHandlerScope.logging() {
         implementation("org.slf4j:slf4j-api:${Versions.slf4jVersion}")
         implementation("org.slf4j:slf4j-simple:${Versions.slf4jVersion}")
-//        implementation("ch.qos.logback:logback-classic:${Versions.logbackVersion}")
     }
 
     fun DependencyHandlerScope.xml() {
@@ -26,5 +25,6 @@ object Deps {
         implementation("org.postgresql:postgresql:42.+")
         implementation("org.xerial:sqlite-jdbc:3.+")
         implementation ("com.zaxxer:HikariCP:6.+")
+        implementation("com.google.cloud.sql:postgres-socket-factory:1.+")
     }
 }

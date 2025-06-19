@@ -37,4 +37,21 @@ This repository provides a command line utility to automatically retrieve indice
 ```
 
 By default, the output directory points to a sibling directory of this repository named `data`. It is usually a clone of
-the `holybook/data` repository ensuring that indices are saved to that repository. 
+the `holybook/data` repository ensuring that indices are saved to that repository.
+
+## Import
+
+The book xmls can be imported into the database with the `:import` application. In order to import into the Google cloud
+instance of the database make sure you authorize the client first.
+
+```shell
+gcloud auth application-default login
+```
+
+The application itself can be run like this:
+
+```shell
+./gradlew :import:run --args="-jdbc <JDBCURL>"
+```
+
+It also provides individual parameters to specify the host, port, username and password for standard jdbc urls.
