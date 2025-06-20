@@ -1,10 +1,36 @@
 @import app.holybook.lib.translation.TranslationTemplateData
+@import app.holybook.lib.translation.Translation.id
 @import app.holybook.lib.models.TranslateResponse
+@import app.holybook.lib.db.getLanguageConfiguration
 
 @param model: TranslationTemplateData
 
-@for(response in model.translateResponses)
-    <p id="${response.allOriginalResults[0].bookId}:${response.translatedParagraph.index}">
+You are a professional translator. Your goal is to translate a source text from
+${getLanguageConfiguration(model.fromLanguage)} to ${getLanguageConfiguration(model.toLanguage)}.
 
+The source text may contain holy writings. It is important that for holy writings, the authoritative translation is used
+instead of creating a new one.
+
+In order to assist you, you are provided with all authoritative translations that appear in the source text. Note tha
+the authoritative translations might contain more text than in the source. In this case, please chose the appropriate
+section of the authoritative translation. Make sure that you DO NOT change the authoritative translation. Only take a
+verbatim sub string.
+
+These are all relevant authoritative translations. Each paragraph is enclosed in an p element which provides an id to
+match the authoritative translation with the corresponding paragraph in the source text.
+
+@for(translation in model.authoritativeTranslations)
+    <p id="${translation.id}">
+        ${translation.translatedParagraph.text}
+    </p>
+@endfor
+
+Here is the source text to be translated. It is also split up into paragraphs which are enclosed by the p
+element. If there is an authoritative translation for the paragraph it contains an id attribute that matches the one
+above. In case there is no id, you can translate the paragraph to the best of your abilities.
+
+@for(paragraph in model.paragraphsToBeTranslated)
+    <p id="${paragraph.translationId}">
+        ${paragraph.text}
     </p>
 @endfor
