@@ -1,0 +1,12 @@
+### GET request to example server
+POST http://0.0.0.0:8080/api/aitranslate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "fromLanguage": "en",
+  "toLanguage": "de",
+  "text": "Hello, how are you?"
+}
+
+###

@@ -1,0 +1,10 @@
+@import app.holybook.lib.translation.TranslationTemplateData
+@import app.holybook.lib.models.TranslateResponse
+
+@param model: TranslationTemplateData
+
+@for(response in model.translateResponses)
+    <p id="${response.allOriginalResults[0].bookId}:${response.translatedParagraph.index}">
+
+    </p>
+@endfor

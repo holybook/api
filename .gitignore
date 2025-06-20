@@ -11,6 +11,7 @@ raw
 dist/build
 dist/raw
 dist/client
+jte-classes
 
 webclient/node_modules
 .DS_Store

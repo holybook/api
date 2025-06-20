@@ -19,6 +19,8 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("com.google.genai:google-genai:1+")
+    implementation("gg.jte:jte:3.+")
+    implementation("gg.jte:jte-kotlin:3.2.1")
     database()
     xml()
 }

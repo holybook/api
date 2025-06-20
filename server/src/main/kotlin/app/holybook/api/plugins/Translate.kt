@@ -11,7 +11,7 @@ fun Routing.configureTranslate() {
     post("/api/aitranslate") {
         val request = call.receive<TranslateRequest>()
         val result = Translation.translate(request.fromLanguage, request.toLanguage, request.text)
-        call.respond(TranslateResponse(result))
+        call.respondText(result)
     }
 }
 
