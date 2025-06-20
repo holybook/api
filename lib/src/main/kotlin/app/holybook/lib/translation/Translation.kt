@@ -2,8 +2,13 @@ package app.holybook.lib.translation
 
 import app.holybook.lib.models.TranslateRequest
 import app.holybook.lib.models.translate
+import com.google.genai.Client
+import org.slf4j.LoggerFactory
 
 object Translation {
+
+  private val log = LoggerFactory.getLogger("translation")
+  val client = Client()
 
   fun translate(
     fromLanguage: String,
@@ -23,10 +28,19 @@ object Translation {
         )
       }
 
-    return TranslationTemplateEngine.renderPrompt(
+    val prompt = TranslationTemplateEngine.renderPrompt(
       TranslationTemplateData(
         translateResponses
       )
     )
+
+    log.info("Prompt: $prompt")
+
+    return client.models.generateContent(
+      "gemini-2.5-flash",
+      prompt,
+      null
+    ).text() ?: "No response"
+
   }
 }
