@@ -1,4 +1,4 @@
-### GET request to example server
+### AI Translation
 POST http://0.0.0.0:8080/api/aitranslate
 Content-Type: application/json
 Accept: application/json
@@ -9,4 +9,7 @@ Accept: application/json
   "text": "As the House of Justice writes in its message from 30 December 2021:\n\nit means learning how to contribute to the discourses that influence the direction of that progress. These areas of endeavour are, naturally, familiar ones. Seen from one perspective, they are quite distinct, each having its own characteristics and imperatives. Yet they all represent ways of awakening the energies latent in the human soul and channelling them towards the betterment of society.\n\nAnd further it writes:\n\nThese three constant protagonists of the Plan each have a part to play, and each one has capacities and qualities that must be developed. However, each is incapable of manifesting its full potential on its own. It is by strengthening their dynamic relationships with one another that their powers are combined and multiplied."
 }
 
-###
+### GET books
+GET http://0.0.0.0:8080/api/books
+Content-Type: application/json
+Accept: application/json

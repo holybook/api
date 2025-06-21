@@ -1,5 +1,5 @@
 @import app.holybook.lib.translation.TranslationTemplateData
-@import app.holybook.lib.translation.Translation.id
+@import app.holybook.lib.translation.Translation.bookId
 @import app.holybook.lib.models.TranslateResponse
 @import app.holybook.lib.db.getLanguageConfiguration
 
@@ -16,21 +16,51 @@ the authoritative translations might contain more text than in the source. In th
 section of the authoritative translation. Make sure that you DO NOT change the authoritative translation. Only take a
 verbatim sub string.
 
-These are all relevant authoritative translations. Each paragraph is enclosed in an p element which provides an id to
-match the authoritative translation with the corresponding paragraph in the source text.
+These are all relevant authoritative translations. Each paragraph is enclosed in an p element which provides a bookId
+and index to match the authoritative translation with the corresponding paragraph in the source text. The combination of
+bookId and index uniquely identifies a paragraph.
 
 @for(translation in model.authoritativeTranslations)
-    <p id="${translation.id}">
+    <p bookId="${translation.bookId}" index="${translation.translatedParagraph.index}">
         ${translation.translatedParagraph.text}
     </p>
 @endfor
 
 Here is the source text to be translated. It is also split up into paragraphs which are enclosed by the p
-element. If there is an authoritative translation for the paragraph it contains an id attribute that matches the one
-above. In case there is no id, you can translate the paragraph to the best of your abilities.
+element. If there is an authoritative translation for the paragraph it contains the bookId and index attributes that
+match the one above. In case there is no identification information, you can translate the paragraph to the best of your
+abilities.
 
 @for(paragraph in model.paragraphsToBeTranslated)
-    <p id="${paragraph.translationId}">
+    <p bookId="${paragraph.reference?.bookId}"
+       index="${paragraph.reference?.index}">
         ${paragraph.text}
     </p>
 @endfor
+
+Output the result as a json object. It has a paragraphs field which is an array of objects. Each object has a text
+field which contains the translated paragraph. In addition to the text field each paragraph also has a reference field
+which in turn is an object with two fields: bookId and index.
+
+Example:
+
+{
+    "paragraphs": [
+        {
+            "text": "This is a paragraph.",
+            "reference": {
+                "bookId": "bookId",
+                "index": 12
+            }
+        },
+        {
+            "text": "This is another paragraph.",
+            "reference": {
+                "bookId": "bookId",
+                "index": 15
+            }
+        }
+    ]
+}
+
+Don't put anything else in the response. Just the plain json object and no markdown around it.
