@@ -13,9 +13,6 @@ object Translation {
   private val log = LoggerFactory.getLogger("translation")
   val client = Client()
 
-  val TranslateResponse.bookId: String
-    get() = allOriginalResults[0].bookId
-
   fun translate(
     fromLanguage: String,
     toLanguage: String,
@@ -72,23 +69,34 @@ object Translation {
 
     log.info("Model response: $modelResponseText")
 
-    val response = Json.decodeFromString<TranslationResponse>(modelResponseText)
-
-    response.validate(translationPairs.mapNotNull {
+    val response =
+      Json.decodeFromString<TranslationModelResponse>(modelResponseText)
+    val authoritativeTranslationsMap = translationPairs.mapNotNull {
       if (it.authoritativeTranslation == null) {
         return@mapNotNull null
       }
 
-      it.textToBeTranslated.reference!! to it.authoritativeTranslation.translatedParagraph.text
-    }.toMap())
+      it.textToBeTranslated.reference!! to it.authoritativeTranslation
+    }.toMap()
 
-    return response
+    response.validate(authoritativeTranslationsMap)
+
+    return TranslationResponse(paragraphs = response.paragraphs.map { paragraph ->
+      val authoritativeTranslation =
+        paragraph.reference?.let { authoritativeTranslationsMap[it] }
+      ParagraphWithAnnotation(
+        annotation = authoritativeTranslation?.annotation,
+        text = paragraph.text
+      )
+    })
   }
 
-  private fun TranslationResponse.validate(authoritativeTranslations: Map<ParagraphReference, String>) {
+  private fun TranslationModelResponse.validate(authoritativeTranslations: Map<ParagraphReference, TranslateResponse>) {
     for (paragraph in paragraphs) {
       val reference = paragraph.reference ?: continue
-      val authoritativeText = authoritativeTranslations[reference] ?: continue
+      val authoritativeText =
+        authoritativeTranslations[reference]?.translatedParagraph?.text
+          ?: continue
       if (!authoritativeText.contains(paragraph.text)) {
         throw IllegalStateException(
           "Translation response does not match authoritative translation for paragraph $paragraph"
@@ -104,6 +112,11 @@ data class TranslationPair(
 )
 
 @Serializable
-data class TranslationResponse(
+data class TranslationModelResponse(
   val paragraphs: List<ParagraphWithReference>
+)
+
+@Serializable
+data class TranslationResponse(
+  val paragraphs: List<ParagraphWithAnnotation>
 )

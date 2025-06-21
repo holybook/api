@@ -1,5 +1,5 @@
 @import app.holybook.lib.translation.TranslationTemplateData
-@import app.holybook.lib.translation.Translation.bookId
+@import app.holybook.lib.translation.bookId
 @import app.holybook.lib.models.TranslateResponse
 @import app.holybook.lib.db.getLanguageConfiguration
 

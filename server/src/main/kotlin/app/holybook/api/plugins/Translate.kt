@@ -1,9 +1,9 @@
 package app.holybook.api.plugins
 
 import app.holybook.lib.translation.Translation
+import app.holybook.lib.translation.TranslationModelResponse
 import app.holybook.lib.translation.TranslationResponse
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
