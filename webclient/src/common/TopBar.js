@@ -38,6 +38,10 @@ export function TopBar({supportedLanguages, activeLanguage}) {
           <Icon><i aria-hidden="true" className="fa-solid fa-language"/></Icon>
           &nbsp;&nbsp;Translate
         </Navbar.Item>
+        <Navbar.Item href="/aitranslate">
+          <Icon><i aria-hidden="true" className="fa-solid fa-robot"/></Icon>
+          &nbsp;&nbsp;AI Translate
+        </Navbar.Item>
       </Navbar.Container>
     </Navbar.Menu>
   </Navbar>);

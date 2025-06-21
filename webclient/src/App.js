@@ -5,6 +5,7 @@ import {Reader} from './reader/Reader.js';
 import {Overview} from './overview/Overview';
 import {SearchResults, SearchResultsPage} from "./search/SearchResults";
 import {Translate} from './translate/Translate';
+import {AiTranslate} from './translate/AiTranslate';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,13 @@ const router = createBrowserRouter([
       return fetch(`/api/languages`);
     },
     element: <Translate />
+  },
+  {
+    path: '/aitranslate',
+    loader: async ({params}) => {
+      return fetch(`/api/languages`);
+    },
+    element: <AiTranslate />
   }
 ]);
 
