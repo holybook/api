@@ -32,6 +32,7 @@ dependencies {
     implementation("com.github.Benjozork:exposed-postgres-extensions:master-SNAPSHOT")
     implementation("org.jetbrains.exposed:exposed-core:0.61.0")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.61.0")
+    implementation("com.google.cloud:google-cloud-secretmanager:2.+")
     database()
     xml()
     pdfBox()

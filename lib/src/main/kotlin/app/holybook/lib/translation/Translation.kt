@@ -8,10 +8,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
-object Translation {
+class Translation(private val apiKey: String) {
 
   private val log = LoggerFactory.getLogger("translation")
-  val client = Client()
+  // Create a client with the provided API key
+  private val client = Client.builder().apiKey(apiKey).build()
 
   fun translate(
     fromLanguage: String,

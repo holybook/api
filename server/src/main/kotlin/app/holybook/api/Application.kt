@@ -1,5 +1,6 @@
 package app.holybook.api
 
+import app.holybook.api.config.ApplicationConfigExt.getJdbcUrl
 import app.holybook.lib.db.Database
 import app.holybook.api.plugins.configureRouting
 import io.ktor.http.*
@@ -17,6 +18,7 @@ fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
   Database.init(environment.config.getJdbcUrl())
+
   install(ContentNegotiation) {
     json()
   }
@@ -30,8 +32,4 @@ fun Application.module() {
     allowHeader(HttpHeaders.ContentType)
   }
   configureRouting()
-}
-
-fun ApplicationConfig.getJdbcUrl(): String {
-  return property("storage.jdbcUrl").getString()
 }

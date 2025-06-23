@@ -1,5 +1,6 @@
 package app.holybook.api.plugins
 
+import app.holybook.api.config.ApiKeyProvider
 import app.holybook.lib.translation.Translation
 import app.holybook.lib.translation.TranslationModelResponse
 import app.holybook.lib.translation.TranslationResponse
@@ -10,9 +11,14 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 fun Routing.configureTranslate() {
+
+  val translation by lazy {
+    Translation(ApiKeyProvider.getApiKey(environment.config))
+  }
+
   post("/api/aitranslate") {
     val request = call.receive<TranslateRequest>()
-    val result = Translation.translate(
+    val result = translation.translate(
       request.fromLanguage,
       request.toLanguage,
       request.text
@@ -32,9 +38,4 @@ private data class TranslateRequest(
   val fromLanguage: String,
   val toLanguage: String,
   val text: String
-)
-
-@Serializable
-private data class TranslateResponse(
-  val prompt: String
 )
