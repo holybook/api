@@ -27,4 +27,10 @@ object Deps {
         implementation ("com.zaxxer:HikariCP:6.+")
         implementation("com.google.cloud.sql:postgres-socket-factory:1.+")
     }
+
+    fun DependencyHandlerScope.ktor() {
+        implementation("io.ktor:ktor-client-jvm:${Versions.ktorVersion}")
+        implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktorVersion}")
+        implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktorVersion}")
+    }
 }

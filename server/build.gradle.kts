@@ -1,11 +1,12 @@
 import Deps.database
+import Deps.ktor
 import Deps.pdfBox
 import Deps.xml
 
 plugins {
     application
     id("common-dependencies")
-    id("ktor-dependencies")
+    id("io.ktor.plugin")
 }
 
 group = "app.holybook:server"
@@ -33,6 +34,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:0.61.0")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.61.0")
     implementation("com.google.cloud:google-cloud-secretmanager:2.+")
+    ktor()
     database()
     xml()
     pdfBox()
@@ -51,4 +53,8 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+tasks.shadowJar {
+    isZip64 = true
 }

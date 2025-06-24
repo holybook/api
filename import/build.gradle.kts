@@ -1,11 +1,11 @@
 import Deps.json
+import Deps.ktor
 import Deps.pdfBox
 import Deps.xml
 
 plugins {
     application
     id("cli-application")
-    id("ktor-dependencies")
 }
 
 group = "app.holybook:import"
@@ -20,6 +20,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(project(":lib"))
+    ktor()
     xml()
     json()
     pdfBox()

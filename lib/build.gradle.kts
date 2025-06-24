@@ -1,10 +1,10 @@
 import Deps.database
+import Deps.ktor
 import Deps.xml
 
 plugins {
     `java-library`
     id("common-dependencies")
-    id("ktor-dependencies")
     id("gg.jte.gradle") version "3.+"
 }
 
@@ -24,6 +24,7 @@ dependencies {
     implementation("gg.jte:jte-kotlin:3.+")
     implementation("gg.jte:jte-runtime:3.+")
     jteGenerate("gg.jte:jte-models:3.+")
+    ktor()
     database()
     xml()
 }
