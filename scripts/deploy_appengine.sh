@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e # Exit on errors
+
 read -s -p "DB Password: " pwd
 echo # new line
 
