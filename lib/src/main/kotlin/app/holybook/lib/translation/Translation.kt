@@ -6,6 +6,9 @@ import app.holybook.lib.models.translate
 import app.holybook.lib.translation.TranslateResponseExt.annotation
 import app.holybook.lib.translation.TranslateResponseExt.bookId
 import com.google.genai.Client
+import com.google.genai.types.GenerateContentConfig
+import com.google.genai.types.Schema
+import com.google.genai.types.Type
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -13,8 +16,29 @@ import org.slf4j.LoggerFactory
 class Translation(private val apiKey: String) {
 
   private val log = LoggerFactory.getLogger("translation")
+
   // Create a client with the provided API key
   private val client = Client.builder().apiKey(apiKey).build()
+
+  private val referenceSchema =
+    Schema.builder().type(Type.Known.OBJECT).properties(
+      mapOf(
+        "bookId" to Schema.builder().type(Type.Known.STRING).build(),
+        "index" to Schema.builder().type(Type.Known.INTEGER).build()
+      )
+    ).build()
+  private val paragraphSchema = Schema.builder().type(Type.Known.OBJECT)
+    .properties(
+      mapOf(
+        "text" to Schema.builder().type(Type.Known.STRING).build(),
+        "reference" to referenceSchema
+      )
+    )
+  private val paragraphsSchema =
+    Schema.builder().type(Type.Known.ARRAY).items(paragraphSchema).build()
+  private val responseSchema =
+    Schema.builder().type(Type.Known.OBJECT)
+      .properties(mapOf("paragraphs" to paragraphsSchema))
 
   fun translate(
     fromLanguage: String,
@@ -61,7 +85,9 @@ class Translation(private val apiKey: String) {
     val modelResponse = client.models.generateContent(
       "gemini-2.5-flash",
       prompt,
-      null
+      GenerateContentConfig.builder().responseMimeType("application/json")
+        .responseSchema(responseSchema)
+        .build()
     )
 
     val modelResponseText = modelResponse.text()

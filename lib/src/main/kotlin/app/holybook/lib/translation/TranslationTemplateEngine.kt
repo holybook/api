@@ -21,21 +21,16 @@ object TranslationTemplateEngine {
 
   private fun TranslationTemplateData.authoritativeTranslationString() =
     authoritativeTranslations.joinToString("\n") { translation ->
-      """"
-      <p bookId="${translation.bookId}" index="${translation.translatedParagraph.index}">
-        ${translation.translatedParagraph.text}
-      </p>
-      """".trimIndent()
+      "<p bookId=\"${translation.bookId}\" index=\"${translation.translatedParagraph.index}\">${translation.translatedParagraph.text}</p>"
     }
 
   private fun TranslationTemplateData.paragraphsString() =
     paragraphsToBeTranslated.joinToString("\n") { paragraph ->
-      """"
-      <p bookId="${paragraph.reference?.bookId}" index="${paragraph.reference?.index}">
-         ${paragraph.text}
-      </p>
-      """".trimIndent()
+      "<p ${paragraph.reference?.format() ?: ""}>${paragraph.text}</p>"
     }
+
+  private fun ParagraphReference.format() =
+    "bookId=\"$bookId\" index=\"$index\""
 
   private fun loadTemplateFromResources(fileName: String): String {
     return this::class.java.classLoader.getResourceAsStream(fileName)

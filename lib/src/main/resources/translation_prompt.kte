@@ -46,5 +46,3 @@ Example:
         }
     ]
 }
-
-Note that your output will be used by a program. Therefore, it is crucial that you ONLY output well-formed json.
