@@ -17,18 +17,20 @@ import io.ktor.server.config.ApplicationConfig
  */
 object ApplicationConfigExt {
   fun ApplicationConfig.getJdbcUrl(): String {
-    return property("storage.jdbcUrl").getString()
+    return getPropertyFromSecret("storage.jdbcUrl")
   }
 
-  fun ApplicationConfig.getSecretManagerProjectId(): String {
-    return property("google.secretManager.projectId").getString()
+  fun ApplicationConfig.getGeminiApiKey(): String {
+    return getPropertyFromSecret("ai.geminiApiKey")
   }
 
-  fun ApplicationConfig.getSecretManagerSecretId(): String {
-    return property("google.secretManager.secretId").getString()
-  }
+  private fun ApplicationConfig.getPropertyFromSecret(propertyName: String): String {
+    val configValue = property(propertyName).getString()
+    if (configValue.startsWith("secret:")) {
+      val secretName = configValue.substringAfter("secret:")
+      return SecretsProvider.getSecret(secretName)
+    }
 
-  fun ApplicationConfig.getSecretManagerSecretVersion(): String {
-    return property("google.secretManager.secretVersion").getString()
+    return configValue
   }
 }

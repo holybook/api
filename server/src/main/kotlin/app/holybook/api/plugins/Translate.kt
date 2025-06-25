@@ -1,10 +1,9 @@
 package app.holybook.api.plugins
 
-import app.holybook.api.config.ApiKeyProvider
+import app.holybook.api.config.ApplicationConfigExt.getGeminiApiKey
 import app.holybook.lib.translation.Translation
-import app.holybook.lib.translation.TranslationModelResponse
 import app.holybook.lib.translation.TranslationResponse
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -13,7 +12,7 @@ import kotlinx.serialization.Serializable
 fun Routing.configureTranslate() {
 
   val translation by lazy {
-    Translation(ApiKeyProvider.getApiKey(environment.config))
+    Translation(environment.config.getGeminiApiKey())
   }
 
   post("/api/aitranslate") {

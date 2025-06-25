@@ -2,9 +2,6 @@
 
 set -e # Exit on errors
 
-read -s -p "DB Password: " pwd
-echo # new line
-
 mkdir appengine-files
 
 echo "Building server"
@@ -15,8 +12,8 @@ echo "Building web client"
 ( cd webclient ; npm run build ) # outputs webclient/build
 cp -r webclient/build appengine-files/webclient
 
-echo "Preparing app.yaml"
-sed -e "s/\${DB_INSTANCE}/holybookapp:europe-west6:holybook/" -e "s/\${DB_USER}/server/" -e "s/\${DB_PWD}/$pwd/" app.yaml > appengine-files/app.yaml
+echo "Copy app.yaml"
+cp app.yaml appengine-files/app.yaml
 
 echo "Deploy to app engine"
 ( cd appengine-files ; gcloud app deploy )

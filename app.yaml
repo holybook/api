@@ -1,7 +1,7 @@
 runtime: java21
 entrypoint: 'java -jar server-all.jar'
 env_variables:
-  JDBC_URL: jdbc:postgresql:///holybook?cloudSqlInstance=${DB_INSTANCE}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${DB_USER}&password=${DB_PWD}
+  JDBC_URL: secret:jdbc-url
 handlers:
   - url: /api/.*
     script: auto
