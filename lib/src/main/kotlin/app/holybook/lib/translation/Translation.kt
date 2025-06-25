@@ -3,6 +3,8 @@ package app.holybook.lib.translation
 import app.holybook.lib.models.TranslateRequest
 import app.holybook.lib.models.TranslateResponse
 import app.holybook.lib.models.translate
+import app.holybook.lib.translation.TranslateResponseExt.annotation
+import app.holybook.lib.translation.TranslateResponseExt.bookId
 import com.google.genai.Client
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

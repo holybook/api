@@ -5,7 +5,6 @@ import Deps.xml
 plugins {
     `java-library`
     id("common-dependencies")
-    id("gg.jte.gradle") version "3.+"
 }
 
 group = "app.holybook:lib"
@@ -20,10 +19,6 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("com.google.genai:google-genai:1+")
-    implementation("gg.jte:jte:3.+")
-    implementation("gg.jte:jte-kotlin:3.+")
-    implementation("gg.jte:jte-runtime:3.+")
-    jteGenerate("gg.jte:jte-models:3.+")
     ktor()
     database()
     xml()
@@ -31,13 +26,4 @@ dependencies {
 
 tasks.test {
     useJUnit()
-}
-
-jte {
-    generate()
-
-    jteExtension("gg.jte.models.generator.ModelExtension") {
-        // Target language ("Java" and "Kotlin" are supported). "Java" is the default.
-        property("language", "Kotlin")
-    }
 }
