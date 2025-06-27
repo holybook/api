@@ -83,14 +83,14 @@ export function AiTranslate() {
         </div>
         <div className="result-container">
           {translationResponse && 
-            <TranslatedParagraphs paragraphs={translationResponse.paragraphs} />}
+            <TranslatedParagraphs paragraphs={translationResponse.paragraphs} toLanguage={toLanguage} />}
         </div>
       </div>
     </div>
   );
 }
 
-function TranslatedParagraphs({paragraphs}) {
+function TranslatedParagraphs({paragraphs, toLanguage}) {
   if (!paragraphs || paragraphs.length === 0) {
     return <div className="no-results">No translation results available</div>;
   }
@@ -98,20 +98,20 @@ function TranslatedParagraphs({paragraphs}) {
   return (
     <div className="translated-paragraphs">
       {paragraphs.map((paragraph, index) => (
-        <TranslatedParagraph key={index} paragraph={paragraph} />
+        <TranslatedParagraph key={index} paragraph={paragraph} toLanguage={toLanguage} />
       ))}
     </div>
   );
 }
 
-function TranslatedParagraph({paragraph}) {
+function TranslatedParagraph({paragraph, toLanguage}) {
   return (
     <div className="paragraph-with-annotation">
       <p className="paragraph-text">{paragraph.text}</p>
       {paragraph.annotation && (
         <div className="paragraph-annotation">
           <a 
-            href={`/books/${paragraph.annotation.bookId}?lang=en&pos=${paragraph.annotation.index}:60`}
+            href={`/books/${paragraph.annotation.bookId}?lang=${toLanguage}&pos=${paragraph.annotation.index}:60`}
           >
             &mdash; {paragraph.annotation.title}, par. {paragraph.annotation.number}
           </a>
