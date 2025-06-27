@@ -153,17 +153,7 @@ data class TranslationPair(
   val textToBeTranslated: String
 )
 
-@Serializable
-data class TranslationModelRequest(
-  val fromLanguage: String,
-  val toLanguage: String,
-  val paragraphs: List<ParagraphWithReference>
-)
 
-@Serializable
-data class TranslationModelResponse(
-  val paragraphs: List<ParagraphWithId>
-)
 
 @Serializable
 data class TranslationResponse(
