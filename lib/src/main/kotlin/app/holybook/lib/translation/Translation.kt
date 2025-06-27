@@ -4,11 +4,9 @@ import app.holybook.lib.models.TranslateRequest
 import app.holybook.lib.models.TranslateResponse
 import app.holybook.lib.models.translate
 import app.holybook.lib.translation.TranslateResponseExt.annotation
-import app.holybook.lib.translation.TranslateResponseExt.bookId
+import app.holybook.lib.translation.TranslateResponseExt.id
 import com.google.genai.Client
-import com.google.genai.types.GenerateContentConfig
-import com.google.genai.types.Schema
-import com.google.genai.types.Type
+import com.google.genai.types.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -20,25 +18,18 @@ class Translation(private val apiKey: String) {
   // Create a client with the provided API key
   private val client = Client.builder().apiKey(apiKey).build()
 
-  private val referenceSchema =
-    Schema.builder().type(Type.Known.OBJECT).properties(
-      mapOf(
-        "bookId" to Schema.builder().type(Type.Known.STRING).build(),
-        "index" to Schema.builder().type(Type.Known.INTEGER).build()
-      )
-    ).build()
   private val paragraphSchema = Schema.builder().type(Type.Known.OBJECT)
     .properties(
       mapOf(
         "text" to Schema.builder().type(Type.Known.STRING).build(),
-        "reference" to referenceSchema
+        "id" to Schema.builder().type(Type.Known.STRING).build()
       )
-    )
+    ).required("text")
   private val paragraphsSchema =
     Schema.builder().type(Type.Known.ARRAY).items(paragraphSchema).build()
   private val responseSchema =
     Schema.builder().type(Type.Known.OBJECT)
-      .properties(mapOf("paragraphs" to paragraphsSchema))
+      .properties(mapOf("paragraphs" to paragraphsSchema)).required("paragraphs")
 
   fun translate(
     fromLanguage: String,
@@ -59,36 +50,58 @@ class Translation(private val apiKey: String) {
         )
         TranslationPair(
           authoritativeTranslation = translateResponse,
-          textToBeTranslated = ParagraphWithReference(
-            translateResponse?.let {
-              ParagraphReference(
-                it.bookId,
-                it.translatedParagraph.index
-              )
-            },
-            paragraphText
-          ),
+          textToBeTranslated = paragraphText
         )
       }
 
-    val prompt = TranslationTemplateEngine.renderPrompt(
-      TranslationTemplateData(
-        fromLanguage,
-        toLanguage,
-        translationPairs.mapNotNull { it.authoritativeTranslation },
-        translationPairs.map { it.textToBeTranslated }
-      )
+    val modelInput = TranslationModelRequest(
+      fromLanguage,
+      toLanguage,
+      translationPairs.map { pair ->
+        ParagraphWithReference(
+          pair.textToBeTranslated,
+          pair.authoritativeTranslation?.let {
+            ParagraphWithId(
+              text = it.translatedParagraph.text,
+              id = it.id,
+            )
+          },
+        )
+      },
     )
+    val prompt = Json.encodeToString(modelInput)
 
     log.info("Prompt: $prompt")
 
+    val systemInstruction =
+      this::class.java.classLoader.getResourceAsStream("system_prompt.txt")
+        ?.use { inputStream ->
+          inputStream.bufferedReader().readText()
+        }
+
     val modelResponse = client.models.generateContent(
-      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite-preview-06-17",
       prompt,
       GenerateContentConfig.builder().responseMimeType("application/json")
         .responseSchema(responseSchema)
+        .thinkingConfig(
+          ThinkingConfig
+            .builder()
+            .thinkingBudget(0)
+            .build()
+        )
+        .systemInstruction(
+          Content.fromParts(Part.fromText(systemInstruction))
+        )
         .build()
     )
+
+    modelResponse.usageMetadata().ifPresent {
+      log.info("Prompt tokens: ${it.promptTokenCount()}")
+      log.info("Thinking tokens: ${it.thoughtsTokenCount()}")
+      log.info("Response tokens: ${it.candidatesTokenCount()}")
+      log.info("Total tokens: ${it.totalTokenCount()}")
+    }
 
     val modelResponseText = modelResponse.text()
 
@@ -105,14 +118,14 @@ class Translation(private val apiKey: String) {
         return@mapNotNull null
       }
 
-      it.textToBeTranslated.reference!! to it.authoritativeTranslation
+      it.authoritativeTranslation.id to it.authoritativeTranslation
     }.toMap()
 
     response.validate(authoritativeTranslationsMap)
 
     return TranslationResponse(paragraphs = response.paragraphs.map { paragraph ->
       val authoritativeTranslation =
-        paragraph.reference?.let { authoritativeTranslationsMap[it] }
+        paragraph.id?.let { authoritativeTranslationsMap[it] }
       ParagraphWithAnnotation(
         annotation = authoritativeTranslation?.annotation,
         text = paragraph.text
@@ -120,13 +133,13 @@ class Translation(private val apiKey: String) {
     })
   }
 
-  private fun TranslationModelResponse.validate(authoritativeTranslations: Map<ParagraphReference, TranslateResponse>) {
+  private fun TranslationModelResponse.validate(authoritativeTranslations: Map<String, TranslateResponse>) {
     for (paragraph in paragraphs) {
-      val reference = paragraph.reference ?: continue
+      val reference = paragraph.id ?: continue
       val authoritativeText =
         authoritativeTranslations[reference]?.translatedParagraph?.text
           ?: continue
-      if (!authoritativeText.contains(paragraph.text)) {
+      if (!authoritativeText.contains(paragraph.text, ignoreCase = true)) {
         throw IllegalStateException(
           "Translation response does not match authoritative translation for paragraph $paragraph"
         )
@@ -137,12 +150,19 @@ class Translation(private val apiKey: String) {
 
 data class TranslationPair(
   val authoritativeTranslation: TranslateResponse?,
-  val textToBeTranslated: ParagraphWithReference
+  val textToBeTranslated: String
+)
+
+@Serializable
+data class TranslationModelRequest(
+  val fromLanguage: String,
+  val toLanguage: String,
+  val paragraphs: List<ParagraphWithReference>
 )
 
 @Serializable
 data class TranslationModelResponse(
-  val paragraphs: List<ParagraphWithReference>
+  val paragraphs: List<ParagraphWithId>
 )
 
 @Serializable

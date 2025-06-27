@@ -4,15 +4,15 @@ import app.holybook.lib.models.TranslateResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ParagraphReference(
-  val bookId: String,
-  val index: Int
+data class ParagraphWithId(
+  val text: String,
+  val id: String? = null,
 )
 
 @Serializable
 data class ParagraphWithReference(
-  val reference: ParagraphReference? = null,
-  val text: String
+  val text: String,
+  val reference: ParagraphWithId? = null,
 )
 
 @Serializable
@@ -33,5 +33,5 @@ data class TranslationTemplateData(
   val fromLanguage: String,
   val toLanguage: String,
   val authoritativeTranslations: List<TranslateResponse>,
-  val paragraphsToBeTranslated: List<ParagraphWithReference>
+  val paragraphsToBeTranslated: List<ParagraphWithId>
 )

@@ -6,8 +6,8 @@ object TranslateResponseExt {
   val TranslateResponse.bookId: String
     get() = allOriginalResults[0].bookId
 
-  val TranslateResponse.reference: ParagraphReference
-    get() = ParagraphReference(bookId, translatedParagraph.index)
+  val TranslateResponse.id: String
+    get() = "$bookId/${translatedParagraph.index}"
 
   val TranslateResponse.annotation: ParagraphAnnotation
     get() = ParagraphAnnotation(
