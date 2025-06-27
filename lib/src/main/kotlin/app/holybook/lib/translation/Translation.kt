@@ -5,31 +5,19 @@ import app.holybook.lib.models.TranslateResponse
 import app.holybook.lib.models.translate
 import app.holybook.lib.translation.TranslateResponseExt.annotation
 import app.holybook.lib.translation.TranslateResponseExt.id
-import com.google.genai.Client
-import com.google.genai.types.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import org.slf4j.LoggerFactory
 
-class Translation(private val apiKey: String) {
-
-  private val log = LoggerFactory.getLogger("translation")
-
-  // Create a client with the provided API key
-  private val client = Client.builder().apiKey(apiKey).build()
-
-  private val paragraphSchema = Schema.builder().type(Type.Known.OBJECT)
-    .properties(
-      mapOf(
-        "text" to Schema.builder().type(Type.Known.STRING).build(),
-        "id" to Schema.builder().type(Type.Known.STRING).build()
-      )
-    ).required("text")
-  private val paragraphsSchema =
-    Schema.builder().type(Type.Known.ARRAY).items(paragraphSchema).build()
-  private val responseSchema =
-    Schema.builder().type(Type.Known.OBJECT)
-      .properties(mapOf("paragraphs" to paragraphsSchema)).required("paragraphs")
+/**
+ * High-level translation service that orchestrates the translation process.
+ *
+ * This class handles the complete translation workflow including:
+ * - Text preprocessing and paragraph splitting
+ * - Authoritative translation lookup for reference
+ * - AI translation request preparation
+ * - Response post-processing and validation
+ * - Final result formatting
+ */
+class Translation(private val translator: Translator) {
 
   fun translate(
     fromLanguage: String,
@@ -69,50 +57,9 @@ class Translation(private val apiKey: String) {
         )
       },
     )
-    val prompt = Json.encodeToString(modelInput)
 
-    log.info("Prompt: $prompt")
-
-    val systemInstruction =
-      this::class.java.classLoader.getResourceAsStream("system_prompt.txt")
-        ?.use { inputStream ->
-          inputStream.bufferedReader().readText()
-        }
-
-    val modelResponse = client.models.generateContent(
-      "gemini-2.5-flash-lite-preview-06-17",
-      prompt,
-      GenerateContentConfig.builder().responseMimeType("application/json")
-        .responseSchema(responseSchema)
-        .thinkingConfig(
-          ThinkingConfig
-            .builder()
-            .thinkingBudget(0)
-            .build()
-        )
-        .systemInstruction(
-          Content.fromParts(Part.fromText(systemInstruction))
-        )
-        .build()
-    )
-
-    modelResponse.usageMetadata().ifPresent {
-      log.info("Prompt tokens: ${it.promptTokenCount()}")
-      log.info("Thinking tokens: ${it.thoughtsTokenCount()}")
-      log.info("Response tokens: ${it.candidatesTokenCount()}")
-      log.info("Total tokens: ${it.totalTokenCount()}")
-    }
-
-    val modelResponseText = modelResponse.text()
-
-    if (modelResponseText == null) {
-      return null
-    }
-
-    log.info("Model response: $modelResponseText")
-
-    val response =
-      Json.decodeFromString<TranslationModelResponse>(modelResponseText)
+    // Delegate to the injected translator
+    val response = translator.translate(modelInput) ?: return null
     val authoritativeTranslationsMap = translationPairs.mapNotNull {
       if (it.authoritativeTranslation == null) {
         return@mapNotNull null
@@ -121,7 +68,8 @@ class Translation(private val apiKey: String) {
       it.authoritativeTranslation.id to it.authoritativeTranslation
     }.toMap()
 
-    response.validate(authoritativeTranslationsMap)
+    // Validate the response against authoritative translations
+    validateResponse(response, authoritativeTranslationsMap)
 
     return TranslationResponse(paragraphs = response.paragraphs.map { paragraph ->
       val authoritativeTranslation =
@@ -133,8 +81,20 @@ class Translation(private val apiKey: String) {
     })
   }
 
-  private fun TranslationModelResponse.validate(authoritativeTranslations: Map<String, TranslateResponse>) {
-    for (paragraph in paragraphs) {
+  /**
+   * Validates that the translation response matches authoritative translations where available.
+   * This is a generic validation that works with any TranslationModelResponse regardless of
+   * the Translator implementation used.
+   *
+   * @param response The translation response to validate
+   * @param authoritativeTranslations Map of reference IDs to authoritative translations
+   * @throws IllegalStateException if validation fails
+   */
+  private fun validateResponse(
+    response: TranslationModelResponse,
+    authoritativeTranslations: Map<String, TranslateResponse>
+  ) {
+    for (paragraph in response.paragraphs) {
       val reference = paragraph.id ?: continue
       val authoritativeText =
         authoritativeTranslations[reference]?.translatedParagraph?.text

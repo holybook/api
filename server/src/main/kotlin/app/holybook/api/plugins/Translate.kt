@@ -1,6 +1,7 @@
 package app.holybook.api.plugins
 
 import app.holybook.api.config.ApplicationConfigExt.getGeminiApiKey
+import app.holybook.lib.translation.MonolithicTranslator
 import app.holybook.lib.translation.Translation
 import app.holybook.lib.translation.TranslationResponse
 import io.ktor.http.*
@@ -12,7 +13,8 @@ import kotlinx.serialization.Serializable
 fun Routing.configureTranslate() {
 
   val translation by lazy {
-    Translation(environment.config.getGeminiApiKey())
+    val translator = MonolithicTranslator(environment.config.getGeminiApiKey())
+    Translation(translator)
   }
 
   post("/api/aitranslate") {

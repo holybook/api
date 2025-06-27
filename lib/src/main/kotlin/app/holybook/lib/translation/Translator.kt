@@ -15,5 +15,5 @@ interface Translator {
    *                and paragraphs to be translated with optional reference translations
    * @return The translation response containing translated paragraphs, or null if translation fails
    */
-  fun translate(request: TranslationModelRequest): TranslationModelResponse?
+  fun translate(request: TranslationModelRequest): TranslationModelResponse
 }
