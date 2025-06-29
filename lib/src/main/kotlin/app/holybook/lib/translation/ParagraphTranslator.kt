@@ -14,11 +14,11 @@ interface ParagraphTranslator {
    * @param fromLanguage The source language code
    * @param toLanguage The target language code
    * @param paragraphText The text of the paragraph to translate
-   * @return The translated text, or null if translation fails
+   * @return The translated text
    */
   fun translateParagraph(
     fromLanguage: String,
     toLanguage: String,
     paragraphText: String
-  ): String?
+  ): String
 } 

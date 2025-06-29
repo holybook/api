@@ -59,7 +59,7 @@ class IncrementalTranslator(
       
       // Create the translated paragraph with ID if we used a reference
       ParagraphWithId(
-        text = translatedText ?: paragraphWithReference.text, // Fallback to original if translation fails
+        text = translatedText,
         id = paragraphWithReference.reference?.id
       )
     }
