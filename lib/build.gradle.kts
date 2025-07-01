@@ -1,5 +1,6 @@
 import Deps.database
 import Deps.ktor
+import Deps.vertexAi
 import Deps.xml
 
 plugins {
@@ -18,12 +19,14 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("com.google.genai:google-genai:1+")
     ktor()
     database()
     xml()
+    vertexAi()
 }
 
 tasks.test {
     useJUnit()
 }
+
+    

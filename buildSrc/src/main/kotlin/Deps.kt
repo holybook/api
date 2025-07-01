@@ -33,4 +33,9 @@ object Deps {
         implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktorVersion}")
         implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktorVersion}")
     }
+
+    fun DependencyHandlerScope.vertexAi() {
+        implementation("com.google.genai:google-genai:1+")
+        implementation("com.google.cloud:google-cloud-vertexai:1.+")
+    }
 }
