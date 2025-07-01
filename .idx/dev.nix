@@ -18,7 +18,7 @@
   env = {};
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
-    extensions = [ "fwcd.kotlin" "vscjava.vscode-gradle"];
+    extensions = [ "fwcd.kotlin" "vscjava.vscode-gradle" "RooVeterinaryInc.roo-cline" ];
 
     # Enable previews
     previews = {
