@@ -3,10 +3,12 @@ package app.holybook.lib.translation.impl
 import app.holybook.lib.translation.TextMatcher
 import com.google.genai.Client
 import com.google.genai.types.GenerateContentConfig
+import javax.inject.Inject
+import javax.inject.Named
 
-class GeminiTextMatcher(
-    private val apiKey: String,
-    private val modelName: String
+class GeminiTextMatcher @Inject constructor(
+    @Named("apiKey") private val apiKey: String,
+    @Named("modelName") private val modelName: String
 ) : TextMatcher {
 
     private val client = Client.builder().apiKey(apiKey).build()
