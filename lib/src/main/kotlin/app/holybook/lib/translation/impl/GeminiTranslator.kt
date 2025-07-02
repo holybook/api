@@ -1,30 +1,22 @@
 package app.holybook.lib.translation.impl
 
 import app.holybook.lib.translation.ParagraphTranslator
-import com.google.cloud.vertexai.VertexAI
-import com.google.cloud.vertexai.api.GenerateContentResponse
-import com.google.cloud.vertexai.generativeai.GenerativeModel
+import com.google.genai.Client
 
 class GeminiTranslator(
-    private val project: String,
-    private val location: String,
-    private val modelName: String = "gemini-1.5-flash-001"
+    private val apiKey: String,
+    private val modelName: String
 ) : ParagraphTranslator {
 
-    private val model: GenerativeModel
+    private val client = Client.builder().apiKey(apiKey).build()
 
-    init {
-        val vertexAi = VertexAI(project, location)
-        model = GenerativeModel(modelName, vertexAi)
-    }
-    
     override fun translateParagraph(
         fromLanguage: String,
         toLanguage: String,
         paragraphText: String
     ): String {
         val prompt = "Translate the following text from $fromLanguage to $toLanguage: $paragraphText"
-        val response: GenerateContentResponse = model.generateContent(prompt)
-        return response.candidatesList.first().content.partsList.first().text
+        val response = client.models.generateContent(modelName, prompt)
+        return response.text()
     }
 }
