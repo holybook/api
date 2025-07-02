@@ -6,6 +6,7 @@ import Deps.xml
 plugins {
     `java-library`
     id("common-dependencies")
+    id("dagger")
 }
 
 group = "app.holybook:lib"

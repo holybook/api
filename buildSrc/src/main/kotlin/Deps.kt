@@ -38,4 +38,8 @@ object Deps {
         implementation("com.google.genai:google-genai:1+")
         implementation("com.google.cloud:google-cloud-vertexai:1.+")
     }
+
+    fun DependencyHandlerScope.dagger() {
+        implementation("com.google.dagger:dagger:${Versions.daggerVersion}")
+    }
 }

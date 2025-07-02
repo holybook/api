@@ -1,9 +1,11 @@
+import Deps.dagger
 import Deps.ktor
 import Deps.xml
 
 plugins {
   application
   id("cli-application")
+  id("dagger")
 }
 
 group = "app.holybook:eval"
