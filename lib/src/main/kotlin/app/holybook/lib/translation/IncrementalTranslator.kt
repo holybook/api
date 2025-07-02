@@ -21,19 +21,21 @@ class IncrementalTranslator(
 
   override fun translate(request: TranslationModelRequest): TranslationModelResponse {
     log.info("Starting incremental translation from ${request.fromLanguage} to ${request.toLanguage} for ${request.paragraphs.size} paragraphs")
-    
+
     val translatedParagraphs = request.paragraphs.mapIndexed { index, paragraphWithReference ->
       log.debug("Translating paragraph ${index + 1}/${request.paragraphs.size}")
-      
+
       val translatedText = when {
         // If we have a reference, try to find the best match
         paragraphWithReference.reference != null -> {
           val bestMatch = textMatcher.findBestMatch(
+            request.fromLanguage,
+            request.toLanguage,
             paragraphWithReference.text,
             paragraphWithReference.reference.text
           )
-          
-          if (bestMatch != null) {
+
+          if (bestMatch.isNotBlank()) {
             log.debug("Found matching text in reference for paragraph ${index + 1}")
             bestMatch
           } else {
@@ -45,7 +47,7 @@ class IncrementalTranslator(
             )
           }
         }
-        
+
         // No reference available, translate from scratch
         else -> {
           log.debug("No reference available, translating from scratch for paragraph ${index + 1}")
@@ -56,16 +58,16 @@ class IncrementalTranslator(
           )
         }
       }
-      
+
       // Create the translated paragraph with ID if we used a reference
       ParagraphWithId(
         text = translatedText,
         id = paragraphWithReference.reference?.id
       )
     }
-    
+
     log.info("Completed incremental translation of ${request.paragraphs.size} paragraphs")
-    
+
     return TranslationModelResponse(paragraphs = translatedParagraphs)
   }
 } 

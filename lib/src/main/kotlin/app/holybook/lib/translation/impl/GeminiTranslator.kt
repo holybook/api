@@ -2,6 +2,7 @@ package app.holybook.lib.translation.impl
 
 import app.holybook.lib.translation.ParagraphTranslator
 import com.google.genai.Client
+import com.google.genai.types.GenerateContentConfig
 
 class GeminiTranslator(
     private val apiKey: String,
@@ -16,7 +17,12 @@ class GeminiTranslator(
         paragraphText: String
     ): String {
         val prompt = "Translate the following text from $fromLanguage to $toLanguage: $paragraphText"
-        val response = client.models.generateContent(modelName, prompt)
-        return response.text()
+        val response = client.models.generateContent(
+            modelName,
+            prompt,
+            GenerateContentConfig.builder().build()
+        )
+        val responseText = response.text()
+        return responseText ?: throw RuntimeException("Translation failed")
     }
 }

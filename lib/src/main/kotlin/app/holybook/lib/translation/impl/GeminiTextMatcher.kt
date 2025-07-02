@@ -2,6 +2,7 @@ package app.holybook.lib.translation.impl
 
 import app.holybook.lib.translation.TextMatcher
 import com.google.genai.Client
+import com.google.genai.types.GenerateContentConfig
 
 class GeminiTextMatcher(
     private val apiKey: String,
@@ -29,7 +30,12 @@ $referenceInTargetLanguage
 
 Please identify and return the portion of the reference translation that is the most accurate translation of the source text. Only return the translated text, with no additional explanation or commentary.
         """.trimIndent()
-        val response = client.models.generateContent(modelName, prompt)
-        return response.text()
+        val response = client.models.generateContent(
+            modelName,
+            prompt,
+            GenerateContentConfig.builder().build()
+        )
+        val responseText = response.text()
+        return responseText ?: throw RuntimeException("Match failed")
     }
 }
