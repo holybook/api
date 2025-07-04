@@ -1,17 +1,16 @@
 package app.holybook.lib.translation.impl
 
+import app.holybook.lib.translation.ModelConfiguration
 import app.holybook.lib.translation.TextMatcher
 import com.google.genai.Client
 import com.google.genai.types.GenerateContentConfig
 import javax.inject.Inject
-import javax.inject.Named
 
 class GeminiTextMatcher @Inject constructor(
-    @Named("apiKey") private val apiKey: String,
-    @Named("modelName") private val modelName: String
+    private val modelConfiguration: ModelConfiguration
 ) : TextMatcher {
 
-    private val client = Client.builder().apiKey(apiKey).build()
+    private val client = Client.builder().apiKey(modelConfiguration.apiKey).build()
 
     override fun findBestMatch(
         sourceLanguage: String,
@@ -33,7 +32,7 @@ $referenceInTargetLanguage
 Please identify and return the portion of the reference translation that is the most accurate translation of the source text. Only return the translated text, with no additional explanation or commentary.
         """.trimIndent()
         val response = client.models.generateContent(
-            modelName,
+            modelConfiguration.modelName,
             prompt,
             GenerateContentConfig.builder().build()
         )

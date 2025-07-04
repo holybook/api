@@ -5,7 +5,6 @@ import com.google.genai.types.*
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * A monolithic implementation of the Translator interface that uses Google's Gemini AI
@@ -17,12 +16,12 @@ import javax.inject.Named
  * - AI model interaction via Google's Gemini API
  * - Response validation against authoritative translations
  */
-class MonolithicTranslator @Inject constructor(@Named("apiKey") private val apiKey: String) : Translator {
+class MonolithicTranslator @Inject constructor(private val modelConfiguration: ModelConfiguration) : Translator {
 
   private val log = LoggerFactory.getLogger("monolithic-translator")
 
   // Create a client with the provided API key
-  private val client = Client.builder().apiKey(apiKey).build()
+  private val client = Client.builder().apiKey(modelConfiguration.apiKey).build()
 
   private val paragraphSchema = Schema.builder().type(Type.Known.OBJECT)
     .properties(
@@ -50,7 +49,7 @@ class MonolithicTranslator @Inject constructor(@Named("apiKey") private val apiK
         }
 
     val modelResponse = client.models.generateContent(
-      "gemini-2.5-flash-lite-preview-06-17",
+      modelConfiguration.modelName,
       prompt,
       GenerateContentConfig.builder().responseMimeType("application/json")
         .responseSchema(responseSchema)
