@@ -7,6 +7,7 @@ plugins {
     application
     id("common-dependencies")
     id("io.ktor.plugin")
+    id("dagger")
 }
 
 group = "app.holybook:server"

@@ -12,4 +12,5 @@ repositories {
 
 dependencies {
   dagger()
+  "kapt"("com.google.dagger:dagger-compiler:${Versions.daggerVersion}")
 }

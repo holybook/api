@@ -6,6 +6,7 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.slf4j.LoggerFactory
 
+import app.holybook.lib.translation.ModelConfiguration
 import app.holybook.lib.translation.IncrementalTranslator
 import app.holybook.lib.translation.MonolithicTranslator
 import app.holybook.lib.translation.ParagraphTranslator
@@ -41,7 +42,12 @@ fun createTranslator(cmd: CommandLine): Translator {
     return when (translatorType.lowercase()) {
         "monolithic" -> {
             val apiKey = cmd.getOptionValue("a") ?: throw IllegalArgumentException("API key is required for monolithic translator")
-            MonolithicTranslator(apiKey)
+            MonolithicTranslator(
+                ModelConfiguration(
+                    apiKey = apiKey,
+                    modelName = "gemini-2.5-flash-lite-preview-06-17"
+                )
+            )
         }
         "incremental" -> {
             // This is a placeholder. In a real implementation, you would need to provide
