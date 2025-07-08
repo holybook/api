@@ -4,58 +4,50 @@ import Deps.pdfBox
 import Deps.xml
 
 plugins {
-    application
-    id("common-dependencies")
-    id("io.ktor.plugin")
-    id("dagger")
+  application
+  id("common-dependencies")
+  id("io.ktor.plugin")
+  id("dagger")
 }
 
 group = "app.holybook:server"
+
 version = "0.1.1"
 
-
 repositories {
-    mavenCentral()
-    maven("https://jitpack.io")
+  mavenCentral()
+  maven("https://jitpack.io")
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-    implementation(project(":lib"))
-    implementation("io.ktor:ktor-server-forwarded-header:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-status-pages:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-call-logging:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-netty-jvm:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-html-builder-jvm:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-call-logging:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-cors:${Versions.ktorVersion}")
-    implementation("io.ktor:ktor-server-call-logging-jvm:${Versions.ktorVersion}")
-    implementation("com.github.Benjozork:exposed-postgres-extensions:master-SNAPSHOT")
-    implementation("org.jetbrains.exposed:exposed-core:0.61.0")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.61.0")
-    implementation("com.google.cloud:google-cloud-secretmanager:2.+")
-    ktor()
-    database()
-    xml()
-    pdfBox()
+  testImplementation(kotlin("test"))
+  implementation(project(":lib"))
+  implementation("io.ktor:ktor-server-forwarded-header:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-status-pages:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-call-logging:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-netty-jvm:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-html-builder-jvm:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-content-negotiation:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-call-logging:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-cors:${Versions.ktorVersion}")
+  implementation("io.ktor:ktor-server-call-logging-jvm:${Versions.ktorVersion}")
+  implementation("com.github.Benjozork:exposed-postgres-extensions:master-SNAPSHOT")
+  implementation("org.jetbrains.exposed:exposed-core:0.61.0")
+  implementation("org.jetbrains.exposed:exposed-jdbc:0.61.0")
+  implementation("com.google.cloud:google-cloud-secretmanager:2.+")
+  ktor()
+  database()
+  xml()
+  pdfBox()
 }
 
-tasks.test {
-    useJUnit()
-}
+tasks.test { useJUnit() }
 
 application {
-    mainClass.set("io.ktor.server.netty.EngineMain")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
+  mainClass.set("io.ktor.server.netty.EngineMain")
+  applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
-tasks.shadowJar {
-    isZip64 = true
-}
+tasks.shadowJar { isZip64 = true }

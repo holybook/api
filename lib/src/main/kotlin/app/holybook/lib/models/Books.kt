@@ -53,7 +53,7 @@ fun getAllBooks(language: String) = transaction {
         bookId = getString("id"),
         language = language,
         title = getString("title"),
-        author = getAuthorName(getString("author"), language)
+        author = getAuthorName(getString("author"), language),
       )
     }
     .groupBy { it.author }
@@ -114,8 +114,4 @@ fun Connection.insertBook(id: String, author: String, publishedAt: LocalDate?) {
 class BookRow(val id: String, val author: String)
 
 @Serializable
-data class Book(
-  val id: String,
-  val paragraphCount: Long?,
-  val translations: List<Translation>,
-)
+data class Book(val id: String, val paragraphCount: Long?, val translations: List<Translation>)

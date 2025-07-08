@@ -9,12 +9,12 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [TranslatorModule::class])
 interface ServerComponent {
-    fun translator(): Translator
+  fun translator(): Translator
 
-    @Component.Builder
-    interface Builder {
-        @BindsInstance
-        fun modelConfiguration(modelConfiguration: ModelConfiguration): Builder
-        fun build(): ServerComponent
-    }
+  @Component.Builder
+  interface Builder {
+    @BindsInstance fun modelConfiguration(modelConfiguration: ModelConfiguration): Builder
+
+    fun build(): ServerComponent
+  }
 }

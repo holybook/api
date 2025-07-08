@@ -35,7 +35,7 @@ fun getJdbcUrl(
   port: String,
   database: String,
   user: String,
-  usePassword: Boolean
+  usePassword: Boolean,
 ): String {
   val passwordQuery =
     if (usePassword) {

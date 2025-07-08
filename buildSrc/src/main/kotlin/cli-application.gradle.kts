@@ -1,12 +1,8 @@
-plugins {
-    id("common-dependencies")
-}
+plugins { id("common-dependencies") }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
-    implementation("commons-cli:commons-cli:1.+")
-    implementation("com.typesafe:config:1.+")
+  implementation("commons-cli:commons-cli:1.+")
+  implementation("com.typesafe:config:1.+")
 }

@@ -74,6 +74,6 @@ fun getFilePath(targetDirectory: Path, descriptor: ContentDescriptor): Path {
   return FileSystems.getDefault()
     .getPath(
       targetDirectory.absolutePathString(),
-      "/${descriptor.language}/${descriptor.authorCode}$yearFolder/${descriptor.id}.xml"
+      "/${descriptor.language}/${descriptor.authorCode}$yearFolder/${descriptor.id}.xml",
     )
 }

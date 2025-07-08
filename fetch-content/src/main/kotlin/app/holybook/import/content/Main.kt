@@ -7,7 +7,6 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 import kotlin.io.path.isDirectory
 import kotlinx.coroutines.runBlocking
-import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.slf4j.LoggerFactory
@@ -23,7 +22,8 @@ fun main(args: Array<String>): Unit = runBlocking {
   val cmd = parser.parse(options, args)
 
   val inputPath = FileSystems.getDefault().getPath(cmd.getOptionValue("i", "../../data/index"))
-  val outputDirectory = FileSystems.getDefault().getPath(cmd.getOptionValue("o", "../../data/content"))
+  val outputDirectory =
+    FileSystems.getDefault().getPath(cmd.getOptionValue("o", "../../data/content"))
   processPath(inputPath, outputDirectory)
 }
 

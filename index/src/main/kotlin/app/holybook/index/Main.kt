@@ -1,7 +1,6 @@
 package app.holybook.index
 
 import app.holybook.lib.db.Database
-import app.holybook.lib.path.PathExtensions.listFilesRecursive
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import org.apache.commons.cli.CommandLine

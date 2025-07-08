@@ -6,8 +6,8 @@ import io.ktor.server.config.ApplicationConfig
  * Provides extension functions for retrieving configuration properties from [ApplicationConfig].
  *
  * Each function in this object is an extension to the [ApplicationConfig] class and is designed to
- * fetch specific configuration values required for application functionality, such as database connection
- * settings or integration with external services like Google Cloud Secret Manager.
+ * fetch specific configuration values required for application functionality, such as database
+ * connection settings or integration with external services like Google Cloud Secret Manager.
  *
  * Extensions:
  * - getJdbcUrl(): Retrieves the JDBC URL for database connection.

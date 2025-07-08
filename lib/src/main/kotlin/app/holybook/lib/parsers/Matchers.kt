@@ -12,7 +12,7 @@ val CONTENT_TYPES_XML = listOf("application/xml", "application/xhtml+xml", "text
 class ContentMatcher(
   private val supportedContentTypes: List<String>,
   private val hostName: String,
-  private val pathPrefix: String = ""
+  private val pathPrefix: String = "",
 ) {
   fun matches(contentType: ContentType?, url: Url) =
     supportedContentTypes.any { contentType?.match(it) == true } &&

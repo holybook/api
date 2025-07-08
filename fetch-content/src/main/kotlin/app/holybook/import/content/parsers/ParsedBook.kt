@@ -13,5 +13,5 @@ fun ParsedBook.withContentDescriptor(descriptor: ContentDescriptor) =
     title,
     descriptor.authorCode,
     descriptor.publishedAt,
-    paragraphs
+    paragraphs,
   )

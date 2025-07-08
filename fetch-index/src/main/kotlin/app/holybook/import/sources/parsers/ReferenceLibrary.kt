@@ -18,7 +18,7 @@ object ReferenceLibrary {
         language = "en",
         authorCode = "uhj",
         url =
-          "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}/${id}.xhtml"
+          "https://bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/${id}/${id}.xhtml",
       )
     }
   }

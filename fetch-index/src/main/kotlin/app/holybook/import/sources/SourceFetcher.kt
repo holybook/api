@@ -24,14 +24,14 @@ object SourceFetcher {
       SourceDescriptor(
         Url("https://bibliothek.bahai.de/pubAuthor.php?authorCode=uhj"),
         "de.uhj.txt",
-        BibliothekBahaiDe.uhjList
+        BibliothekBahaiDe.uhjList,
       ),
       SourceDescriptor(
         Url(
           "https://www.bahai.org/library/authoritative-texts/the-universal-house-of-justice/messages/"
         ),
         "en.uhj.txt",
-        ReferenceLibrary.uhjList
+        ReferenceLibrary.uhjList,
       ),
     )
   private val log = LoggerFactory.getLogger("fetch-sources")

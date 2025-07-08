@@ -11,9 +11,7 @@ import io.ktor.server.routing.get
 
 fun Routing.configureBooks() {
 
-  get("/api/languages") {
-    call.respond(getSupportedLanguages())
-  }
+  get("/api/languages") { call.respond(getSupportedLanguages()) }
 
   get("/api/books") {
     val language = call.parameters["lang"] ?: "en"

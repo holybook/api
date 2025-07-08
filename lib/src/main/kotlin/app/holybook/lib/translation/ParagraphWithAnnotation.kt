@@ -12,20 +12,13 @@ data class ParagraphAnnotation(
 )
 
 @Serializable
-data class ParagraphWithAnnotation(
-  val annotation: ParagraphAnnotation? = null,
-  val text: String
-)
+data class ParagraphWithAnnotation(val annotation: ParagraphAnnotation? = null, val text: String)
 
-@Serializable
-data class ParagraphReference(
-  val bookId: String,
-  val index: Int
-)
+@Serializable data class ParagraphReference(val bookId: String, val index: Int)
 
 data class TranslationTemplateData(
   val fromLanguage: String,
   val toLanguage: String,
   val authoritativeTranslations: List<TranslateResponse>,
-  val paragraphsToBeTranslated: List<ParagraphWithId>
+  val paragraphsToBeTranslated: List<ParagraphWithId>,
 )

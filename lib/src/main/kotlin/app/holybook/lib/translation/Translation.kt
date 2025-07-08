@@ -19,72 +19,71 @@ import kotlinx.serialization.Serializable
  */
 class Translation(private val translator: Translator) {
 
-  fun translate(
-    fromLanguage: String,
-    toLanguage: String,
-    text: String
-  ): TranslationResponse? {
-    val paragraphs =
-      text.lines().mapNotNull { it.trim().takeIf { it.isNotBlank() } }
+  fun translate(fromLanguage: String, toLanguage: String, text: String): TranslationResponse? {
+    val paragraphs = text.lines().mapNotNull { it.trim().takeIf { it.isNotBlank() } }
 
     val translationPairs =
       paragraphs.map { paragraphText ->
-        val translateResponse = translate(
-          TranslateRequest(
-            fromLanguage = fromLanguage,
-            toLanguage = toLanguage,
-            text = paragraphText,
+        val translateResponse =
+          translate(
+            TranslateRequest(
+              fromLanguage = fromLanguage,
+              toLanguage = toLanguage,
+              text = paragraphText,
+            )
           )
-        )
         TranslationPair(
           authoritativeTranslation = translateResponse,
-          textToBeTranslated = paragraphText
+          textToBeTranslated = paragraphText,
         )
       }
 
-    val modelInput = TranslationModelRequest(
-      fromLanguage,
-      toLanguage,
-      translationPairs.map { pair ->
-        ParagraphWithReference(
-          pair.textToBeTranslated,
-          pair.authoritativeTranslation?.let {
-            ParagraphWithId(
-              text = it.translatedParagraph.text,
-              id = it.id,
-            )
-          },
-        )
-      },
-    )
+    val modelInput =
+      TranslationModelRequest(
+        fromLanguage,
+        toLanguage,
+        translationPairs.map { pair ->
+          ParagraphWithReference(
+            pair.textToBeTranslated,
+            pair.authoritativeTranslation?.let {
+              ParagraphWithId(text = it.translatedParagraph.text, id = it.id)
+            },
+          )
+        },
+      )
 
     // Delegate to the injected translator
     val response = translator.translate(modelInput) ?: return null
-    val authoritativeTranslationsMap = translationPairs.mapNotNull {
-      if (it.authoritativeTranslation == null) {
-        return@mapNotNull null
-      }
+    val authoritativeTranslationsMap =
+      translationPairs
+        .mapNotNull {
+          if (it.authoritativeTranslation == null) {
+            return@mapNotNull null
+          }
 
-      it.authoritativeTranslation.id to it.authoritativeTranslation
-    }.toMap()
+          it.authoritativeTranslation.id to it.authoritativeTranslation
+        }
+        .toMap()
 
     // Validate the response against authoritative translations
     validateResponse(response, authoritativeTranslationsMap)
 
-    return TranslationResponse(paragraphs = response.paragraphs.map { paragraph ->
-      val authoritativeTranslation =
-        paragraph.id?.let { authoritativeTranslationsMap[it] }
-      ParagraphWithAnnotation(
-        annotation = authoritativeTranslation?.annotation,
-        text = paragraph.text
-      )
-    })
+    return TranslationResponse(
+      paragraphs =
+        response.paragraphs.map { paragraph ->
+          val authoritativeTranslation = paragraph.id?.let { authoritativeTranslationsMap[it] }
+          ParagraphWithAnnotation(
+            annotation = authoritativeTranslation?.annotation,
+            text = paragraph.text,
+          )
+        }
+    )
   }
 
   /**
    * Validates that the translation response matches authoritative translations where available.
-   * This is a generic validation that works with any TranslationModelResponse regardless of
-   * the Translator implementation used.
+   * This is a generic validation that works with any TranslationModelResponse regardless of the
+   * Translator implementation used.
    *
    * @param response The translation response to validate
    * @param authoritativeTranslations Map of reference IDs to authoritative translations
@@ -92,13 +91,12 @@ class Translation(private val translator: Translator) {
    */
   private fun validateResponse(
     response: TranslationModelResponse,
-    authoritativeTranslations: Map<String, TranslateResponse>
+    authoritativeTranslations: Map<String, TranslateResponse>,
   ) {
     for (paragraph in response.paragraphs) {
       val reference = paragraph.id ?: continue
       val authoritativeText =
-        authoritativeTranslations[reference]?.translatedParagraph?.text
-          ?: continue
+        authoritativeTranslations[reference]?.translatedParagraph?.text ?: continue
       if (!authoritativeText.contains(paragraph.text, ignoreCase = true)) {
         throw IllegalStateException(
           "Translation response does not match authoritative translation for paragraph $paragraph"
@@ -110,12 +108,7 @@ class Translation(private val translator: Translator) {
 
 data class TranslationPair(
   val authoritativeTranslation: TranslateResponse?,
-  val textToBeTranslated: String
+  val textToBeTranslated: String,
 )
 
-
-
-@Serializable
-data class TranslationResponse(
-  val paragraphs: List<ParagraphWithAnnotation>
-)
+@Serializable data class TranslationResponse(val paragraphs: List<ParagraphWithAnnotation>)

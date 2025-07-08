@@ -11,7 +11,7 @@ data class ContentDescriptor(
   val id: String,
   val language: String,
   val authorCode: String,
-  val url: String
+  val url: String,
 ) {
   val publishedAt: LocalDate?
     get() =
@@ -39,7 +39,7 @@ fun String.readContentDescriptor(): ContentDescriptor {
     language = parts[0],
     authorCode = parts[1],
     id = parts[2],
-    url = parts[3]
+    url = parts[3],
   )
 }
 

@@ -4,10 +4,10 @@ import app.holybook.index.IndexLogger.log
 import app.holybook.lib.models.toBookContent
 import app.holybook.lib.parsers.readDocument
 import app.holybook.lib.path.PathExtensions.listFilesRecursive
-import kotlinx.serialization.Serializable
 import java.nio.file.Path
 import kotlin.io.path.inputStream
 import kotlin.io.path.relativeTo
+import kotlinx.serialization.Serializable
 
 class Indexer {
   private val indexedBooks = mutableMapOf<String, BookMetadata>()

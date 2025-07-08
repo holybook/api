@@ -44,34 +44,30 @@ fun Connection.dropParagraphsTable() {
     )
 }
 
-fun getParagraphs(
-  bookId: String,
-  language: String,
-  startIndex: Int?,
-  endIndex: Int?,
-) = transaction {
-  val startClause = if (startIndex != null) "AND index >= ?" else ""
-  val endClause = if (endIndex != null) "AND index <= ?" else ""
-  val getParagraphs =
-    prepareStatement(
-      """
+fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: Int?) =
+  transaction {
+    val startClause = if (startIndex != null) "AND index >= ?" else ""
+    val endClause = if (endIndex != null) "AND index <= ?" else ""
+    val getParagraphs =
+      prepareStatement(
+        """
       SELECT index, number, type, text FROM paragraphs 
       WHERE book = ? AND language = ? $startClause $endClause 
       ORDER BY index 
     """
-        .trimIndent()
-    )
-  getParagraphs.setString(1, bookId)
-  getParagraphs.setString(2, language)
-  var colIndex = 3
-  if (startIndex != null) {
-    getParagraphs.setInt(colIndex++, startIndex)
+          .trimIndent()
+      )
+    getParagraphs.setString(1, bookId)
+    getParagraphs.setString(2, language)
+    var colIndex = 3
+    if (startIndex != null) {
+      getParagraphs.setInt(colIndex++, startIndex)
+    }
+    if (endIndex != null) {
+      getParagraphs.setInt(colIndex, endIndex)
+    }
+    getParagraphs.executeQuery().map { currentParagraph() }
   }
-  if (endIndex != null) {
-    getParagraphs.setInt(colIndex, endIndex)
-  }
-  getParagraphs.executeQuery().map { currentParagraph() }
-}
 
 fun searchParagraphs(language: String, query: String) = transaction {
   val languageConfiguration = getLanguageConfiguration(language)
@@ -99,7 +95,7 @@ fun searchParagraphs(language: String, query: String) = transaction {
       author = getAuthorName(getString("author"), language),
       title = getString("title"),
       highlightedText = getString("highlighted"),
-      paragraph = currentParagraph()
+      paragraph = currentParagraph(),
     )
   }
 }
@@ -130,7 +126,7 @@ fun translate(request: TranslateRequest) = transaction {
         author = getAuthorName(getString("author"), request.fromLanguage),
         title = getString("title"),
         highlightedText = getString("highlighted"),
-        paragraph = currentParagraph()
+        paragraph = currentParagraph(),
       )
     }
   val firstResult = searchResults.firstOrNull() ?: return@transaction null
@@ -160,15 +156,11 @@ private fun ResultSet.currentParagraph(): Paragraph {
     getInt("index"),
     getString("text"),
     ParagraphType.fromValue(getString("type"))!!,
-    if (number > 0) number else null
+    if (number > 0) number else null,
   )
 }
 
-fun Connection.insertParagraphs(
-  bookId: String,
-  language: String,
-  paragraphs: List<Paragraph>,
-) {
+fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: List<Paragraph>) {
   val insertParagraph =
     prepareStatement(
       """
@@ -195,11 +187,7 @@ fun Connection.insertParagraphs(
 }
 
 @Serializable
-data class TranslateRequest(
-  val fromLanguage: String,
-  val toLanguage: String,
-  val text: String,
-)
+data class TranslateRequest(val fromLanguage: String, val toLanguage: String, val text: String)
 
 @Serializable
 data class TranslateResponse(
@@ -212,7 +200,7 @@ data class Paragraph(
   val index: Int,
   val text: String,
   @Serializable(with = ParagraphTypeSerializer::class) val type: ParagraphType,
-  val number: Int?
+  val number: Int?,
 )
 
 @Serializable
@@ -259,16 +247,12 @@ class ParagraphListBuilder {
     } else {
       null
     }
-
-
 }
 
 class ParagraphElement(val text: String, val type: ParagraphType = ParagraphType.BODY)
 
 fun Iterable<ParagraphElement>.withIndices(): List<Paragraph> {
   val builder = ParagraphListBuilder()
-  forEach {
-    builder.addParagraph(it.text, it.type)
-  }
+  forEach { builder.addParagraph(it.text, it.type) }
   return builder.build()
 }

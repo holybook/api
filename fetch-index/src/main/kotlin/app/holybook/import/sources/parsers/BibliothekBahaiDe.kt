@@ -24,7 +24,7 @@ object BibliothekBahaiDe {
         language = "de",
         authorCode = "uhj",
         url =
-          "https://bibliothek.bahai.de/download/xml/export_UHJ_${dateStringWithHyphens}_de%20(1.01)%20MAS-XML.xml"
+          "https://bibliothek.bahai.de/download/xml/export_UHJ_${dateStringWithHyphens}_de%20(1.01)%20MAS-XML.xml",
       )
     }
   }

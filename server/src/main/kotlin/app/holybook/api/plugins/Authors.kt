@@ -7,8 +7,5 @@ import io.ktor.server.routing.*
 
 fun Routing.configureAuthors() {
 
-    get("/api/authors") {
-        call.respond(authors)
-    }
-
+  get("/api/authors") { call.respond(authors) }
 }

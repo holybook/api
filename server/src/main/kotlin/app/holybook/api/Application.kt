@@ -1,8 +1,8 @@
 package app.holybook.api
 
 import app.holybook.api.config.ApplicationConfigExt.getJdbcUrl
-import app.holybook.lib.db.Database
 import app.holybook.api.plugins.configureRouting
+import app.holybook.lib.db.Database
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -19,9 +19,7 @@ fun main(args: Array<String>) = EngineMain.main(args)
 fun Application.module() {
   Database.init(environment.config.getJdbcUrl())
 
-  install(ContentNegotiation) {
-    json()
-  }
+  install(ContentNegotiation) { json() }
   install(CallLogging) {
     level = Level.INFO
     filter { call -> call.request.path().startsWith("/") }

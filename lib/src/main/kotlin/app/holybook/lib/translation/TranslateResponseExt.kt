@@ -10,10 +10,11 @@ object TranslateResponseExt {
     get() = "$bookId/${translatedParagraph.index}"
 
   val TranslateResponse.annotation: ParagraphAnnotation
-    get() = ParagraphAnnotation(
-      bookId,
-      index = translatedParagraph.index,
-      number = translatedParagraph.number,
-      title = allOriginalResults[0].title
-    )
+    get() =
+      ParagraphAnnotation(
+        bookId,
+        index = translatedParagraph.index,
+        number = translatedParagraph.number,
+        title = allOriginalResults[0].title,
+      )
 }

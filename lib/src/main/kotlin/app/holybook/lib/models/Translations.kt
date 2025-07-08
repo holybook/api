@@ -58,7 +58,7 @@ fun Connection.getTranslations(bookId: String, authorCode: String): List<Transla
       bookId = bookId,
       language = language,
       title = getString("title"),
-      author = getAuthorName(authorCode, language)
+      author = getAuthorName(authorCode, language),
     )
   }
 }
@@ -83,5 +83,5 @@ data class Translation(
   val bookId: String,
   val language: String,
   val title: String,
-  val author: String
+  val author: String,
 )

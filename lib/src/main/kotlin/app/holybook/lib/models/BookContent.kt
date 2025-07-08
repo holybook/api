@@ -14,7 +14,7 @@ data class BookContent(
   val title: String,
   val author: String,
   val publishedAt: LocalDate?,
-  val paragraphs: List<Paragraph>
+  val paragraphs: List<Paragraph>,
 )
 
 fun Document.toBookContent(): BookContent {
@@ -28,7 +28,7 @@ fun Document.toBookContent(): BookContent {
         ParagraphElement(
           element.textContent,
           element.getAttributeOrNull("type")?.let { ParagraphType.fromValue(it) }
-            ?: ParagraphType.BODY
+            ?: ParagraphType.BODY,
         )
       }
       .withIndices()
@@ -41,7 +41,7 @@ fun Document.toBookContent(): BookContent {
       bookElement.getAttributeOrNull("publishedAt")?.let {
         LocalDate.parse(it, DateTimeFormatter.ISO_DATE)
       },
-    paragraphs = paragraphs
+    paragraphs = paragraphs,
   )
 }
 

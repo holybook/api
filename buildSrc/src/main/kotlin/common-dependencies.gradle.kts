@@ -1,17 +1,17 @@
 import Deps.logging
 
 plugins {
-    `java-library`
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+  `java-library`
+  kotlin("jvm")
+  kotlin("plugin.serialization")
 }
 
 repositories {
-    mavenCentral()
-    gradlePluginPortal()
+  mavenCentral()
+  gradlePluginPortal()
 }
 
 dependencies {
-    logging()
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.+")
+  logging()
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.+")
 }

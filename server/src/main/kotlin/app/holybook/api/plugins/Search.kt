@@ -1,7 +1,6 @@
 package app.holybook.api.plugins
 
 import app.holybook.lib.models.TranslateRequest
-import app.holybook.lib.models.getBook
 import app.holybook.lib.models.searchParagraphs
 import app.holybook.lib.models.translate
 import io.ktor.http.HttpStatusCode

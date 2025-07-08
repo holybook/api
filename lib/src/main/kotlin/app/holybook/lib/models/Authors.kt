@@ -8,8 +8,8 @@ private val universalHouseOfJustice =
     names =
       mapOf(
         "en" to "The Universal House of Justice",
-        "de" to "Das Universale Haus der Gerechtigkeit"
-      )
+        "de" to "Das Universale Haus der Gerechtigkeit",
+      ),
   )
 
 val authors = listOf(universalHouseOfJustice).associateBy { it.id }

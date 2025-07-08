@@ -1,4 +1,3 @@
-import Deps.dagger
 import Deps.ktor
 import Deps.xml
 
