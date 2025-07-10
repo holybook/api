@@ -1,4 +1,4 @@
-import gradle.kotlin.dsl.accessors._0449600b324c89f28a01158b532ae80c.implementation
+import gradle.kotlin.dsl.accessors._0fe83e200ed26695aaa149fee753aa39.implementation
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 
 object Deps {
