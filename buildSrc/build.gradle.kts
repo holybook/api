@@ -3,10 +3,10 @@ plugins { `kotlin-dsl` }
 repositories { gradlePluginPortal() }
 
 dependencies {
-  implementation("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.+")
+  implementation("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.3.21")
   implementation(
-    "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.+"
+    "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.3.21"
   )
-  implementation("io.ktor.plugin:io.ktor.plugin.gradle.plugin:3.+")
-  implementation("com.google.dagger:dagger-compiler:2.+")
+  implementation("io.ktor.plugin:io.ktor.plugin.gradle.plugin:3.5.0")
+  implementation("com.google.dagger:dagger-compiler:2.59.2")
 }
