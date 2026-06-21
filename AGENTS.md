@@ -117,6 +117,10 @@ The project includes deployment scripts in the `scripts/` directory:
 - `update_db.sh`: Database update script
 - `update_rds.sh`: RDS database update script
 
+## Git Protocol
+
+**Always get explicit user approval before committing or pushing.** Present the diff or a summary of the changes and wait for confirmation before running `git commit` or `git push`.
+
 ## Development Notes
 
 - Use Java 21 as the target language version
