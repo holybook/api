@@ -16,7 +16,7 @@ fun Routing.configureTranslate() {
       .modelConfiguration(
         ModelConfiguration(
           apiKey = environment.config.getGeminiApiKey(),
-          modelName = "gemini-2.5-flash-lite-preview-06-17",
+          modelName = "gemini-3.1-flash-lite",
         )
       )
       .build()

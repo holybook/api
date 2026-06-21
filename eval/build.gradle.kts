@@ -26,3 +26,5 @@ dependencies {
 tasks.test { useJUnit() }
 
 application { mainClass.set("app.holybook.eval.MainKt") }
+
+tasks.named<JavaExec>("run") { workingDir = rootProject.projectDir }
