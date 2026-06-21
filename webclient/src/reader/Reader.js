@@ -30,7 +30,8 @@ export function Reader() {
           <div id="content">
             <Paragraphs
                 paragraphs={paragraphs}
-                scrollPosition={position}/>
+                scrollPosition={position}
+                language={language}/>
           </div>
         </div>
       </div>

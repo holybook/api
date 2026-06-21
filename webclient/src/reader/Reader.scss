@@ -32,6 +32,9 @@ p.par {
   color: #2d2835;
   max-width: 800px;
   margin: 0;
+  hyphens: auto;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
 
   .par-number {
     font-size: 12pt;
@@ -43,8 +46,11 @@ p.par {
 p.letter-head {
   text-align: center;
   text-transform: uppercase;
+  text-wrap: balance;
+  hyphens: none;
 }
 
 p.date {
   text-align: center;
+  text-wrap: balance;
 }

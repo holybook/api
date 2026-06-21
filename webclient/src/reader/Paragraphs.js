@@ -1,16 +1,17 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {setTopPosition} from "./ScrollPosition";
 
-export function Paragraphs({paragraphs, scrollPosition}) {
+export function Paragraphs({paragraphs, scrollPosition, language}) {
   return paragraphs.map((paragraph) =>
     <Paragraph
       paragraph={paragraph}
       key={paragraph.index}
-      scrollPosition={scrollPosition}/>
+      scrollPosition={scrollPosition}
+      language={language}/>
   )
 }
 
-function Paragraph({paragraph, scrollPosition}) {
+function Paragraph({paragraph, scrollPosition, language}) {
 
   const ref = useRef(null);
   useLayoutEffect(() => {
@@ -24,7 +25,7 @@ function Paragraph({paragraph, scrollPosition}) {
     }
   });
 
-  return (<p ref={ref} className={`par ${paragraph.type}`}>
+  return (<p ref={ref} lang={language} className={`par ${paragraph.type}`}>
     {paragraph.number && <span className="par-number">{paragraph.number}</span>} {paragraph.text}
   </p>);
 }
