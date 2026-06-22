@@ -1,5 +1,6 @@
 import {Dropdown, Icon} from "react-bulma-components";
 import {useSearchParams} from "react-router-dom";
+import "./LanguageSelect.scss";
 
 export function LanguageSelect({
   supportedLanguages,
@@ -27,6 +28,7 @@ export function LanguageSelect({
   }
 
   return (<Dropdown
+    className="lang-select"
     value={activeLanguage}
     onChange={setLanguage}
     icon={<Icon><i aria-hidden="true"

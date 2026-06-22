@@ -20,6 +20,9 @@ export function Reader() {
   const supportedLanguages = book.translations.map(
       (translation) => translation.language);
 
+  const translation = book.translations.find(
+      (t) => t.language === language) ?? book.translations[0];
+
   return (
       <div className="reader">
         <TopBar
@@ -28,6 +31,15 @@ export function Reader() {
             supportedLanguages={supportedLanguages}/>
         <div id="content-container">
           <div id="content">
+            {translation &&
+              <header className="reader-head">
+                {translation.author &&
+                  <p className="reader-head__author">{translation.author}</p>}
+                <h1 className="reader-head__title">{translation.title}</h1>
+                <div className="reader-head__rule" aria-hidden="true">
+                  <span/>
+                </div>
+              </header>}
             <Paragraphs
                 paragraphs={paragraphs}
                 scrollPosition={position}

@@ -1,13 +1,89 @@
+:root {
+  /* Warm paper palette ------------------------------------------------ */
+  --color-bg: #f4f0e8;          /* page background, warm parchment */
+  --color-surface: #fdfbf7;     /* cards / header                  */
+  --color-surface-alt: #f9f5ee; /* subtle raised / hover surface   */
+  --color-paper: #fffdf9;       /* reading surface                 */
+
+  --color-ink: #2b2630;         /* primary text                    */
+  --color-ink-soft: #54505c;    /* secondary text                  */
+  --color-muted: #8b8593;       /* tertiary / captions             */
+
+  --color-primary: #9c5566;     /* refined wine-rose accent        */
+  --color-primary-strong: #7f4252;
+  --color-primary-tint: #f3e7e6; /* hover wash                     */
+  --color-accent: #c08862;      /* warm terracotta                 */
+  --color-gold: #c79a3f;        /* highlight / mark                */
+  --color-gold-tint: #f7ecca;
+
+  --color-border: #e7dfd2;      /* hairline borders                */
+  --color-border-strong: #d8cdbb;
+
+  /* Typography -------------------------------------------------------- */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-read: Libertine, 'Spectral', Georgia, serif;
+
+  /* Radii & shadows --------------------------------------------------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(43, 38, 48, 0.06);
+  --shadow-md: 0 6px 20px -8px rgba(43, 38, 48, 0.18);
+  --shadow-lg: 0 18px 48px -18px rgba(43, 38, 48, 0.28);
+
+  --header-height: 64px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  min-height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+::selection {
+  background: var(--color-gold-tint);
+  color: var(--color-ink);
+}
+
+/* Slim, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+  background-clip: content-box;
 }
