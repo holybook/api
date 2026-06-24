@@ -1,9 +1,9 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './App.scss';
-import {createBrowserRouter, RouterProvider, useParams,} from 'react-router-dom';
+import {createBrowserRouter, RouterProvider,} from 'react-router-dom';
 import {Reader} from './reader/Reader.js';
 import {Overview} from './overview/Overview';
-import {SearchResults, SearchResultsPage} from "./search/SearchResults";
+import {SearchResultsPage} from "./search/SearchResults";
 import {Translate} from './translate/Translate';
 import {AiTranslate} from './translate/AiTranslate';
 

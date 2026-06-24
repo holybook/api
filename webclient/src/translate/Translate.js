@@ -48,44 +48,66 @@ export function Translate() {
     if (textToBeTranslated.length > 0) {
       submitTranslation();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromLanguage, toLanguage, textToBeTranslated])
 
-  return (<div id="translate">
+  return (<div id="translate" className="translate-page">
       <TopBar
         activeLanguage={fromLanguage}
         supportedLanguages={supportedLanguages}/>
-      <div className="language-header">
-        <div className="language-container left">
-          <LanguageSelect
-            supportedLanguages={supportedLanguages}
-            activeLanguage={fromLanguage}
-            onLanguageChanged={setFromLanguage}
+      <div className="translate-shell">
+        <header className="translate-intro">
+          <h1 className="translate-intro__title">Verbatim translation</h1>
+          <p className="translate-intro__subtitle">
+            Find the authorized published rendering of a passage in another language.
+          </p>
+        </header>
+
+        <div className="language-header">
+          <div className="language-container left">
+            <LanguageSelect
+              supportedLanguages={supportedLanguages}
+              activeLanguage={fromLanguage}
+              onLanguageChanged={setFromLanguage}
+            />
+          </div>
+          <div className="language-swap" aria-hidden="true">
+            <i className="fa-solid fa-arrow-right-long"/>
+          </div>
+          <div className="language-container right">
+            <LanguageSelect
+              supportedLanguages={supportedLanguages}
+              activeLanguage={toLanguage}
+              onLanguageChanged={setToLanguage}
+            />
+          </div>
+        </div>
+
+        <div className="text-container">
+          <div className="translate-panel">
+            <span className="translate-panel__label">Original</span>
+            <div className="translate-text">
+              <Form.Textarea
+                fixedSize={true}
+                placeholder="Paste a passage to look up…"
+                onChange={(event) => setTextToBeTranslated(event.target.value)}
+              />
+            </div>
+          </div>
+          <div className="translate-panel">
+            <span className="translate-panel__label">Translation</span>
+            <ResultText
+              translatedText={getTranslatedText()}
+              language={toLanguage}/>
+          </div>
+        </div>
+
+        <div className="attribution-container">
+          <Attribution
+            translationResult={translationResult}
+            toLanguage={toLanguage}
           />
         </div>
-        <div className="language-container right">
-          <LanguageSelect
-            supportedLanguages={supportedLanguages}
-            activeLanguage={toLanguage}
-            onLanguageChanged={setToLanguage}
-          />
-        </div>
-      </div>
-      <div className="text-container">
-        <div className="translate-text">
-          <Form.Textarea
-            fixedSize={true}
-            onChange={(event) => setTextToBeTranslated(event.target.value)}
-          />
-        </div>
-        <ResultText
-          translatedText={getTranslatedText()}
-          language={toLanguage}/>
-      </div>
-      <div className="attribution-container">
-        <Attribution
-          translationResult={translationResult}
-          toLanguage={toLanguage}
-        />
       </div>
     </div>
   )
@@ -101,7 +123,8 @@ function Attribution({translationResult, toLanguage}) {
   return (<a
     href={`/books/${originalResult.bookId}?lang=${toLanguage}&pos=${translationResult.translatedParagraph.index}:60`}
     className="translation-attribution">
-    &mdash; {originalResult.author}, {originalResult.title}, par. {translationResult.translatedParagraph.number}
+    <i className="fa-solid fa-bookmark" aria-hidden="true"/>
+    {originalResult.author}, {originalResult.title}, par. {translationResult.translatedParagraph.number}
   </a>);
 }
 
@@ -109,7 +132,7 @@ function ResultText({translatedText, language}) {
   if (translatedText === null) {
     return (
       <div className="translate-text error">
-        Could not find paragraph in language {language}.
+        Could not find this paragraph in {language}.
       </div>
     )
   }
@@ -118,6 +141,7 @@ function ResultText({translatedText, language}) {
     <div className="translate-text">
       <Form.Textarea
         fixedSize={true}
+        readOnly={true}
         value={translatedText}
       /></div>);
 }

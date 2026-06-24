@@ -1,18 +1,100 @@
-.search-result {
-  display: block;
-  padding: 12px;
-  font-family: Libertine, serif;
-  color: #2d2835;
-  text-decoration: none;
-  font-size: 16pt;
+.search-results {
+  background: var(--color-bg);
+}
 
-  .search-result-author {
-    font-size: 12pt;
-    text-align: end;
-    font-style: italic;
+.search-head {
+  margin-bottom: 28px;
+}
+
+.search-head__title {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.7rem;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.search-head__query {
+  margin: 0;
+  color: var(--color-ink-soft);
+
+  span {
+    color: var(--color-ink);
+    font-weight: 500;
   }
 }
 
-.search-result:hover {
-  background-color: #ffcdb2;
+.search-empty {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 1.02rem;
+}
+
+/* Result card --------------------------------------------------------- */
+.search-result {
+  display: block;
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-decoration: none;
+  color: var(--color-ink);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.search-result__text {
+  font-family: var(--font-read);
+  font-size: 1.18rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+
+  b {
+    font-weight: 400;
+    background: var(--color-gold-tint);
+    border-radius: 4px;
+    padding: 0 2px;
+    box-shadow: inset 0 -1px 0 rgba(199, 154, 63, 0.5);
+  }
+}
+
+.search-result__cite {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.search-result__author {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.search-result__sep {
+  color: var(--color-border-strong);
+}
+
+.search-result__title {
+  font-style: italic;
+}
+
+.search-result__par {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }

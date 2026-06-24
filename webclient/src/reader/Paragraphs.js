@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useLayoutEffect, useRef} from 'react';
 import {setTopPosition} from "./ScrollPosition";
 
 export function Paragraphs({paragraphs, scrollPosition, language}) {
