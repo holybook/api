@@ -44,22 +44,33 @@ if [ ! -d "$DATA_DIR/.git" ]; then
   git clone --branch "$BRANCH" --single-branch "$DATA_REPO" "$DATA_DIR"
 else
   git -C "$DATA_DIR" fetch --quiet origin "$BRANCH"
-  local_sha=$(git -C "$DATA_DIR" rev-parse HEAD)
-  remote_sha=$(git -C "$DATA_DIR" rev-parse "origin/$BRANCH")
-  if [ "$local_sha" = "$remote_sha" ]; then
-    echo "$(ts) no content changes ($local_sha), nothing to do"
-    exit 0
-  fi
-  echo "$(ts) updating content $local_sha -> $remote_sha"
-  git -C "$DATA_DIR" reset --hard "origin/$BRANCH"
+fi
+remote_sha=$(git -C "$DATA_DIR" rev-parse "origin/$BRANCH")
+
+# Compare against the commit actually imported into the database (recorded by
+# the importer), not the local clone's HEAD. This way a previous run that
+# cloned/fetched but failed to import does not look "in sync" — the import is
+# retried until it succeeds. Empty when the table or row does not exist yet.
+applied_sha=$(docker compose exec -T db \
+  psql -U server -d holybook -tAc \
+  "SELECT value FROM sync_state WHERE key = 'applied_commit'" 2>/dev/null |
+  tr -d '[:space:]' || true)
+
+if [ "$remote_sha" = "$applied_sha" ]; then
+  echo "$(ts) database already at $remote_sha, nothing to do"
+  exit 0
 fi
 
-echo "$(ts) reimporting database from content"
+echo "$(ts) importing ${applied_sha:-<none>} -> $remote_sha"
+git -C "$DATA_DIR" reset --hard --quiet "origin/$BRANCH"
+
 # The importer reads the password from DB_PASSWORD in its environment (injected
-# by Compose from .env), so no credentials appear here or in the URL.
+# by Compose from .env), so no credentials appear here or in the URL. It records
+# the commit as applied only after the import completes successfully.
 docker compose run --rm importer \
   -jdbc "jdbc:postgresql://db:5432/holybook" \
   -u server \
+  --commit "$remote_sha" \
   -i /content
 
-echo "$(ts) import complete, commit $(git -C "$DATA_DIR" rev-parse HEAD)"
+echo "$(ts) import complete, database now at $remote_sha"
