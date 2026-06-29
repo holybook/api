@@ -1,5 +1,7 @@
 package app.holybook.api
 
+import app.holybook.api.config.ApplicationConfigExt.getDbPassword
+import app.holybook.api.config.ApplicationConfigExt.getDbUser
 import app.holybook.api.config.ApplicationConfigExt.getJdbcUrl
 import app.holybook.api.plugins.configureRouting
 import app.holybook.lib.db.Database
@@ -17,7 +19,11 @@ import org.slf4j.event.*
 fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
-  Database.init(environment.config.getJdbcUrl())
+  Database.init(
+    environment.config.getJdbcUrl(),
+    environment.config.getDbUser(),
+    environment.config.getDbPassword(),
+  )
 
   val isDevelopment = developmentMode
 

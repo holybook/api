@@ -39,16 +39,6 @@ else
   echo "$(ts) flock not available, running without an overlap lock"
 fi
 
-# Read DB_PASSWORD from the deploy .env. Do NOT `source` the file: it is a
-# Compose env file, not a shell script, and the password may contain characters
-# the shell would try to interpret. Extract the literal value instead. (Compose
-# loads .env itself for IMPORT_IMAGE etc. when it runs the importer.)
-DB_PASSWORD=$(grep -E '^DB_PASSWORD=' "$COMPOSE_DIR/.env" | head -n1 | cut -d= -f2-)
-if [ -z "$DB_PASSWORD" ]; then
-  echo "$(ts) DB_PASSWORD not found in $COMPOSE_DIR/.env" >&2
-  exit 1
-fi
-
 if [ ! -d "$DATA_DIR/.git" ]; then
   echo "$(ts) cloning $DATA_REPO"
   git clone --branch "$BRANCH" --single-branch "$DATA_REPO" "$DATA_DIR"
@@ -65,8 +55,11 @@ else
 fi
 
 echo "$(ts) reimporting database from content"
+# The importer reads the password from DB_PASSWORD in its environment (injected
+# by Compose from .env), so no credentials appear here or in the URL.
 docker compose run --rm importer \
-  -jdbc "jdbc:postgresql://db:5432/holybook?user=server&password=${DB_PASSWORD}" \
+  -jdbc "jdbc:postgresql://db:5432/holybook" \
+  -u server \
   -i /content
 
 echo "$(ts) import complete, commit $(git -C "$DATA_DIR" rev-parse HEAD)"

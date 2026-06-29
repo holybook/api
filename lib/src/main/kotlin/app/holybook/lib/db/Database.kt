@@ -11,8 +11,18 @@ object Database {
   private val dataSource = HikariDataSource()
   private val log: Logger = LoggerFactory.getLogger("db")
 
-  fun init(jdbcUrl: String) {
+  /**
+   * Configures the connection pool.
+   *
+   * Credentials are passed as connection properties rather than embedded in the
+   * JDBC URL, so passwords may contain any character (URL query strings mangle
+   * '+', '/', '=', '&', etc.). [username] and [password] are optional for URLs
+   * that carry no credentials (e.g. SQLite).
+   */
+  fun init(jdbcUrl: String, username: String? = null, password: String? = null) {
     dataSource.jdbcUrl = jdbcUrl
+    username?.let { dataSource.username = it }
+    password?.let { dataSource.password = it }
   }
 
   fun <R> transaction(body: Connection.() -> R): R {

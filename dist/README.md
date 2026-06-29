@@ -75,12 +75,11 @@ workflow does this).
 
 > **Two separate database passwords.** `DB_PASSWORD` is the `server` superuser
 > (used by the importer); `WEBAPP_PASSWORD` is the read-only `webapp` role the
-> server connects as. Generate **two different** strong values with a **URL-safe
-> charset** (hex) — the importer passes the password inside a JDBC URL, where
-> base64 characters like `+`, `/`, and `=` get mangled:
+> server connects as. Generate **two different** strong values — any charset
+> works, since credentials are passed as connection properties, not in the URL:
 >
 > ```bash
-> openssl rand -hex 24   # run twice, once per secret
+> openssl rand -base64 24   # run twice, once per secret
 > ```
 >
 > ⚠️ Both are written into the Postgres data volume the **first** time the `db`
