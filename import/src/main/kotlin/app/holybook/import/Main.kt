@@ -15,23 +15,40 @@ import org.apache.commons.cli.Options
 
 fun main(args: Array<String>): Unit = runBlocking {
   val options = Options()
-  options.addOption("jdbc", true, "Full custom jdbc url")
+  options.addOption("jdbc", true, "Custom jdbc url (without credentials)")
   options.addOption("h", "host", true, "Database host")
   options.addOption("p", "port", true, "Database port")
   options.addOption("d", "database", true, "Database name")
   options.addOption("u", "user", true, "Database username")
-  options.addOption("pwd", "password", false, "Use password")
+  options.addOption("pw", "password-value", true, "Database password")
+  options.addOption("pwd", "password", false, "Prompt for the database password")
   options.addOption("i", "input", true, "Input directory")
 
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
 
-  Database.init(cmd.getJdbcUrl())
+  Database.init(cmd.getJdbcUrl(), cmd.getDbUser(), cmd.getDbPassword())
   resetDatabase()
   createDatabase()
 
   cmd.getInputDirectory().listFilesRecursive().forEach { processFile(it) }
 }
+
+fun CommandLine.getDbUser(): String = getOptionValue("u", "server")
+
+/**
+ * Resolves the database password from, in order: the -pw option, the
+ * DB_PASSWORD environment variable, or an interactive prompt (-pwd). Returns
+ * null when none is given (e.g. local trust auth). The password is never placed
+ * in the JDBC URL, so it may contain any character.
+ */
+fun CommandLine.getDbPassword(): String? =
+  when {
+    hasOption("pw") -> getOptionValue("pw")
+    System.getenv("DB_PASSWORD") != null -> System.getenv("DB_PASSWORD")
+    hasOption("pwd") -> readPassword()
+    else -> null
+  }
 
 fun processFile(path: Path) {
   log.info("Importing ${path.toAbsolutePath()}")
@@ -47,11 +64,9 @@ fun CommandLine.getJdbcUrl(): String {
     return getOptionValue("jdbc")
   }
 
-  return getJdbcUrl(
+  return buildJdbcUrl(
     host = getOptionValue("h", "127.0.0.1"),
     port = getOptionValue("p", "5432"),
     database = getOptionValue("d", "holybook"),
-    user = getOptionValue("u", "server"),
-    usePassword = hasOption("pwd"),
   )
 }

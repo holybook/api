@@ -12,9 +12,13 @@ services:
     environment:
       # The server is read-only against the DB, so it connects as the
       # least-privilege `webapp` role (SELECT only), not the `server` superuser.
-      # The env-var override in application.conf takes precedence over the
-      # Google Secret Manager "secret:" lookup, so no GCP credentials are needed.
-      JDBC_URL: "jdbc:postgresql://db:5432/holybook?user=webapp&password=${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}"
+      # Credentials are passed separately (not in the URL) so the password may
+      # contain any character. The env-var overrides in application.conf take
+      # precedence over the Google Secret Manager "secret:" lookup, so no GCP
+      # credentials are needed.
+      JDBC_URL: "jdbc:postgresql://db:5432/holybook"
+      JDBC_USER: webapp
+      JDBC_PASSWORD: ${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in .env}
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -Dio.ktor.development=false"
     depends_on:
@@ -63,6 +67,10 @@ services:
     image: ${IMPORT_IMAGE:-ghcr.io/holybook/api-import:latest}
     profiles: ["tools"]
     restart: "no"
+    environment:
+      # The importer reads the `server` superuser password from DB_PASSWORD and
+      # passes it as a connection property, so it may contain any character.
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
     volumes:
       - ./data/content:/content:ro
     depends_on:

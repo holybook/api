@@ -30,23 +30,12 @@ fun resetDatabase() {
   }
 }
 
-fun getJdbcUrl(
-  host: String,
-  port: String,
-  database: String,
-  user: String,
-  usePassword: Boolean,
-): String {
-  val passwordQuery =
-    if (usePassword) {
-      "&password=${readPassword()}"
-    } else {
-      ""
-    }
-  return "jdbc:postgresql://$host:$port/$database?user=$user$passwordQuery"
+fun buildJdbcUrl(host: String, port: String, database: String): String {
+  // Credentials are supplied separately to Database.init, not in the URL.
+  return "jdbc:postgresql://$host:$port/$database"
 }
 
-private fun readPassword(): String {
+fun readPassword(): String {
   val console = System.console()
   if (console == null) {
     print("Password: ")

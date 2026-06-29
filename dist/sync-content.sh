@@ -39,12 +39,6 @@ else
   echo "$(ts) flock not available, running without an overlap lock"
 fi
 
-# Load DB_PASSWORD (and IMPORT_IMAGE) from the deploy .env.
-set -a
-# shellcheck disable=SC1091
-. "$COMPOSE_DIR/.env"
-set +a
-
 if [ ! -d "$DATA_DIR/.git" ]; then
   echo "$(ts) cloning $DATA_REPO"
   git clone --branch "$BRANCH" --single-branch "$DATA_REPO" "$DATA_DIR"
@@ -61,8 +55,11 @@ else
 fi
 
 echo "$(ts) reimporting database from content"
+# The importer reads the password from DB_PASSWORD in its environment (injected
+# by Compose from .env), so no credentials appear here or in the URL.
 docker compose run --rm importer \
-  -jdbc "jdbc:postgresql://db:5432/holybook?user=server&password=${DB_PASSWORD}" \
+  -jdbc "jdbc:postgresql://db:5432/holybook" \
+  -u server \
   -i /content
 
 echo "$(ts) import complete, commit $(git -C "$DATA_DIR" rev-parse HEAD)"
