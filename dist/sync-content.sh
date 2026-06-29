@@ -39,11 +39,15 @@ else
   echo "$(ts) flock not available, running without an overlap lock"
 fi
 
-# Load DB_PASSWORD (and IMPORT_IMAGE) from the deploy .env.
-set -a
-# shellcheck disable=SC1091
-. "$COMPOSE_DIR/.env"
-set +a
+# Read DB_PASSWORD from the deploy .env. Do NOT `source` the file: it is a
+# Compose env file, not a shell script, and the password may contain characters
+# the shell would try to interpret. Extract the literal value instead. (Compose
+# loads .env itself for IMPORT_IMAGE etc. when it runs the importer.)
+DB_PASSWORD=$(grep -E '^DB_PASSWORD=' "$COMPOSE_DIR/.env" | head -n1 | cut -d= -f2-)
+if [ -z "$DB_PASSWORD" ]; then
+  echo "$(ts) DB_PASSWORD not found in $COMPOSE_DIR/.env" >&2
+  exit 1
+fi
 
 if [ ! -d "$DATA_DIR/.git" ]; then
   echo "$(ts) cloning $DATA_REPO"
