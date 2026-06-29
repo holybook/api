@@ -1,0 +1,23 @@
+# SITE_ADDRESS is set via the environment (see compose.yaml / .env).
+# A bare domain (e.g. holybook.app) makes Caddy provision a Let's Encrypt
+# certificate automatically. Use :80 to test over plain HTTP against an IP.
+{$SITE_ADDRESS} {
+	encode gzip
+
+	# API requests go to the Ktor server.
+	handle /api/* {
+		reverse_proxy {$SERVER_UPSTREAM:web:8080}
+	}
+
+	# Everything else is the single-page app: serve the file if it exists,
+	# otherwise fall back to index.html so client-side routing works.
+	handle {
+		root * /srv
+
+		@static path *.css *.js *.json *.ico *.png *.svg *.woff *.woff2
+		header @static Cache-Control "public, max-age=31536000, immutable"
+
+		try_files {path} /index.html
+		file_server
+	}
+}

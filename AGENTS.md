@@ -111,11 +111,29 @@ The project uses JUnit for testing. Run tests for all modules:
 
 ## Deployment
 
-The project includes deployment scripts in the `scripts/` directory:
-- `deploy_appengine.sh`: Google App Engine deployment
-- `deploy_compose.sh`: Docker Compose deployment
-- `update_db.sh`: Database update script
-- `update_rds.sh`: RDS database update script
+The app is deployed to a single DigitalOcean droplet (Postgres + Ktor server +
+Caddy) via Docker Compose. GitHub Actions
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) builds and
+pushes the server and web images to GHCR on every push to `main`, then SSHes
+into the droplet to pull and restart. See [`dist/README.md`](dist/README.md) for
+droplet setup, required GitHub secrets, and data import. Deployment artifacts
+live in `dist/` (`compose.yaml`, `Caddyfile`, `server.Dockerfile`,
+`web.Dockerfile`).
+
+Secrets (`JDBC_URL`, `GEMINI_API_KEY`) are provided as environment variables in
+`dist/.env`, which the deploy workflow renders from GitHub secrets. The env-var
+overrides in `application.conf` take precedence over the legacy Google Secret
+Manager lookup, so no GCP credentials are needed on the droplet.
+
+Database content is synced from the **holybook/data** repository (book XML under
+`content/`) by `dist/sync-content.sh` (run from cron on the droplet): when
+`main` moves it reimports the whole dataset via the one-off `importer` compose
+service, so the DB mirrors the repo HEAD. The schema is (re)created by the
+importer itself, so there is no separate init SQL.
+
+The older `scripts/` helpers (`deploy_appengine.sh`, `deploy_compose.sh`,
+`update_db.sh`, `update_rds.sh`) target the previous Google Cloud / manual
+Compose setup and are superseded by the workflow above.
 
 ## Git Protocol
 
