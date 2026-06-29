@@ -10,9 +10,11 @@ services:
     image: ${SERVER_IMAGE:-ghcr.io/holybook/api-server:latest}
     restart: unless-stopped
     environment:
+      # The server is read-only against the DB, so it connects as the
+      # least-privilege `webapp` role (SELECT only), not the `server` superuser.
       # The env-var override in application.conf takes precedence over the
       # Google Secret Manager "secret:" lookup, so no GCP credentials are needed.
-      JDBC_URL: "jdbc:postgresql://db:5432/holybook?user=server&password=${DB_PASSWORD:?set DB_PASSWORD in .env}"
+      JDBC_URL: "jdbc:postgresql://db:5432/holybook?user=webapp&password=${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}"
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in .env}
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -Dio.ktor.development=false"
     depends_on:
@@ -42,8 +44,11 @@ services:
       POSTGRES_DB: holybook
       POSTGRES_USER: server
       POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      # Consumed by db-init/01-webapp-role.sh on first initialisation.
+      WEBAPP_PASSWORD: ${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U server -d holybook"]
       interval: 5s

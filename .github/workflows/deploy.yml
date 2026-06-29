@@ -79,7 +79,7 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "dist/compose.yaml,dist/sync-content.sh"
+          source: "dist/compose.yaml,dist/sync-content.sh,dist/db-init/*"
           target: holybook
           strip_components: 1
 
@@ -93,12 +93,13 @@ jobs:
           IMPORT_IMAGE: ${{ env.IMPORT_IMAGE }}:${{ github.sha }}
           SITE_ADDRESS: ${{ secrets.SITE_ADDRESS }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          WEBAPP_PASSWORD: ${{ secrets.WEBAPP_PASSWORD }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          envs: GHCR_TOKEN,GHCR_USER,SERVER_IMAGE,WEB_IMAGE,IMPORT_IMAGE,SITE_ADDRESS,DB_PASSWORD,GEMINI_API_KEY
+          envs: GHCR_TOKEN,GHCR_USER,SERVER_IMAGE,WEB_IMAGE,IMPORT_IMAGE,SITE_ADDRESS,DB_PASSWORD,WEBAPP_PASSWORD,GEMINI_API_KEY
           script: |
             set -euo pipefail
             cd ~/holybook
@@ -106,12 +107,13 @@ jobs:
             cat > .env <<EOF
             SITE_ADDRESS=${SITE_ADDRESS}
             DB_PASSWORD=${DB_PASSWORD}
+            WEBAPP_PASSWORD=${WEBAPP_PASSWORD}
             GEMINI_API_KEY=${GEMINI_API_KEY}
             SERVER_IMAGE=${SERVER_IMAGE}
             WEB_IMAGE=${WEB_IMAGE}
             IMPORT_IMAGE=${IMPORT_IMAGE}
             EOF
-            chmod +x sync-content.sh
+            chmod +x sync-content.sh db-init/*.sh
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker compose pull
             docker compose pull importer

@@ -14,6 +14,12 @@ to `main`. The workflow then SSHes into the droplet, writes `.env` from GitHub
 secrets, and runs `docker compose pull && up -d`. The droplet itself never
 builds anything.
 
+**Database roles:** the server is read-only against the database, so it connects
+as a least-privilege `webapp` role (SELECT only). All writes go through the
+importer, which connects as the `server` superuser. The `webapp` role is created
+once by [`db-init/01-webapp-role.sh`](db-init/01-webapp-role.sh), and
+`ALTER DEFAULT PRIVILEGES` keeps it readable across the importer's reimports.
+
 ## One-time droplet setup
 
 1. **Create the droplet** – the $6 (1 GB / 1 vCPU) shared-CPU droplet is enough.
@@ -59,7 +65,8 @@ Set these under **Settings → Secrets and variables → Actions**:
 | `DROPLET_USER` | SSH user (e.g. `root` or a sudo user) |
 | `DROPLET_SSH_KEY` | private key matching the droplet's authorized_keys |
 | `SITE_ADDRESS` | `holybook.app` (or `:80` to test over HTTP first) |
-| `DB_PASSWORD` | password for the Postgres `server` role |
+| `DB_PASSWORD` | password for the Postgres `server` superuser (importer) |
+| `WEBAPP_PASSWORD` | password for the read-only `webapp` role (server); use a different value |
 | `GEMINI_API_KEY` | Gemini API key for translation |
 
 `GITHUB_TOKEN` is provided automatically and is used to push/pull the images –
@@ -121,7 +128,16 @@ DATA_REPO=https://github.com/holybook/data.git ~/holybook/sync-content.sh
 > data until the swap commits.
 
 Postgres itself is not published on the host. To reach it from your machine for
-ad-hoc work, add a `ports` mapping to the `db` service or use an SSH tunnel.
+ad-hoc work, use an **SSH tunnel** rather than publishing the port:
+
+```bash
+ssh -L 5432:localhost:5432 <user>@<droplet>   # then connect to localhost:5432
+```
+
+⚠️ Do **not** add a bare `ports: ["5432:5432"]` mapping to the `db` service.
+Docker writes its own iptables rules and bypasses `ufw`, so that would expose
+Postgres to the entire internet regardless of your firewall. If you genuinely
+need a host-published port, bind it to localhost only: `["127.0.0.1:5432:5432"]`.
 
 ## Manual operations
 
