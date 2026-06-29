@@ -19,13 +19,19 @@ fun main(args: Array<String>) = EngineMain.main(args)
 fun Application.module() {
   Database.init(environment.config.getJdbcUrl())
 
+  val isDevelopment = developmentMode
+
   install(ContentNegotiation) { json() }
   install(CallLogging) {
     level = Level.INFO
     filter { call -> call.request.path().startsWith("/") }
   }
   install(CORS) {
-    allowHost("localhost:3000")
+    // The dev frontend (npm start) runs cross-origin on :3000; in production the
+    // frontend is served same-origin by Caddy, so this allowance is dev-only.
+    if (isDevelopment) {
+      allowHost("localhost:3000")
+    }
     allowHost("holybook.app", schemes = listOf("http", "https"))
     allowHeader(HttpHeaders.ContentType)
   }

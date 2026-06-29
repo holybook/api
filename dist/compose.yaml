@@ -1,0 +1,75 @@
+name: holybook
+
+# Production stack for a single DigitalOcean droplet: Postgres + Ktor server +
+# Caddy (static frontend + TLS reverse proxy). Images are built and pushed by
+# the GitHub Actions deploy workflow; this file is copied to the droplet and run
+# with a sibling .env that provides the secrets (see .env.example).
+
+services:
+  web:
+    image: ${SERVER_IMAGE:-ghcr.io/holybook/api-server:latest}
+    restart: unless-stopped
+    environment:
+      # The server is read-only against the DB, so it connects as the
+      # least-privilege `webapp` role (SELECT only), not the `server` superuser.
+      # The env-var override in application.conf takes precedence over the
+      # Google Secret Manager "secret:" lookup, so no GCP credentials are needed.
+      JDBC_URL: "jdbc:postgresql://db:5432/holybook?user=webapp&password=${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in .env}
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60 -Dio.ktor.development=false"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 512m
+
+  caddy:
+    image: ${WEB_IMAGE:-ghcr.io/holybook/api-web:latest}
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    mem_limit: 96m
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: holybook
+      POSTGRES_USER: server
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      # Consumed by db-init/01-webapp-role.sh on first initialisation.
+      WEBAPP_PASSWORD: ${WEBAPP_PASSWORD:?set WEBAPP_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U server -d holybook"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    mem_limit: 256m
+
+  # One-off content importer. Not started by `up` (it lives in the "tools"
+  # profile); invoked on demand by sync-content.sh via `docker compose run`.
+  # The content/ subfolder of the holybook/data clone is mounted read-only.
+  importer:
+    image: ${IMPORT_IMAGE:-ghcr.io/holybook/api-import:latest}
+    profiles: ["tools"]
+    restart: "no"
+    volumes:
+      - ./data/content:/content:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:
