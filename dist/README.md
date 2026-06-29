@@ -73,6 +73,19 @@ Set these under **Settings → Secrets and variables → Actions**:
 no PAT needed as long as the droplet logs in with it at deploy time (the
 workflow does this).
 
+> **Two separate database passwords.** `DB_PASSWORD` is the `server` superuser
+> (used by the importer); `WEBAPP_PASSWORD` is the read-only `webapp` role the
+> server connects as. Generate **two different** strong values, e.g.:
+>
+> ```bash
+> openssl rand -base64 24   # run twice, once per secret
+> ```
+>
+> ⚠️ Both are written into the Postgres data volume the **first** time the `db`
+> container initialises. Changing either secret afterwards does **not** update
+> the database — you'd have to `ALTER ... PASSWORD` inside Postgres (or recreate
+> the volume). So set them before the first deploy and leave them be.
+
 ## Loading data
 
 Content lives in the **holybook/data** repository, with book XML files under
