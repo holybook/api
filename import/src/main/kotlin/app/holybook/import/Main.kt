@@ -23,6 +23,7 @@ fun main(args: Array<String>): Unit = runBlocking {
   options.addOption("pw", "password-value", true, "Database password")
   options.addOption("pwd", "password", false, "Prompt for the database password")
   options.addOption("i", "input", true, "Input directory")
+  options.addOption("c", "commit", true, "Content commit to record as applied after import")
 
   val parser = DefaultParser()
   val cmd = parser.parse(options, args)
@@ -30,8 +31,14 @@ fun main(args: Array<String>): Unit = runBlocking {
   Database.init(cmd.getJdbcUrl(), cmd.getDbUser(), cmd.getDbPassword())
   resetDatabase()
   createDatabase()
+  createSyncStateTable()
 
   cmd.getInputDirectory().listFilesRecursive().forEach { processFile(it) }
+
+  // Only mark the commit as applied once the whole import has completed, so a
+  // failure partway through leaves the recorded commit unchanged and the next
+  // sync run retries.
+  cmd.getOptionValue("c")?.let { recordAppliedCommit(it) }
 }
 
 fun CommandLine.getDbUser(): String = getOptionValue("u", "server")

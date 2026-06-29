@@ -95,14 +95,18 @@ repo by [`sync-content.sh`](sync-content.sh), which is deployed to
 `~/holybook/sync-content.sh`:
 
 1. It clones/pulls `holybook/data` into `~/holybook/data`.
-2. If `main` moved since the last run, it reimports the whole dataset from
+2. It compares the repo HEAD against the commit actually imported into the
+   database — the importer records this in a small `sync_state` table **after** a
+   successful import. If they differ, it reimports the whole dataset from
    `data/content/` via the `importer` container (`docker compose run --rm
    importer`). The importer drops and recreates the schema, so the database ends
    up an exact mirror of the repo HEAD — added books appear, changed books are
-   replaced, removed books vanish. The local clone's HEAD is the record of which
-   commit is in the DB.
+   replaced, removed books vanish.
 
-It is a no-op when there are no new commits, so it is safe to run often.
+Because the marker is the *imported* commit (not the local clone's HEAD), a run
+that fetched but failed to import is not mistaken for "in sync" — the import is
+retried on the next run. It is a no-op when there are no new commits, so it is
+safe to run often.
 
 ### Run it manually
 
