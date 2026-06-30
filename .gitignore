@@ -11,6 +11,9 @@ raw
 dist/build
 dist/raw
 dist/client
+dist/data
+dist/.env
+dist/.sync-content.lock
 jte-classes
 
 webclient/node_modules

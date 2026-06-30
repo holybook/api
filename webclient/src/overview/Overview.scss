@@ -36,27 +36,93 @@
     font-size: 1.02rem;
   }
 
-  /* Author groups ------------------------------------------------------- */
-  .author-books {
-    margin-bottom: 36px;
+  /* Filter ------------------------------------------------------------- */
+  .library-filter {
+    position: relative;
+    margin-bottom: 32px;
+  }
 
-    h1 {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 12px;
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 1.3rem;
-      color: var(--color-primary);
+  .library-filter__icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
 
-      &::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--color-border);
-      }
+  .library-filter__input {
+    width: 100%;
+    padding: 13px 16px 13px 44px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--color-ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(156, 85, 102, 0.15);
     }
+  }
+
+  /* Author groups (collapsible tree) ----------------------------------- */
+  .author-books {
+    margin-bottom: 20px;
+  }
+
+  .author-books__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--color-primary);
+    text-align: left;
+  }
+
+  .author-books__caret {
+    flex: 0 0 auto;
+    width: 0.9em;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    transition: color 0.15s ease;
+  }
+
+  .author-books__header:hover .author-books__caret {
+    color: var(--color-primary);
+  }
+
+  .author-books__name {
+    flex: 1 1 auto;
+  }
+
+  .author-books__count {
+    flex: 0 0 auto;
+    min-width: 1.6em;
+    padding: 2px 9px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-alt);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-ink-soft);
+  }
+
+  .author-books__list {
+    padding-left: 4px;
   }
 
   /* Book rows ----------------------------------------------------------- */

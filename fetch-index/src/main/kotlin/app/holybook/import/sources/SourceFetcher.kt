@@ -19,6 +19,20 @@ import org.slf4j.LoggerFactory
 
 object SourceFetcher {
 
+  /**
+   * Maps each bahai.org author index path segment to our internal author code. The Universal House
+   * of Justice is intentionally excluded here: its works are messages enumerated separately (see
+   * [ReferenceLibrary.uhjList]) rather than a flat list of works.
+   */
+  private val referenceLibraryAuthors =
+    mapOf(
+      "the-bab" to "bab",
+      "bahaullah" to "bahaullah",
+      "abdul-baha" to "abdulbaha",
+      "shoghi-effendi" to "shoghieffendi",
+      "compilations" to "compilation",
+    )
+
   private val fetchers =
     listOf(
       SourceDescriptor(
@@ -33,7 +47,14 @@ object SourceFetcher {
         "en.uhj.txt",
         ReferenceLibrary.uhjList,
       ),
-    )
+    ) +
+      referenceLibraryAuthors.map { (urlAuthor, authorCode) ->
+        SourceDescriptor(
+          Url("https://www.bahai.org/library/authoritative-texts/$urlAuthor/"),
+          "en.$authorCode.txt",
+          ReferenceLibrary.workList(urlAuthor, authorCode),
+        )
+      }
   private val log = LoggerFactory.getLogger("fetch-sources")
 
   suspend fun fetchSources(outputDirectory: Path) {

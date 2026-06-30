@@ -2,6 +2,120 @@
   background: var(--color-bg);
 }
 
+/* Body layout: optional table-of-contents rail beside the reading column ---- */
+.reader-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Section headings ---------------------------------------------------------- */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55em;
+  max-width: 720px;
+  margin: 0;
+  padding: 1.6rem 0 0.9rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-ink);
+  text-wrap: balance;
+  scroll-margin-top: 24px;
+
+  .section-title__number {
+    flex: 0 0 auto;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--color-primary);
+    opacity: 0.85;
+  }
+}
+
+.section-title--l1 { font-size: 1.7rem; }
+.section-title--l2 { font-size: 1.4rem; padding-left: 0.6rem; }
+.section-title--l3 { font-size: 1.18rem; padding-left: 1.2rem; }
+.section-title--l4 { font-size: 1.05rem; padding-left: 1.8rem; color: var(--color-ink-soft); }
+
+/* Table of contents --------------------------------------------------------- */
+.toc {
+  flex: 0 0 auto;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  &.toc--open {
+    width: 300px;
+  }
+
+  &.toc--closed {
+    width: auto;
+  }
+}
+
+.toc__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.toc__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px 16px;
+}
+
+.toc__entry {
+  display: flex;
+  gap: 0.5em;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--color-ink-soft);
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-surface-alt);
+    color: var(--color-ink);
+  }
+
+  .toc__number {
+    flex: 0 0 auto;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  &.toc__entry--l2 { padding-left: 22px; }
+  &.toc__entry--l3 { padding-left: 34px; font-size: 0.86rem; }
+  &.toc__entry--l4 { padding-left: 46px; font-size: 0.82rem; }
+}
+
+@media (max-width: 720px) {
+  .toc.toc--open {
+    width: 220px;
+  }
+}
+
 #content-container {
   /* Give the long-form reading column a calm paper surface */
   background: var(--color-bg);
