@@ -11,8 +11,9 @@ raw
 dist/build
 dist/raw
 dist/client
-dist/data
 dist/.env
+dist/data
+dist/content
 dist/.sync-content.lock
 jte-classes
 

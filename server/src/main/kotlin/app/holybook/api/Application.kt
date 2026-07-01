@@ -1,5 +1,7 @@
 package app.holybook.api
 
+import app.holybook.api.config.ApplicationConfigExt.getDbPassword
+import app.holybook.api.config.ApplicationConfigExt.getDbUser
 import app.holybook.api.config.ApplicationConfigExt.getJdbcUrl
 import app.holybook.api.plugins.configureRouting
 import app.holybook.lib.db.Database
@@ -17,7 +19,13 @@ import org.slf4j.event.*
 fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
-  Database.init(environment.config.getJdbcUrl())
+  Database.init(
+    environment.config.getJdbcUrl(),
+    environment.config.getDbUser(),
+    environment.config.getDbPassword(),
+  )
+
+  val isDevelopment = developmentMode
 
   install(ContentNegotiation) { json() }
   install(CallLogging) {
@@ -25,7 +33,11 @@ fun Application.module() {
     filter { call -> call.request.path().startsWith("/") }
   }
   install(CORS) {
-    allowHost("localhost:3000")
+    // The dev frontend (npm start) runs cross-origin on :3000; in production the
+    // frontend is served same-origin by Caddy, so this allowance is dev-only.
+    if (isDevelopment) {
+      allowHost("localhost:3000")
+    }
     allowHost("holybook.app", schemes = listOf("http", "https"))
     allowHeader(HttpHeaders.ContentType)
   }

@@ -20,6 +20,14 @@ object ApplicationConfigExt {
     return getPropertyFromSecret("storage.jdbcUrl")
   }
 
+  fun ApplicationConfig.getDbUser(): String {
+    return getPropertyFromSecret("storage.user")
+  }
+
+  fun ApplicationConfig.getDbPassword(): String {
+    return getPropertyFromSecret("storage.password")
+  }
+
   fun ApplicationConfig.getGeminiApiKey(): String {
     return getPropertyFromSecret("ai.geminiApiKey")
   }

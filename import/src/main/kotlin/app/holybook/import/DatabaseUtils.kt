@@ -38,23 +38,43 @@ fun resetDatabase() {
   }
 }
 
-fun getJdbcUrl(
-  host: String,
-  port: String,
-  database: String,
-  user: String,
-  usePassword: Boolean,
-): String {
-  val passwordQuery =
-    if (usePassword) {
-      "&password=${readPassword()}"
-    } else {
-      ""
-    }
-  return "jdbc:postgresql://$host:$port/$database?user=$user$passwordQuery"
+/**
+ * Tracks which content commit is currently imported. Lives outside the content
+ * tables (it is not dropped by [resetDatabase]) so the sync job can compare the
+ * repository HEAD against what was actually imported, and is only advanced after
+ * a successful import — making the sync self-healing if an import fails midway.
+ */
+fun createSyncStateTable() {
+  transaction {
+    createStatement()
+      .executeUpdate(
+        "CREATE TABLE IF NOT EXISTS sync_state (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
+      )
+  }
 }
 
-private fun readPassword(): String {
+fun recordAppliedCommit(commit: String) {
+  log.info("Recording applied commit $commit")
+  transaction {
+    val statement =
+      prepareStatement(
+        """
+        INSERT INTO sync_state(key, value) VALUES ('applied_commit', ?)
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+        """
+          .trimIndent()
+      )
+    statement.setString(1, commit)
+    statement.executeUpdate()
+  }
+}
+
+fun buildJdbcUrl(host: String, port: String, database: String): String {
+  // Credentials are supplied separately to Database.init, not in the URL.
+  return "jdbc:postgresql://$host:$port/$database"
+}
+
+fun readPassword(): String {
   val console = System.console()
   if (console == null) {
     print("Password: ")

@@ -1,0 +1,12 @@
+.git
+.idea
+.kotlin
+.gradle
+**/.gradle
+**/build
+**/node_modules
+dist/raw
+dist/client
+dist/build
+*.log
+.DS_Store
