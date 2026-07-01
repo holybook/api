@@ -10,7 +10,7 @@ fun Connection.createTranslationsTable() {
     .executeUpdate(
       """
     CREATE TABLE IF NOT EXISTS translations (
-        book VARCHAR(32) NOT NULL,
+        book VARCHAR(128) NOT NULL,
         language VARCHAR(3) NOT NULL,
         title VARCHAR(512) NOT NULL,
     

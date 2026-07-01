@@ -14,11 +14,12 @@ fun Connection.createParagraphsTable() {
     .executeUpdate(
       """
     CREATE TABLE IF NOT EXISTS paragraphs (
-        book VARCHAR(32) NOT NULL,
+        book VARCHAR(128) NOT NULL,
         language VARCHAR(3) NOT NULL,
         search_configuration REGCONFIG NOT NULL,
         index INT NOT NULL,
         number INT NULL,
+        section_path VARCHAR(64) NOT NULL DEFAULT '',
         type VARCHAR(64) NOT NULL,
         text TEXT NOT NULL,
         text_tokens tsvector
@@ -51,9 +52,9 @@ fun getParagraphs(bookId: String, language: String, startIndex: Int?, endIndex: 
     val getParagraphs =
       prepareStatement(
         """
-      SELECT index, number, type, text FROM paragraphs 
-      WHERE book = ? AND language = ? $startClause $endClause 
-      ORDER BY index 
+      SELECT index, number, section_path, type, text FROM paragraphs
+      WHERE book = ? AND language = ? $startClause $endClause
+      ORDER BY index
     """
           .trimIndent()
       )
@@ -74,7 +75,7 @@ fun searchParagraphs(language: String, query: String) = transaction {
   val getParagraphs =
     prepareStatement(
       """
-      SELECT paragraphs.book, author, title, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+      SELECT paragraphs.book, author, title, index, number, section_path, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted
       FROM paragraphs
       INNER JOIN books on paragraphs.book = books.id
       INNER JOIN translations on books.id = translations.book and translations.language = ?
@@ -105,7 +106,7 @@ fun translate(request: TranslateRequest) = transaction {
   val getParagraphs =
     prepareStatement(
       """
-    SELECT paragraphs.book, author, title, index, number, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted 
+    SELECT paragraphs.book, author, title, index, number, section_path, type, text, ts_headline(?::REGCONFIG, text, websearch_to_tsquery(?::REGCONFIG, ?)) as highlighted
     FROM paragraphs
     INNER JOIN books on books.id = paragraphs.book
     INNER JOIN translations on books.id = translations.book and translations.language = ?
@@ -133,7 +134,7 @@ fun translate(request: TranslateRequest) = transaction {
   val getTranslatedParagraph =
     prepareStatement(
       """
-    SELECT index, number, type, text FROM paragraphs
+    SELECT index, number, section_path, type, text FROM paragraphs
     WHERE book = ? AND index = ? AND language = ?
   """
         .trimIndent()
@@ -157,6 +158,7 @@ private fun ResultSet.currentParagraph(): Paragraph {
     getString("text"),
     ParagraphType.fromValue(getString("type"))!!,
     if (number > 0) number else null,
+    getString("section_path") ?: "",
   )
 }
 
@@ -164,8 +166,8 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
   val insertParagraph =
     prepareStatement(
       """
-        INSERT INTO paragraphs(book, language, search_configuration, index, number, type, text)
-        VALUES (?, ?, ?::REGCONFIG, ?, ?, ?, ?)
+        INSERT INTO paragraphs(book, language, search_configuration, index, number, section_path, type, text)
+        VALUES (?, ?, ?::REGCONFIG, ?, ?, ?, ?, ?)
     """
         .trimIndent()
     )
@@ -179,11 +181,12 @@ fun Connection.insertParagraphs(bookId: String, language: String, paragraphs: Li
     } else {
       insertParagraph.setNull(5, Types.INTEGER)
     }
-    insertParagraph.setString(6, paragraph.type.value)
-    insertParagraph.setString(7, paragraph.text)
+    insertParagraph.setString(6, paragraph.sectionPath)
+    insertParagraph.setString(7, paragraph.type.value)
+    insertParagraph.setString(8, paragraph.text)
     insertParagraph.addBatch()
-    insertParagraph.executeBatch()
   }
+  insertParagraph.executeBatch()
 }
 
 @Serializable
@@ -201,6 +204,12 @@ data class Paragraph(
   val text: String,
   @Serializable(with = ParagraphTypeSerializer::class) val type: ParagraphType,
   val number: Int?,
+  /**
+   * Dotted path of the section this paragraph belongs to (e.g. `"1"`, `"1.1"`). Empty for
+   * top-level paragraphs in flat books. Combined with [number] this yields the displayed label,
+   * e.g. `1.1:5`.
+   */
+  val sectionPath: String = "",
 )
 
 @Serializable
@@ -214,6 +223,7 @@ data class SearchResult(
 
 enum class ParagraphType(val value: String) {
   BODY("body"),
+  SECTION_TITLE("section-title"),
   HEADER("header"),
   TITLE("title"),
   LETTER_HEAD("letter-head"),
@@ -231,28 +241,78 @@ enum class ParagraphType(val value: String) {
   }
 }
 
+/**
+ * Builds a flat, indexed list of [Paragraph]s while tracking an arbitrarily deep section hierarchy.
+ *
+ * Sections are numbered per parent (`1`, `2`, then `1.1`, `1.2`, ...). Body paragraph numbers
+ * restart at `1` within each section, so the rendered label is `sectionPath:number`
+ * (e.g. `1.1:5`). Top-level paragraphs have an empty section path and a plain running number.
+ */
 class ParagraphListBuilder {
+  private class Frame(val path: String) {
+    var childCount = 0
+    var bodyCounter = 0
+  }
+
   private val paragraphs = mutableListOf<Paragraph>()
-  private var nextNumber = 1
+  private val stack = ArrayDeque(listOf(Frame("")))
+  // Source heading level of each open section, parallel to [stack] (excluding the root frame). Used
+  // by [heading] to translate a stream of leveled headings (e.g. <h2>/<h3>) into proper nesting.
+  private val headingLevels = ArrayDeque<Int>()
+
+  private val current
+    get() = stack.last()
+
+  /** Opens a new (sub)section, emitting a [ParagraphType.SECTION_TITLE] paragraph for its title. */
+  fun enterSection(title: String) {
+    val parent = current
+    parent.childCount++
+    val path =
+      if (parent.path.isEmpty()) "${parent.childCount}" else "${parent.path}.${parent.childCount}"
+    stack.addLast(Frame(path))
+    paragraphs.add(Paragraph(paragraphs.size, title, ParagraphType.SECTION_TITLE, null, path))
+  }
+
+  /** Closes the current section, returning to its parent. */
+  fun exitSection() {
+    check(stack.size > 1) { "exitSection called without a matching enterSection" }
+    stack.removeLast()
+  }
+
+  /** Runs [body] inside a freshly opened section, closing it afterwards. */
+  inline fun section(title: String, body: ParagraphListBuilder.() -> Unit) {
+    enterSection(title)
+    body()
+    exitSection()
+  }
+
+  /**
+   * Opens a section for a heading at the given source [level] (e.g. `2` for `<h2>`), closing any
+   * open sections at the same or deeper level first so that the resulting nesting mirrors the
+   * heading hierarchy. Do not mix with manual [enterSection]/[exitSection] in the same build.
+   */
+  fun heading(level: Int, title: String) {
+    while (headingLevels.isNotEmpty() && headingLevels.last() >= level) {
+      exitSection()
+      headingLevels.removeLast()
+    }
+    enterSection(title)
+    headingLevels.addLast(level)
+  }
 
   fun addParagraph(text: String, type: ParagraphType = ParagraphType.BODY) {
-    paragraphs.add(Paragraph(paragraphs.size, text, type, getNumber(type)))
+    val number = if (type == ParagraphType.BODY) ++current.bodyCounter else null
+    paragraphs.add(Paragraph(paragraphs.size, text, type, number, current.path))
   }
 
   fun build(): List<Paragraph> = paragraphs
-
-  private fun getNumber(type: ParagraphType) =
-    if (type == ParagraphType.BODY) {
-      nextNumber++
-    } else {
-      null
-    }
 }
+
+fun buildParagraphs(body: ParagraphListBuilder.() -> Unit): List<Paragraph> =
+  ParagraphListBuilder().apply(body).build()
 
 class ParagraphElement(val text: String, val type: ParagraphType = ParagraphType.BODY)
 
-fun Iterable<ParagraphElement>.withIndices(): List<Paragraph> {
-  val builder = ParagraphListBuilder()
-  forEach { builder.addParagraph(it.text, it.type) }
-  return builder.build()
+fun Iterable<ParagraphElement>.withIndices(): List<Paragraph> = buildParagraphs {
+  this@withIndices.forEach { addParagraph(it.text, it.type) }
 }

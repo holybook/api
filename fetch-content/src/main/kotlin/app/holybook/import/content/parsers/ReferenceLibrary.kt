@@ -2,9 +2,8 @@ package app.holybook.import.content.parsers
 
 import app.holybook.import.common.CONTENT_TYPES_XML
 import app.holybook.import.common.ContentMatcher
-import app.holybook.lib.models.ParagraphElement
 import app.holybook.lib.models.ParagraphType
-import app.holybook.lib.models.withIndices
+import app.holybook.lib.models.buildParagraphs
 import app.holybook.lib.parsers.ContentParsingRule
 import app.holybook.lib.parsers.parse
 import org.jsoup.nodes.Document
@@ -15,11 +14,28 @@ object ReferenceLibrary {
     ContentParsingRule(ContentMatcher(CONTENT_TYPES_XML, "bahai.org")) { it.parse { parse() } }
 
   private fun Document.parse(): ParsedBook {
-    val paragraphs =
-      select("div.b p")
-        .map { ParagraphElement(it.text(), getParagraphType(it.className())) }
-        .withIndices()
-    return ParsedBook(title = select("head title").text(), paragraphs = paragraphs)
+    val body = selectFirst("div.b")
+    // Real heading tags (<h2>..<h6>) carry the section nesting of structured works; <h1> is the
+    // work title and is dropped (it is captured as metadata). A HEADER-class paragraph (used by
+    // some letters) is treated as the deepest heading. Works without any of these stay flat.
+    val paragraphs = buildParagraphs {
+      body?.select("h1, h2, h3, h4, h5, h6, p")?.forEach { element ->
+        // Skip table-of-contents entries, which the source renders inside <li>.
+        if (element.parents().any { it.tagName() == "li" }) return@forEach
+        val text = element.text().trim()
+        if (text.isEmpty()) return@forEach
+        val tag = element.tagName().lowercase()
+        when {
+          tag == "h1" -> {}
+          tag.length == 2 && tag[0] == 'h' -> heading(tag[1].digitToInt(), text)
+          else -> {
+            val type = getParagraphType(element.className())
+            if (type == ParagraphType.HEADER) heading(7, text) else addParagraph(text, type)
+          }
+        }
+      }
+    }
+    return ParsedBook(title = selectFirst("head title")?.text() ?: "", paragraphs = paragraphs)
   }
 }
 

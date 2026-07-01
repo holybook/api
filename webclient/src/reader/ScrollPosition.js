@@ -4,6 +4,14 @@ export function setTopPosition(index, position) {
     topPositions[index] = position;
 }
 
+export function scrollToIndex(index) {
+    const top = topPositions[index];
+    if (top === undefined) {
+        return;
+    }
+    document.getElementById('content-container').scrollTo({top, behavior: 'smooth'});
+}
+
 export function getScrollPosition() {
     console.log('getScrollPosition: ', topPositions);
     const contentElement = document.getElementById('content-container');

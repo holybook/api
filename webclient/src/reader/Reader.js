@@ -1,5 +1,6 @@
 import {useLoaderData, useSearchParams} from "react-router-dom";
 import {Paragraphs} from "./Paragraphs";
+import {TableOfContents} from "./TableOfContents";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -29,21 +30,24 @@ export function Reader() {
             book={book}
             activeLanguage={language}
             supportedLanguages={supportedLanguages}/>
-        <div id="content-container">
-          <div id="content">
-            {translation &&
-              <header className="reader-head">
-                {translation.author &&
-                  <p className="reader-head__author">{translation.author}</p>}
-                <h1 className="reader-head__title">{translation.title}</h1>
-                <div className="reader-head__rule" aria-hidden="true">
-                  <span/>
-                </div>
-              </header>}
-            <Paragraphs
-                paragraphs={paragraphs}
-                scrollPosition={position}
-                language={language}/>
+        <div className="reader-body">
+          <TableOfContents paragraphs={paragraphs}/>
+          <div id="content-container">
+            <div id="content">
+              {translation &&
+                <header className="reader-head">
+                  {translation.author &&
+                    <p className="reader-head__author">{translation.author}</p>}
+                  <h1 className="reader-head__title">{translation.title}</h1>
+                  <div className="reader-head__rule" aria-hidden="true">
+                    <span/>
+                  </div>
+                </header>}
+              <Paragraphs
+                  paragraphs={paragraphs}
+                  scrollPosition={position}
+                  language={language}/>
+            </div>
           </div>
         </div>
       </div>

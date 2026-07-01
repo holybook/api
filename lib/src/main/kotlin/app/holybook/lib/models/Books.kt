@@ -12,7 +12,7 @@ fun Connection.createBooksTable() {
     .executeUpdate(
       """
     CREATE TABLE IF NOT EXISTS books (
-        id VARCHAR(32) NOT NULL,
+        id VARCHAR(128) NOT NULL,
         author VARCHAR(32) NOT NULL,
         published_at DATE NULL,
 

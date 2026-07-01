@@ -11,6 +11,21 @@ export function Paragraphs({paragraphs, scrollPosition, language}) {
   )
 }
 
+/** Depth of a section path: "" -> 0, "1" -> 1, "1.1" -> 2, ... */
+function sectionDepth(sectionPath) {
+  return sectionPath ? sectionPath.split('.').length : 0;
+}
+
+/** The label shown next to a body paragraph, e.g. "1.1:5" or, for flat books, "5". */
+function numberLabel(paragraph) {
+  if (paragraph.number == null) {
+    return null;
+  }
+  return paragraph.sectionPath
+    ? `${paragraph.sectionPath}:${paragraph.number}`
+    : `${paragraph.number}`;
+}
+
 function Paragraph({paragraph, scrollPosition, language}) {
 
   const ref = useRef(null);
@@ -25,7 +40,20 @@ function Paragraph({paragraph, scrollPosition, language}) {
     }
   });
 
+  if (paragraph.type === 'section-title') {
+    const level = Math.min(Math.max(sectionDepth(paragraph.sectionPath), 1), 4);
+    return (
+      <div ref={ref} lang={language}
+           className={`section-title section-title--l${level}`}>
+        {paragraph.sectionPath &&
+          <span className="section-title__number">{paragraph.sectionPath}</span>}
+        <span className="section-title__text">{paragraph.text}</span>
+      </div>
+    );
+  }
+
+  const label = numberLabel(paragraph);
   return (<p ref={ref} lang={language} className={`par ${paragraph.type}`}>
-    {paragraph.number && <span className="par-number">{paragraph.number}</span>} {paragraph.text}
+    {label && <span className="par-number">{label}</span>} {paragraph.text}
   </p>);
 }
